@@ -19,24 +19,29 @@
 
 import { firestore } from './index'
 
+export async function isDataCompleted(email) {
+  const data = (await queryUser(email)) || {}
+  return typeof data.displayName === 'string'
+}
+
 export async function queryUser(email) {
-  const doc = await firestore.doc(`users/${email}`).get()
-  if (doc.exists) {
-    return {
-      email, ...doc.data()
+  try {
+    const doc = await firestore.doc(`users/${email}`).get()
+    if (doc.exists) {
+      return {
+        email, ...doc.data()
+      }
     }
-  }
+  } catch (ignored) { }
 }
 
 export async function createUser(user, data) {
-  const userRef = firestore.doc(`users/${user.email}`)
-  const snapshot = await userRef.get()
-
-  if (!snapshot.exists) {
-    await userRef.set(data || {})
+  const userExists = !!(await queryUser(user.email))
+  if (!userExists) {
+    await firestore.doc(`users/${user.email}`).set(data || {})
   }
 
-  return queryUser(user.uid)
+  return await queryUser(user.email)
 }
 
 export async function updateUserData(email, data) {

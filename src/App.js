@@ -24,19 +24,37 @@ import { UserContext, UserProvider } from './providers/UserProvider';
 import LogInScreen from './components/screen/auth/LogInScreen';
 import { auth } from './services/firebase';
 
+import 'primereact/resources/primereact.css'
+import 'primereact/resources/themes/luna-pink/theme.css'
+import 'primeflex/primeflex.css'
+import 'primeicons/primeicons.css'
+import { isDataCompleted } from './services/firebase/userManager';
+import CompleteDataScreen from './components/screen/auth/CompleteDataScreen';
+
 function App() {
   const user = React.useContext(UserContext)
+  const userEmail = user?.email
+  const [showProfileCompletePopup, setShowProfileCompletePopup] = React.useState(false)
+
+  React.useEffect(() => {
+    (async () => {
+      setShowProfileCompletePopup(userEmail && !(await isDataCompleted(userEmail)))
+    })()
+  }, [userEmail])
 
   function renderLoggedIn() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <span onClick={() => auth.signOut()}>
+      <>
+        <CompleteDataScreen visible={showProfileCompletePopup}/>
+        <div className="App">
+          <header className="App-header">
+            <img src={logo} className="App-logo" alt="logo" />
+            <span onClick={() => auth.signOut()}>
             Logout
           </span>
-        </header>
-      </div>
+          </header>
+        </div>
+      </>
     );
   }
 
