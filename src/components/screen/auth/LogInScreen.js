@@ -17,36 +17,13 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import { UserContext, UserProvider } from './providers/UserProvider';
-import LogInScreen from './components/screen/auth/LogInScreen';
-import { auth } from './services/firebase';
+import React from 'react'
 
-function App() {
-  const user = React.useContext(UserContext)
+import { auth, googleAuthProvider } from '../../../services/firebase'
 
-  function renderLoggedIn() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <span onClick={() => auth.signOut()}>
-            Logout
-          </span>
-        </header>
-      </div>
-    );
-  }
+export default function LogInScreen() {
 
-  return user ? renderLoggedIn() : <LogInScreen/>
-}
-
-export default function() {
   return (
-    <UserProvider>
-      <App/>
-    </UserProvider>
+    <span onClick={() => auth.signInWithRedirect(googleAuthProvider)}>Login with Google</span>
   )
-};
+}

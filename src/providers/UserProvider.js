@@ -18,35 +18,20 @@
  */
 
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import { UserContext, UserProvider } from './providers/UserProvider';
-import LogInScreen from './components/screen/auth/LogInScreen';
-import { auth } from './services/firebase';
 
-function App() {
-  const user = React.useContext(UserContext)
+import { auth } from '../services/firebase';
 
-  function renderLoggedIn() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <span onClick={() => auth.signOut()}>
-            Logout
-          </span>
-        </header>
-      </div>
-    );
-  }
+export const UserContext = React.createContext({ user: null })
 
-  return user ? renderLoggedIn() : <LogInScreen/>
+export function UserProvider({ children }) {
+  const [user, setUser] = React.useState()
+
+  React.useEffect(() => void auth.onAuthStateChanged(setUser), [])
+
+  return (
+    <UserContext.Provider value={user}>
+      { children }
+    </UserContext.Provider>
+  );
 }
 
-export default function() {
-  return (
-    <UserProvider>
-      <App/>
-    </UserProvider>
-  )
-};
