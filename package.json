@@ -1,7 +1,9 @@
 {
   "name": "wmd-webapp",
   "version": "0.1.0",
-  "private": true,
+  "license": "LGPL-3.0-or-later",
+  "repository": "https://github.com/NathanPB/wmd-webapp.git",
+  "author": "Nathan P. Bombana<nathan.pbombana@gmail.com>(https://github.com/NathanPB/)",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
