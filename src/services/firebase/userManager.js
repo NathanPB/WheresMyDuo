@@ -19,17 +19,17 @@
 
 import { firestore } from './index'
 
-export async function queryUser(uid) {
-  const doc = await firestore.doc(`users/${uid}`).get()
+export async function queryUser(email) {
+  const doc = await firestore.doc(`users/${email}`).get()
   if (doc.exists) {
     return {
-      uid, ...doc.data()
+      email, ...doc.data()
     }
   }
 }
 
 export async function createUser(user, data) {
-  const userRef = firestore.doc(`users/${user.uid}`)
+  const userRef = firestore.doc(`users/${user.email}`)
   const snapshot = await userRef.get()
 
   if (!snapshot.exists) {
@@ -39,6 +39,6 @@ export async function createUser(user, data) {
   return queryUser(user.uid)
 }
 
-export async function updateUserData(uid, data) {
-  return await firestore.doc(`users/${uid}`).update(data)
+export async function updateUserData(email, data) {
+  return await firestore.doc(`users/${email}`).update(data)
 }
