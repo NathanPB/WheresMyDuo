@@ -17,7 +17,29 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-fun main() {
-    println("Hello Kotlin")
+package dev.nathanpb.wmd.server
+
+import dev.nathanpb.wmd.server.routes.gamingProfileRoutes
+import io.ktor.routing.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
+
+private fun getPort(): Int {
+    return try {
+        System.getenv("PORT").toInt()
+    } catch (e: Exception) {
+        8080
+    }
 }
 
+fun startServer() {
+    val port = getPort()
+    println("Starting server at port $port")
+    embeddedServer(Netty, getPort()) {
+        routing {
+            route("/gamingProfile") {
+                gamingProfileRoutes()
+            }
+        }
+    }
+}
