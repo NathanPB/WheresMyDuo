@@ -46,29 +46,29 @@ import io.github.nathanpb.bb.BootManager
  */
 
 fun initFirebaseAdmin() {
-  FirebaseOptions.builder()
-    .setCredentials(GoogleCredentials.getApplicationDefault())
-    .setDatabaseUrl(System.getenv("FIREBASE_DB_URL") ?: "https://wheresmyduo.firebaseio.com")
-    .build()
-    .run(FirebaseApp::initializeApp)
+    FirebaseOptions.builder()
+        .setCredentials(GoogleCredentials.getApplicationDefault())
+        .setDatabaseUrl(System.getenv("FIREBASE_DB_URL") ?: "https://wheresmyduo.firebaseio.com")
+        .build()
+        .run(FirebaseApp::initializeApp)
 }
 
 fun main() {
-  BootManager().apply {
-    phase {
-      subphase("Connecting to external services") {
-        subphase("Initializing Firebase Admin") {
-          execute {
-            initFirebaseAdmin()
-          }
+    BootManager().apply {
+        phase {
+            subphase("Connecting to external services") {
+                subphase("Initializing Firebase Admin") {
+                    execute {
+                        initFirebaseAdmin()
+                    }
+                }
+            }
+            subphase("Starting HTTP api") {
+                execute {
+                    startServer()
+                }
+            }
         }
-      }
-      subphase("Starting HTTP api") {
-        execute {
-          startServer()
-        }
-      }
-    }
-  }.startup()
+    }.startup()
 }
 
