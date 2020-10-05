@@ -22,9 +22,13 @@ package dev.nathanpb.wmd
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
-import com.google.firebase.auth.FirebaseAuth
+import com.mongodb.reactivestreams.client.MongoClient
+import com.mongodb.reactivestreams.client.MongoDatabase
 import dev.nathanpb.wmd.server.startServer
 import io.github.nathanpb.bb.BootManager
+import kotlinx.coroutines.runBlocking
+import org.litote.kmongo.coroutine.coroutine
+import org.litote.kmongo.reactivestreams.KMongo
 
 /*
  * Copyright (c) 2020 - Nathan P. Bombana
@@ -45,6 +49,9 @@ import io.github.nathanpb.bb.BootManager
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+lateinit var mongoClient: MongoClient
+lateinit var mongoDb: MongoDatabase
+
 fun initFirebaseAdmin() {
     FirebaseOptions.builder()
         .setCredentials(GoogleCredentials.getApplicationDefault())
@@ -61,6 +68,10 @@ fun main() {
                     execute {
                         initFirebaseAdmin()
                     }
+                }
+                subphase("Connecting to MongoDB") {
+                    mongoClient = KMongo.createClient(System.getenv("MONGO_CONN_STRING") ?: "mongodb://localhost")
+                    mongoDb = mongoClient.getDatabase(System.getenv("MONGO_DB_NAME") ?: "wmd")
                 }
             }
             subphase("Starting HTTP api") {

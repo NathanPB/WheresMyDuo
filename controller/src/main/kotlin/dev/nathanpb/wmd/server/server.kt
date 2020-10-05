@@ -41,5 +41,5 @@ fun startServer() {
                 gamingProfileRoutes()
             }
         }
-    }
+    }.start()
 }
