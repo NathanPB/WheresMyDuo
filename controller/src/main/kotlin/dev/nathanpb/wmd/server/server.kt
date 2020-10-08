@@ -20,7 +20,12 @@
 package dev.nathanpb.wmd.server
 
 import dev.nathanpb.wmd.server.routes.gamingProfileRoutes
+import io.ktor.application.*
+import io.ktor.features.*
+import io.ktor.http.*
+import io.ktor.jackson.*
 import io.ktor.routing.*
+import io.ktor.routing.route
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 
@@ -37,6 +42,12 @@ fun startServer() {
     println("Starting server at port $port")
     embeddedServer(Netty, getPort()) {
         routing {
+
+            install(CallLogging)
+            install(ContentNegotiation) {
+                register(ContentType.Application.Json, JacksonConverter())
+            }
+
             route("/gamingProfile") {
                 gamingProfileRoutes()
             }
