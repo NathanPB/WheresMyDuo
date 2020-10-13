@@ -19,6 +19,7 @@
 
 package dev.nathanpb.wmd.server
 
+import dev.nathanpb.wmd.server.routes.auth
 import dev.nathanpb.wmd.server.routes.tag
 import io.ktor.application.*
 import io.ktor.features.*
@@ -48,6 +49,10 @@ fun startServer() {
         routing {
             route("/tag") {
                 tag()
+            }
+
+            route("/auth") {
+                auth()
             }
         }
     }.start()

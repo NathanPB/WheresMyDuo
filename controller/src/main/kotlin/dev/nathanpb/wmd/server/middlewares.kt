@@ -26,13 +26,14 @@ import dev.nathanpb.wmd.ADMIN_EMAILS
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
-import java.lang.IllegalArgumentException
 
-fun ApplicationCall.authenticate(requireAdmin: Boolean = false) : FirebaseToken? {
+fun ApplicationCall.authenticate(requireAdmin: Boolean = false, respondCall: Boolean = true) : FirebaseToken? {
     val token = request.header("Authorization").orEmpty()
 
     if (token.isEmpty()) {
-        response.status(HttpStatusCode.Unauthorized)
+        if (respondCall) {
+            response.status(HttpStatusCode.Unauthorized)
+        }
         return null
     }
 
@@ -46,9 +47,13 @@ fun ApplicationCall.authenticate(requireAdmin: Boolean = false) : FirebaseToken?
 
         return user
     } catch (e: IllegalArgumentException) {
-        response.status(HttpStatusCode.ServiceUnavailable)
+        if (respondCall) {
+            response.status(HttpStatusCode.ServiceUnavailable)
+        }
     } catch (e: FirebaseAuthException) {
-        response.status(HttpStatusCode.Forbidden)
+        if (respondCall) {
+            response.status(HttpStatusCode.Forbidden)
+        }
     }
 
     return null
