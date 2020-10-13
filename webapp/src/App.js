@@ -24,16 +24,25 @@ import { UserContext, UserProvider } from './providers/UserProvider';
 import LogInScreen from './components/screen/LogInScreen';
 import { auth } from './services/firebase';
 
-import 'primereact/resources/primereact.css'
-import 'primereact/resources/themes/luna-pink/theme.css'
-import 'primeflex/primeflex.css'
-import 'primeicons/primeicons.css'
+import 'primereact/resources/primereact.css';
+import 'primereact/resources/themes/luna-pink/theme.css';
+import 'primeflex/primeflex.css';
+import 'primeicons/primeicons.css';
+import { ApiProvider } from './providers/ApiProvider';
+import useIsAdmin from './hooks/useIsAdmin';
+import { Route } from 'react-router';
+import { BrowserRouter } from 'react-router-dom';
 
 function App() {
   const user = React.useContext(UserContext)
+  const isAdmin = useIsAdmin()
 
-  function renderLoggedIn() {
-    return (
+  const guestRoutes = <>
+    <Route path="/" component={LogInScreen}/>
+  </>
+
+  const userRoutes = <>
+    <Route path="/" exact>
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
@@ -42,16 +51,32 @@ function App() {
           </span>
         </header>
       </div>
-    );
-  }
+    </Route>
+    <Route path="/me">
+      <span>User Profile</span>
+    </Route>
+  </>
 
-  return user ? renderLoggedIn() : <LogInScreen/>
+  const adminRoutes = <>
+    <Route path="/admin">
+      <span>Admin Dashboard</span>
+    </Route>
+  </>
+
+  return (
+    <BrowserRouter>
+      { user ? userRoutes : guestRoutes }
+      { isAdmin && adminRoutes }
+    </BrowserRouter>
+  )
 }
 
 export default function() {
   return (
     <UserProvider>
-      <App/>
+      <ApiProvider>
+        <App/>
+      </ApiProvider>
     </UserProvider>
   )
 };
