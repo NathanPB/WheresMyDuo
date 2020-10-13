@@ -24,9 +24,12 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.mongodb.reactivestreams.client.MongoClient
 import com.mongodb.reactivestreams.client.MongoDatabase
+import dev.nathanpb.wmd.data.Tag
 import dev.nathanpb.wmd.server.startServer
 import io.github.nathanpb.bb.BootManager
 import kotlinx.coroutines.runBlocking
+import org.litote.kmongo.coroutine.CoroutineClient
+import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 
@@ -49,8 +52,8 @@ import org.litote.kmongo.reactivestreams.KMongo
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-lateinit var mongoClient: MongoClient
-lateinit var mongoDb: MongoDatabase
+lateinit var mongoClient: CoroutineClient
+lateinit var mongoDb: CoroutineDatabase
 
 fun initFirebaseAdmin() {
     FirebaseOptions.builder()
@@ -70,7 +73,7 @@ fun main() {
                     }
                 }
                 subphase("Connecting to MongoDB") {
-                    mongoClient = KMongo.createClient(System.getenv("MONGO_CONN_STRING") ?: "mongodb://localhost")
+                    mongoClient = KMongo.createClient(System.getenv("MONGO_CONN_STRING") ?: "mongodb://localhost").coroutine
                     mongoDb = mongoClient.getDatabase(System.getenv("MONGO_DB_NAME") ?: "wmd")
                 }
             }
@@ -81,5 +84,11 @@ fun main() {
             }
         }
     }.startup()
+
+
+    val collection = mongoDb.getCollection<Tag>()
+    runBlocking {
+        collection.insertOne(Tag(displayName = "foobar"))
+    }
 }
 

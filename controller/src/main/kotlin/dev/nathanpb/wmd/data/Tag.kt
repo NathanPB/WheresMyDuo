@@ -17,38 +17,25 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.nathanpb.wmd.server
+package dev.nathanpb.wmd.data
 
-import dev.nathanpb.wmd.server.routes.tag
-import io.ktor.application.*
-import io.ktor.features.*
-import io.ktor.routing.*
-import io.ktor.serialization.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import org.litote.kmongo.Id
+import org.litote.kmongo.id.MongoId
+import org.litote.kmongo.newId
 
-private fun getPort(): Int {
-    return try {
-        System.getenv("PORT").toInt()
-    } catch (e: Exception) {
-        8080
+@Serializable
+data class Tag (
+    @Contextual @SerialName("_id") @MongoId val id: Id<Tag>? = newId(),
+    val displayName: String,
+    val description: String? = null,
+    val createdAt: Long = System.currentTimeMillis()
+) {
+
+    fun validate(): Boolean {
+        return displayName.isNotEmpty()
     }
-}
 
-fun startServer() {
-    val port = getPort()
-    println("Starting server at port $port")
-    embeddedServer(Netty, getPort()) {
-
-        install(CallLogging)
-        install(ContentNegotiation) {
-            json()
-        }
-
-        routing {
-            route("/tag") {
-                tag()
-            }
-        }
-    }.start()
 }

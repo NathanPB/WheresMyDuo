@@ -17,38 +17,12 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.nathanpb.wmd.server
+package dev.nathanpb.wmd.utils
 
-import dev.nathanpb.wmd.server.routes.tag
-import io.ktor.application.*
-import io.ktor.features.*
-import io.ktor.routing.*
-import io.ktor.serialization.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
+import org.litote.kmongo.combine
+import org.litote.kmongo.setValue
+import kotlin.reflect.KProperty
 
-private fun getPort(): Int {
-    return try {
-        System.getenv("PORT").toInt()
-    } catch (e: Exception) {
-        8080
-    }
-}
-
-fun startServer() {
-    val port = getPort()
-    println("Starting server at port $port")
-    embeddedServer(Netty, getPort()) {
-
-        install(CallLogging)
-        install(ContentNegotiation) {
-            json()
-        }
-
-        routing {
-            route("/tag") {
-                tag()
-            }
-        }
-    }.start()
-}
+fun <T> combine(vararg properties: KProperty<T>) = combine(
+    properties.map { setValue(it, it.call()) }
+)
