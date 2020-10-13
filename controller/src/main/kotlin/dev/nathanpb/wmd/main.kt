@@ -22,11 +22,9 @@ package dev.nathanpb.wmd
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
-import com.mongodb.reactivestreams.client.MongoClient
-import com.mongodb.reactivestreams.client.MongoDatabase
+import dev.nathanpb.wmd.boot.BootManager
 import dev.nathanpb.wmd.data.Tag
 import dev.nathanpb.wmd.server.startServer
-import io.github.nathanpb.bb.BootManager
 import kotlinx.coroutines.runBlocking
 import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.coroutine.CoroutineDatabase
@@ -51,6 +49,12 @@ import org.litote.kmongo.reactivestreams.KMongo
  * You should have received a copy of the GNU Lesser General Public License
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+val ADMIN_EMAILS by lazy {
+    System.getenv("ADMIN_EMAIL").orEmpty().split(",").map {
+        it.trim().toLowerCase()
+    }.filter(String::isNotEmpty)
+}
 
 lateinit var mongoClient: CoroutineClient
 lateinit var mongoDb: CoroutineDatabase

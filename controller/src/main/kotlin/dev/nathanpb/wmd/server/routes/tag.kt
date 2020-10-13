@@ -42,7 +42,7 @@ fun Route.tag() {
     }
 
     post {
-        context.authenticate() ?: return@post
+        context.authenticate(true) ?: return@post
 
         try {
             val sample = call.receive<Tag>().copy(
@@ -70,7 +70,7 @@ fun Route.tag() {
     }
 
     put(":id") {
-        context.authenticate() ?: return@put
+        context.authenticate(true) ?: return@put
 
         context.genericPut(
             collection = collection,
@@ -81,7 +81,7 @@ fun Route.tag() {
     }
 
     delete(":id") {
-        context.authenticate() ?: return@delete
+        context.authenticate(true) ?: return@delete
 
         context.genericDelete(
             collection = collection,

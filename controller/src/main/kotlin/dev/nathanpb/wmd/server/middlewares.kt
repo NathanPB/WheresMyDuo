@@ -22,12 +22,13 @@ package dev.nathanpb.wmd.server
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseToken
+import dev.nathanpb.wmd.ADMIN_EMAILS
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
 import java.lang.IllegalArgumentException
 
-fun ApplicationCall.authenticate() : FirebaseToken? {
+fun ApplicationCall.authenticate(requireAdmin: Boolean = false) : FirebaseToken? {
     val token = request.header("Authorization").orEmpty()
 
     if (token.isEmpty()) {
@@ -36,7 +37,14 @@ fun ApplicationCall.authenticate() : FirebaseToken? {
     }
 
     try {
-        return FirebaseAuth.getInstance().verifyIdToken(token)
+        val user = FirebaseAuth.getInstance().verifyIdToken(token)
+
+        // Validate if the user is admin
+        if (user != null && requireAdmin && user.email.toLowerCase() !in ADMIN_EMAILS) {
+            return null
+        }
+
+        return user
     } catch (e: IllegalArgumentException) {
         response.status(HttpStatusCode.ServiceUnavailable)
     } catch (e: FirebaseAuthException) {
