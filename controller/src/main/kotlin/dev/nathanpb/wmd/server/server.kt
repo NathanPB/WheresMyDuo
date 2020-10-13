@@ -46,6 +46,11 @@ fun startServer() {
             json()
         }
 
+        install(CORS) {
+            header("Authorization")
+            anyHost()
+        }
+
         routing {
             route("/tag") {
                 tag()
