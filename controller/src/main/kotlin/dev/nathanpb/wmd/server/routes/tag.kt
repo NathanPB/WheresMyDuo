@@ -28,7 +28,7 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.serialization.SerializationException
-import org.litote.kmongo.*
+import org.litote.kmongo.newId
 
 fun Route.tag() {
     val collection = mongoDb.getCollection<Tag>()
@@ -37,7 +37,7 @@ fun Route.tag() {
         context.genericGetAll(collection)
     }
 
-    get(":id") {
+    get("/{id}") {
         context.genericGetOne(collection = collection)
     }
 
@@ -69,7 +69,7 @@ fun Route.tag() {
 
     }
 
-    put(":id") {
+    put("/{id}") {
         context.authenticate(true) ?: return@put
 
         context.genericPut(
@@ -80,7 +80,7 @@ fun Route.tag() {
         )
     }
 
-    delete(":id") {
+    delete("/{id}") {
         context.authenticate(true) ?: return@delete
 
         context.genericDelete(

@@ -27,6 +27,8 @@ import io.ktor.routing.*
 import io.ktor.serialization.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import kotlinx.serialization.json.Json
+import org.litote.kmongo.id.serialization.IdKotlinXSerializationModule
 
 private fun getPort(): Int {
     return try {
@@ -43,7 +45,9 @@ fun startServer() {
 
         install(CallLogging)
         install(ContentNegotiation) {
-            json()
+            json(json = Json {
+                serializersModule = IdKotlinXSerializationModule
+            })
         }
 
         install(CORS) {

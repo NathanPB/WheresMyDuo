@@ -58,11 +58,16 @@ suspend inline fun <reified T: Any> ApplicationCall.genericPut(
             return response.status(HttpStatusCode.BadRequest)
         }
 
-        collection
-            .updateOne(
-                idProp eq id,
-                combine(*updateFields(sample))
-            )
+        collection.updateOne(
+            idProp eq id,
+            combine(*updateFields(sample))
+        ).apply {
+            if (wasAcknowledged() && matchedCount > 0) {
+                respond(HttpStatusCode.OK)
+            } else {
+                respond(HttpStatusCode.NotFound)
+            }
+        }
     } catch (e: SerializationException) {
         respond(HttpStatusCode.BadRequest, e.message.orEmpty())
     }

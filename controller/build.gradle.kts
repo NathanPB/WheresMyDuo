@@ -18,6 +18,8 @@ dependencies {
     implementation("com.google.firebase:firebase-admin:7.0.0")
     implementation("com.github.NathanPB:BootingBits:1.0-SNAPSHOT")
     implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.1.2")
+    implementation("org.litote.kmongo:kmongo-id-serialization:4.1.2")
+    implementation("org.litote.kmongo:kmongo-id:4.1.2")
     implementation("org.slf4j:slf4j-simple:1.7.30")
 }
 
