@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright (c) 2020 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
@@ -17,24 +17,46 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
+.AdminDashboard {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 
-import { auth } from '../services/firebase';
+  & > header {
+    flex-shrink: 0;
+    border-bottom: solid 1px rgba(255, 255, 255, 0.12);
 
-export const UserContext = React.createContext({ user: null })
+    & > * {
+      border-radius: 0;
+      border: none;
+    }
+  }
 
-export function UserProvider({ children }) {
-  const [user, setUser] = React.useState()
+  & > div {
+    flex-grow: 100;
+    display: flex;
+    flex-direction: row;
+  }
 
-  React.useEffect(() => void auth.onAuthStateChanged(user => {
-    setUser(user)
-    user.getIdToken().then(console.log)
-  }), [])
+  & > div > aside {
+    width: 128px;
+    max-width: 70vw;
+    flex-grow: 1;
+    flex-shrink: 0;
 
-  return (
-    <UserContext.Provider value={user}>
-      { children }
-    </UserContext.Provider>
-  );
+    border-right: solid 1px grey;
+
+    & > * {
+      border-radius: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  }
+
+  & > div > main {
+    flex-grow: 100;
+    height: 100%;
+    padding: 1em;
+  }
 }
-

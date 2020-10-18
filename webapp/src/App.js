@@ -24,14 +24,16 @@ import { UserContext, UserProvider } from './providers/UserProvider';
 import LogInScreen from './components/screen/LogInScreen';
 import { auth } from './services/firebase';
 
-import 'primereact/resources/primereact.css';
-import 'primereact/resources/themes/luna-pink/theme.css';
-import 'primeflex/primeflex.css';
-import 'primeicons/primeicons.css';
 import { ApiProvider } from './providers/ApiProvider';
 import useIsAdmin from './hooks/useIsAdmin';
 import { Route } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
+import AdminDashboard from './components/screen/AdminDashboard';
+
+import 'primereact/resources/primereact.css';
+import 'primereact/resources/themes/mdc-dark-deeppurple/theme.css';
+import 'primeicons/primeicons.css';
+import 'primeflex/primeflex.css';
 
 function App() {
   const user = React.useContext(UserContext)
@@ -57,11 +59,7 @@ function App() {
     </Route>
   </>
 
-  const adminRoutes = <>
-    <Route path="/admin">
-      <span>Admin Dashboard</span>
-    </Route>
-  </>
+  const adminRoutes = <Route path="/admin" component={AdminDashboard}/>
 
   return (
     <BrowserRouter>
