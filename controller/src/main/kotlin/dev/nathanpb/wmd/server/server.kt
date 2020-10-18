@@ -23,6 +23,7 @@ import dev.nathanpb.wmd.server.routes.auth
 import dev.nathanpb.wmd.server.routes.tag
 import io.ktor.application.*
 import io.ktor.features.*
+import io.ktor.http.*
 import io.ktor.routing.*
 import io.ktor.serialization.*
 import io.ktor.server.engine.*
@@ -51,7 +52,15 @@ fun startServer() {
         }
 
         install(CORS) {
+            method(HttpMethod.Options)
+            method(HttpMethod.Get)
+            method(HttpMethod.Post)
+            method(HttpMethod.Put)
+            method(HttpMethod.Delete)
+
             header("Authorization")
+            header("Content-Type")
+
             anyHost()
         }
 
