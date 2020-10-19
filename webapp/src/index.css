@@ -17,6 +17,11 @@ html {
     color: white;
 }
 
+#root {
+    position: relative;
+    z-index: 1;
+}
+
 html, body, #root {
     height: 100%;
     width: 100%;
