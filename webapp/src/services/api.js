@@ -18,6 +18,7 @@
  */
 
 import Axios from 'axios';
+import Apicalypse from 'apicalypse';
 
 export default function create(token) {
   const axios = Axios.create({
@@ -29,14 +30,25 @@ export default function create(token) {
 
   const isAdmin = () => axios.get('/auth/isAdmin')
 
+  const igdb = Apicalypse({
+    method: 'POST',
+    baseURL: `${process.env.REACT_APP_API_BASE_URL}/igdb`,
+    headers: {
+      Authorization: token
+    },
+    responseType: 'json'
+  })
+
   const getTags = () => axios.get('/tag')
   const getTag = (id) => axios.get(`/tag/${id}`)
   const createTag = (payload) => axios.post('/tag', payload)
   const editTag = (id, payload) => axios.put(`/tag/${id}`, payload)
   const deleteTag = (id) => axios.delete(`/tag/${id}`)
 
+
   return {
     isAdmin,
+    igdb,
 
     getTags,
     getTag,

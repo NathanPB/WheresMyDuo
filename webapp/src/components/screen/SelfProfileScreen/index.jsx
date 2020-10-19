@@ -45,11 +45,12 @@ export default function SelfProfileScreen() {
           className={Styles.GamingProfiles}
         >
 
-          <GamingProfileCard gameId="co1nza"/>
-          <GamingProfileCard gameId="co1v3o"/>
-          <GamingProfileCard gameId="co2dx9"/>
-          <GamingProfileCard gameId="co24ug"/>
-          <GamingProfileCard gameId="co1nmf"/>
+          <GamingProfileCard gameId="1912"/>
+          <GamingProfileCard gameId="3277"/>
+          <GamingProfileCard gameId="121"/>
+          <GamingProfileCard gameId="5447"/>
+          <GamingProfileCard gameId="1979"/>
+          <GamingProfileCard gameId="18320"/>
           <div className={`${GamingProfileCardStyles.Card} ${Styles.NewCard}`} title="New Game">
             <i className="pi pi-plus"/>
           </div>

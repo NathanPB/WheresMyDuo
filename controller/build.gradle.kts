@@ -21,6 +21,9 @@ dependencies {
     implementation("org.litote.kmongo:kmongo-id-serialization:4.1.2")
     implementation("org.litote.kmongo:kmongo-id:4.1.2")
     implementation("org.slf4j:slf4j-simple:1.7.30")
+    implementation("com.github.kittinunf.fuel:fuel:2.3.0")
+    implementation("com.github.kittinunf.fuel:fuel-coroutines:2.3.0")
+    implementation("com.github.kittinunf.fuel:fuel-kotlinx-serialization:2.3.0")
 }
 
 tasks.withType<Jar> {

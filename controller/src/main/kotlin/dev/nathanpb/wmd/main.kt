@@ -56,6 +56,9 @@ val ADMIN_EMAILS by lazy {
     }.filter(String::isNotEmpty)
 }
 
+val twitchClientId = System.getenv("TWITCH_CLIENT_ID")
+val twitchClientSecret = System.getenv("TWITCH_CLIENT_SECRET")
+
 lateinit var mongoClient: CoroutineClient
 lateinit var mongoDb: CoroutineDatabase
 
