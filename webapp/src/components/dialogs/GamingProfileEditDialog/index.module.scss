@@ -1,0 +1,67 @@
+/*
+ * Copyright (c) 2020 - Nathan P. Bombana
+ *
+ * This file is part of Wheres My Duo.
+ *
+ * Wheres My Duo is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Wheres My Duo is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+.Dialog > :global(.p-dialog-content) {
+  overflow: initial !important;
+  padding: 0 !important;
+
+  &, & > span {
+    width: 70vw;
+  }
+
+
+  & :global(.p-card) {
+    margin: 1em .5em;
+  }
+}
+
+.Content {
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.8));
+
+  box-shadow: 0px -32px 24px 0px var(--surface-f) inset;
+}
+
+.Header {
+  height: 128px;
+
+  & > h1 {
+    background: var(--surface-f);
+    margin-top: 0;
+    transform: translateY(.75em);
+    text-align: center;
+  }
+}
+
+.Close {
+  position: relative;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+}
+
+@keyframes wave {
+  0% {
+    margin-left: 0;
+  }
+  100% {
+    margin-left: -1600px;
+  }
+}

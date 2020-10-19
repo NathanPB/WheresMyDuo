@@ -22,7 +22,7 @@ import React from 'react';
 import Styles from './index.module.scss';
 import { ApiContext } from '../../../providers/ApiProvider';
 
-export default function GamingProfileCard({ gameId }) {
+export default function GamingProfileCard({ gameId, onClick }) {
 
   const api = React.useContext(ApiContext)
 
@@ -38,7 +38,7 @@ export default function GamingProfileCard({ gameId }) {
   }, [api])
 
   return (
-    <div className={Styles.Card} title={gameData?.name}>
+    <div className={Styles.Card} title={gameData?.name} onClick={onClick}>
       <img
         alt={gameData?.name}
         className={Styles.Cover}

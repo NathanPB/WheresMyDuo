@@ -27,6 +27,7 @@ import GamingProfileCard from '../GamingProfileCard';
 import GamingProfileCardStyles from '../GamingProfileCard/index.module.scss';
 import { ApiContext } from '../../../providers/ApiProvider';
 import GamingProfileAddDialog from '../../dialogs/GamingProfileAddDialog';
+import GamingProfileEditDialog from '../../dialogs/GamingProfileEditDialog';
 
 export default function SelfProfileScreen() {
   const user = React.useContext(UserContext)
@@ -35,26 +36,32 @@ export default function SelfProfileScreen() {
   const [gamingProfiles, setGamingProfiles] = React.useState([])
 
   const [addingProfile, setAddingProfile] = React.useState(false)
+  const [gameProfileEdit, setGameProfileEdit] = React.useState()
 
-  React.useEffect(() => {
+  function reloadGamingProfiles() {
     if (api) {
       api.getGamingProfiles(user.uid)
         .then(response => setGamingProfiles(response.data))
     }
-  }, [api])
+  }
+
+  React.useEffect(reloadGamingProfiles, [api])
 
   function handleAddGamingProfile(data) {
     if (!gamingProfiles.some(it => it.game === data.id)) {
       api.createGamingProfile({ game: data.id })
-        .then(() => {
-          api.getGamingProfiles(user.uid)
-            .then(response => setGamingProfiles(response.data))
-        })
+        .then(reloadGamingProfiles)
     }
   }
 
   return (
     <>
+      <GamingProfileEditDialog
+        id={gameProfileEdit}
+        visible={!!gameProfileEdit}
+        setVisible={flag => setGameProfileEdit(!flag ? undefined : gameProfileEdit)}
+        notify={reloadGamingProfiles}
+      />
       <GamingProfileAddDialog
         visible={addingProfile}
         setVisible={setAddingProfile}
@@ -74,7 +81,15 @@ export default function SelfProfileScreen() {
           className={Styles.GamingProfiles}
         >
 
-          { gamingProfiles.map(profile => <GamingProfileCard key={profile._id} gameId={profile.game}/>) }
+          {
+            gamingProfiles.map(profile => (
+              <GamingProfileCard
+                key={profile._id}
+                gameId={profile.game}
+                onClick={() => setGameProfileEdit(profile._id)}
+              />
+
+            )) }
 
           <div
             className={`${GamingProfileCardStyles.Card} ${Styles.NewCard}`}
