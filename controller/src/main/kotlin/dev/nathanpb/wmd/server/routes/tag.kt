@@ -38,7 +38,7 @@ fun Route.tag() {
     }
 
     get("/{id}") {
-        context.genericGetOne(collection = collection)
+        context.genericGetOne(collection = collection, idProp = Tag::id)
     }
 
     post {

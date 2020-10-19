@@ -19,7 +19,6 @@
 
 package dev.nathanpb.wmd.server.routes
 
-import dev.nathanpb.wmd.data.Tag
 import dev.nathanpb.wmd.utils.combine
 import dev.nathanpb.wmd.utils.parseObjectId
 import io.ktor.application.*
@@ -35,10 +34,10 @@ suspend fun ApplicationCall.genericGetAll(collection: CoroutineCollection<*>) {
     respond(collection.find().toList())
 }
 
-suspend fun ApplicationCall.genericGetOne(idParamKey: String = "id", collection: CoroutineCollection<*>) {
+suspend fun ApplicationCall.genericGetOne(idParamKey: String = "id", idProp: KProperty<*>, collection: CoroutineCollection<*>) {
     val id = parseObjectId(parameters[idParamKey].orEmpty()) ?: return
 
-    collection.findOne(Tag::id eq id)?.let {
+    collection.findOne(idProp eq id)?.let {
         respond(it)
     } ?: response.status(HttpStatusCode.NotFound)
 }

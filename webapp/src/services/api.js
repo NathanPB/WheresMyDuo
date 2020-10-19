@@ -45,7 +45,6 @@ export default function create(token) {
   const editTag = (id, payload) => axios.put(`/tag/${id}`, payload)
   const deleteTag = (id) => axios.delete(`/tag/${id}`)
 
-
   return {
     isAdmin,
     igdb,
