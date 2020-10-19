@@ -1,4 +1,4 @@
-/*!
+/*
  * Copyright (c) 2020 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
@@ -17,51 +17,14 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-.ProfilePic {
-  border-radius: 8px;
-  width: 256px;
-  height: auto;
-  max-width: 256px;
-  flex-grow: 1;
-  flex-shrink: 0;
+package dev.nathanpb.wmd.controller
 
-  display: block;
-  margin: 0 auto 0 auto;
-}
+import dev.nathanpb.wmd.data.RawTwitchToken
+import kotlinx.coroutines.runBlocking
 
-.UserName {
-  display: block;
-  margin: 0 auto 0 auto;
-  width: 256px;
-
-  background-color: #181818;
-  text-align: center;
-  font-size: 2rem;
-
-  transform: translateY(-3rem);
-}
-
-.GamingProfiles {
-
-  & > div > div {
-    display: flex;
-    overflow-x: auto;
-
-    & > *:not(:last-child) {
-      margin-right: 1em;
+var igdbToken: RawTwitchToken? = null
+    get() = field ?: runBlocking {
+        RawTwitchToken.requestNew().also {
+            field = it
+        }
     }
-  }
-}
-
-.NewCard {
-  position: relative;
-  min-height: 164px;
-
-  & > * {
-    font-size: 3rem;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%)
-  }
-}

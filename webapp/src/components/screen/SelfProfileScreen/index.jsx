@@ -25,12 +25,41 @@ import { Card } from 'primereact/card';
 import GamingProfileCard from '../GamingProfileCard';
 
 import GamingProfileCardStyles from '../GamingProfileCard/index.module.scss';
+import { ApiContext } from '../../../providers/ApiProvider';
+import GamingProfileAddDialog from '../../dialogs/GamingProfileAddDialog';
 
 export default function SelfProfileScreen() {
   const user = React.useContext(UserContext)
+  const api = React.useContext(ApiContext)
+
+  const [gamingProfiles, setGamingProfiles] = React.useState([])
+
+  const [addingProfile, setAddingProfile] = React.useState(false)
+
+  React.useEffect(() => {
+    if (api) {
+      api.getGamingProfiles(user.uid)
+        .then(response => setGamingProfiles(response.data))
+    }
+  }, [api])
+
+  function handleAddGamingProfile(data) {
+    if (!gamingProfiles.some(it => it.game === data.id)) {
+      api.createGamingProfile({ game: data.id })
+        .then(() => {
+          api.getGamingProfiles(user.uid)
+            .then(response => setGamingProfiles(response.data))
+        })
+    }
+  }
 
   return (
     <>
+      <GamingProfileAddDialog
+        visible={addingProfile}
+        setVisible={setAddingProfile}
+        onPicked={handleAddGamingProfile}
+      />
       <div className="p-p-3">
         <img
           alt="Your Avatar"
@@ -45,13 +74,13 @@ export default function SelfProfileScreen() {
           className={Styles.GamingProfiles}
         >
 
-          <GamingProfileCard gameId="1912"/>
-          <GamingProfileCard gameId="3277"/>
-          <GamingProfileCard gameId="121"/>
-          <GamingProfileCard gameId="5447"/>
-          <GamingProfileCard gameId="1979"/>
-          <GamingProfileCard gameId="18320"/>
-          <div className={`${GamingProfileCardStyles.Card} ${Styles.NewCard}`} title="New Game">
+          { gamingProfiles.map(profile => <GamingProfileCard key={profile._id} gameId={profile.game}/>) }
+
+          <div
+            className={`${GamingProfileCardStyles.Card} ${Styles.NewCard}`}
+            onClick={() => setAddingProfile(true)}
+            title="New Game"
+          >
             <i className="pi pi-plus"/>
           </div>
         </Card>

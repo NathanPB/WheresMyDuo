@@ -22,7 +22,7 @@ package dev.nathanpb.wmd.server.routes
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.coroutines.awaitString
-import dev.nathanpb.wmd.data.RawTwitchToken
+import dev.nathanpb.wmd.controller.igdbToken
 import dev.nathanpb.wmd.server.authenticate
 import dev.nathanpb.wmd.twitchClientId
 import io.ktor.application.*
@@ -31,25 +31,18 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 
-var _token: RawTwitchToken? = null
-
-suspend fun token(): RawTwitchToken {
-    return _token ?: RawTwitchToken.requestNew().also {
-        _token = it
-    }
-}
 
 private suspend fun proxyToIgdb(path: String, body: String, tryCount: Int = 0): String {
     return try {
         Fuel.post("https://api.igdb.com/v4/$path")
             .header(
                 "Client-ID" to twitchClientId,
-                "Authorization" to "Bearer ${token().token}",
+                "Authorization" to "Bearer ${igdbToken?.token}",
                 "Accept" to "application/json"
             ).body(body).awaitString()
     } catch (e: FuelError) {
         if (e.response.statusCode in arrayOf(401, 403) && tryCount < 1) {
-            _token = null
+            igdbToken = null
             proxyToIgdb(path, body, tryCount + 1)
         } else {
             throw e

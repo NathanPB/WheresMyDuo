@@ -20,6 +20,7 @@
 package dev.nathanpb.wmd.server
 
 import dev.nathanpb.wmd.server.routes.auth
+import dev.nathanpb.wmd.server.routes.gamingProfile
 import dev.nathanpb.wmd.server.routes.igdbProxy
 import dev.nathanpb.wmd.server.routes.tag
 import io.ktor.application.*
@@ -69,12 +70,17 @@ fun startServer() {
             route("igdb/*") {
                 igdbProxy()
             }
+
             route("/tag") {
                 tag()
             }
 
             route("/auth") {
                 auth()
+            }
+
+            route("/gamingProfile") {
+                gamingProfile()
             }
         }
     }.start()

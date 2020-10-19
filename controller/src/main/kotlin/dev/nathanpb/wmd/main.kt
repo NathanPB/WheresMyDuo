@@ -19,11 +19,12 @@
 
 package dev.nathanpb.wmd
 
+import com.api.igdb.request.IGDBWrapper
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import dev.nathanpb.wmd.boot.BootManager
-import dev.nathanpb.wmd.data.Tag
+import dev.nathanpb.wmd.controller.igdbToken
 import dev.nathanpb.wmd.server.startServer
 import kotlinx.coroutines.runBlocking
 import org.litote.kmongo.coroutine.CoroutineClient
@@ -83,6 +84,13 @@ fun main() {
                     mongoClient = KMongo.createClient(System.getenv("MONGO_CONN_STRING") ?: "mongodb://localhost").coroutine
                     mongoDb = mongoClient.getDatabase(System.getenv("MONGO_DB_NAME") ?: "wmd")
                 }
+                subphase("Connecting to IGDB") {
+                    execute {
+                        runBlocking {
+                            IGDBWrapper.setCredentials(twitchClientId, igdbToken?.token ?: error("Could not acquire the Twitch token"))
+                        }
+                    }
+                }
             }
             subphase("Starting HTTP api") {
                 execute {
@@ -91,11 +99,5 @@ fun main() {
             }
         }
     }.startup()
-
-
-    val collection = mongoDb.getCollection<Tag>()
-    runBlocking {
-        collection.insertOne(Tag(displayName = "foobar"))
-    }
 }
 

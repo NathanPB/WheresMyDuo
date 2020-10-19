@@ -45,6 +45,12 @@ export default function create(token) {
   const editTag = (id, payload) => axios.put(`/tag/${id}`, payload)
   const deleteTag = (id) => axios.delete(`/tag/${id}`)
 
+  const getGamingProfiles = (user) => axios.get(`/gamingProfile?user=${user}`)
+  const getGamingProfile = (id) => axios.get(`/gamingProfile/${id}`)
+  const createGamingProfile = (payload) => axios.post('/gamingProfile', payload)
+  const editGamingProfile = (id, payload) => axios.put(`/gamingProfile/${id}`, payload)
+  const deleteGamingProfile = (id) => axios.delete(`/gamimgProfile/${id}`)
+
   return {
     isAdmin,
     igdb,
@@ -53,7 +59,13 @@ export default function create(token) {
     getTag,
     createTag,
     editTag,
-    deleteTag
+    deleteTag,
+
+    getGamingProfiles,
+    getGamingProfile,
+    createGamingProfile,
+    editGamingProfile,
+    deleteGamingProfile
   }
 
 }

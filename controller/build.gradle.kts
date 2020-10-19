@@ -24,6 +24,7 @@ dependencies {
     implementation("com.github.kittinunf.fuel:fuel:2.3.0")
     implementation("com.github.kittinunf.fuel:fuel-coroutines:2.3.0")
     implementation("com.github.kittinunf.fuel:fuel-kotlinx-serialization:2.3.0")
+    implementation("com.github.husnjak:IGDB-API-JVM:1.0.1")
 }
 
 tasks.withType<Jar> {
