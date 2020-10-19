@@ -29,6 +29,7 @@ export default function GamingProfileAddDialog({ visible, setVisible, onPicked }
   function handleAdd() {
     if (game && onPicked) {
       onPicked(game)
+      setGame(undefined)
       setVisible(false)
     }
   }
