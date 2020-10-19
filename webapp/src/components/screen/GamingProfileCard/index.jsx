@@ -27,19 +27,13 @@ export default function GamingProfileCard({ gameId }) {
   const api = React.useContext(ApiContext)
 
   const [gameData, setGameData] = React.useState()
-  const [coverUrl, setCoverUrl] = React.useState()
 
   React.useEffect(() => {
     if (api) {
-      api.igdb.fields('*')
+      api.igdb.fields(['*', 'cover.url'])
         .where(`id = ${gameId}`)
         .request('/games')
         .then(response => setGameData(response.data[0]))
-
-      api.igdb.fields('*')
-        .where(`game = ${gameId}`)
-        .request('/covers')
-        .then(response => setCoverUrl(response.data[0].url))
     }
   }, [api])
 
@@ -48,8 +42,8 @@ export default function GamingProfileCard({ gameId }) {
       <img
         alt={gameData?.name}
         className={Styles.Cover}
-        src={`https:${coverUrl?.replace('t_thumb', 't_cover_big')}`}
-        onErrorCapture={e => e.target.src = `https:${coverUrl}`}
+        src={`https:${gameData?.cover?.url?.replace('t_thumb', 't_cover_big')}`}
+        onErrorCapture={e => e.target.src = `https:${gameData?.cover?.url}`}
       />
       <span
         style={gameData?.name?.length > 15 ? { fontSize: '.7rem' } : undefined}
