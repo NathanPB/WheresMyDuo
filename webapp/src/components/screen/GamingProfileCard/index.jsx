@@ -19,11 +19,14 @@
 
 import React from 'react';
 
-import { auth, googleAuthProvider } from '../../../services/firebase';
+import Styles from './index.module.scss';
 
-export default function LogInScreen() {
+export default function GamingProfileCard({ gameId }) {
 
   return (
-    <button onClick={() => auth.signInWithRedirect(googleAuthProvider)}>Login with Google</button>
+    <img
+      className={Styles.Card}
+      src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${gameId}.jpg`}
+    />
   )
 }

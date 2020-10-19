@@ -34,6 +34,7 @@ import 'primereact/resources/primereact.css';
 import 'primereact/resources/themes/mdc-dark-deeppurple/theme.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
+import SelfProfileScreen from './components/screen/SelfProfileScreen';
 
 function App() {
   const user = React.useContext(UserContext)
@@ -54,9 +55,7 @@ function App() {
         </header>
       </div>
     </Route>
-    <Route path="/me">
-      <span>User Profile</span>
-    </Route>
+    <Route path="/me" component={SelfProfileScreen} />
   </>
 
   const adminRoutes = <Route path="/admin" component={AdminDashboard}/>

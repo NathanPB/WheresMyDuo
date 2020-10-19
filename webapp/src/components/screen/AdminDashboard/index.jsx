@@ -43,7 +43,7 @@ export default function AdminDashboard({ history, match }) {
   ]
 
   const topMenuStart = <>
-    <img src="https://www.primefaces.org/primereact/showcase/showcase/images/logo.png" height="40"/>
+    <img alt="WMD Logo" src="https://www.primefaces.org/primereact/showcase/showcase/images/logo.png" height="40"/>
   </>
 
   const topMenuEnd = <>

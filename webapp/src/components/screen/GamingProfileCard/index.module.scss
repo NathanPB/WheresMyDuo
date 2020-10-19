@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright (c) 2020 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
@@ -17,13 +17,12 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
+.Card {
+  cursor: pointer;
+  border-radius: 2px;
+  width: 128px;
+  min-width: 128px;
+  height: auto;
 
-import { auth, googleAuthProvider } from '../../../services/firebase';
-
-export default function LogInScreen() {
-
-  return (
-    <button onClick={() => auth.signInWithRedirect(googleAuthProvider)}>Login with Google</button>
-  )
+  background-color: #2d2d2d;
 }
