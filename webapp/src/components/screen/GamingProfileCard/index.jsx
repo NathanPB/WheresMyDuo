@@ -51,7 +51,12 @@ export default function GamingProfileCard({ gameId }) {
         src={`https:${coverUrl?.replace('t_thumb', 't_cover_big')}`}
         onErrorCapture={e => e.target.src = `https:${coverUrl}`}
       />
-      <span className={Styles.GameTitle}>{gameData?.name}</span>
+      <span
+        style={gameData?.name?.length > 15 ? { fontSize: '.7rem' } : undefined}
+        className={Styles.GameTitle}
+      >
+        {gameData?.name}
+      </span>
     </div>
 
   )
