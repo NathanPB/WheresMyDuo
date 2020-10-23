@@ -19,35 +19,26 @@
 
 package dev.nathanpb.wmd.data
 
-import com.api.igdb.request.IGDBWrapper
-import com.api.igdb.utils.Endpoints
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.bson.types.ObjectId
 import org.litote.kmongo.Id
 import org.litote.kmongo.id.MongoId
 import org.litote.kmongo.newId
-import proto.GameResult
 
 @Serializable
 data class GamingProfile (
     @Contextual @SerialName("_id") @MongoId val id: Id<GamingProfile>? = newId(),
-    val user: String? = null,
+    val user: String,
     val game: Int,
     val hoursPerWeek: List<Int> = listOf(),
-    val tags: List<Tag> = listOf(),
+    val tags: List<@Contextual ObjectId> = listOf(),
     val createdAt: Long = System.currentTimeMillis()
 ) {
     fun validate(): Boolean {
-        val gameValidation by lazy {
-            GameResult.parseFrom(
-                IGDBWrapper.apiProtoRequest(Endpoints.GAMES, "fields *; limit 1; where id = $game;")
-            ).gamesCount > 0
-        }
-
         return hoursPerWeek.size <= 168
             && hoursPerWeek.all { it in 0..167 }
             && hoursPerWeek.distinct().size == hoursPerWeek.size
-            && gameValidation
     }
 }

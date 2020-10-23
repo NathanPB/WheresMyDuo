@@ -49,7 +49,7 @@ export default function SelfProfileScreen() {
 
   function handleAddGamingProfile(data) {
     if (!gamingProfiles.some(it => it.game === data.id)) {
-      api.createGamingProfile({ game: data.id })
+      api.createGamingProfile(data.id)
         .then(reloadGamingProfiles)
     }
   }

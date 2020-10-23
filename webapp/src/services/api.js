@@ -47,7 +47,7 @@ export default function create(token) {
 
   const getGamingProfiles = (user) => axios.get(`/gamingProfile?user=${user}`)
   const getGamingProfile = (id) => axios.get(`/gamingProfile/${id}`)
-  const createGamingProfile = (payload) => axios.post('/gamingProfile', payload)
+  const createGamingProfile = (gameId) => axios.post(`/gamingProfile/${gameId}`)
   const editGamingProfile = (id, payload) => axios.put(`/gamingProfile/${id}`, payload)
   const deleteGamingProfile = (id) => axios.delete(`/gamingProfile/${id}`)
 

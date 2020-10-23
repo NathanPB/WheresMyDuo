@@ -23,9 +23,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseToken
 import dev.nathanpb.wmd.ADMIN_EMAILS
+import dev.nathanpb.wmd.utils.parseObjectId
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
+import io.ktor.response.*
+import org.bson.types.ObjectId
 
 fun ApplicationCall.authenticate(requireAdmin: Boolean = false, respondCall: Boolean = true) : FirebaseToken? {
     val token = request.header("Authorization").orEmpty()
@@ -57,4 +60,12 @@ fun ApplicationCall.authenticate(requireAdmin: Boolean = false, respondCall: Boo
     }
 
     return null
+}
+
+suspend fun ApplicationCall.getRequestedObjectId(paramKey: String): ObjectId? {
+    val id = parseObjectId(parameters[paramKey].orEmpty())
+    if (id == null) {
+        respond(HttpStatusCode.BadRequest, "$paramKey parameter is invalid")
+    }
+    return id
 }

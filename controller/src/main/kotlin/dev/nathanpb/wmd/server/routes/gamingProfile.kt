@@ -19,19 +19,19 @@
 
 package dev.nathanpb.wmd.server.routes
 
+import com.api.igdb.request.IGDBWrapper
+import com.api.igdb.utils.Endpoints
 import dev.nathanpb.wmd.data.GamingProfile
 import dev.nathanpb.wmd.mongoDb
 import dev.nathanpb.wmd.server.authenticate
-import dev.nathanpb.wmd.utils.parseObjectId
-import io.ktor.application.*
+import dev.nathanpb.wmd.server.getRequestedObjectId
 import io.ktor.http.*
-import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerializationException
-import org.litote.kmongo.and
-import org.litote.kmongo.eq
-import org.litote.kmongo.newId
+import org.litote.kmongo.*
+import proto.GameResult
 
 fun Route.gamingProfile() {
     val collection = mongoDb.getCollection<GamingProfile>()
@@ -51,26 +51,49 @@ fun Route.gamingProfile() {
         context.genericGetOne(collection = collection, idProp = GamingProfile::id)
     }
 
-    post {
+    post("/{gameId}") {
         val user = context.authenticate() ?: return@post
 
         try {
-            val sample = call.receive<GamingProfile>().copy(
-                id = newId(),
-                user = user.uid,
-                createdAt = System.currentTimeMillis()
-            )
+            val gameId = context.parameters["gameId"].orEmpty().toIntOrNull()
 
-            if (!sample.validate()) {
-                context.response.status(HttpStatusCode.BadRequest)
+            val validateGame by lazy {
+                GameResult.parseFrom(
+                    IGDBWrapper.apiProtoRequest(Endpoints.GAMES, "fields *; limit 1; where id = $gameId;")
+                ).gamesCount > 0
+            }
+
+            val validateDuplicated by lazy {
+                runBlocking {
+                    collection.countDocuments(
+                        and(
+                            GamingProfile::user eq user.uid,
+                            GamingProfile::game eq gameId
+                        )
+                    ) == 0L
+                }
+            }
+
+            if (gameId == null) {
+                context.respond(HttpStatusCode.BadRequest, "gameId is not a 32 bit integer")
                 return@post
             }
 
-            collection.insertOne(sample).apply {
+            if (!validateGame) {
+                context.respond(HttpStatusCode.BadRequest, "ID is not valid")
+                return@post
+            }
+
+            if (!validateDuplicated) {
+                context.respond(HttpStatusCode.Conflict, "A gaming profile with this game and user already exists")
+                return@post
+            }
+
+            collection.insertOne(GamingProfile(newId(), user.uid, gameId)).apply {
                 if (wasAcknowledged()) {
-                    context.respondText("""{ "id": "${insertedId?.asObjectId()?.value}" }""")
+                    context.respondText("""{ "_id": "${insertedId?.asObjectId()?.value}" }""")
                 } else {
-                    context.response.status(HttpStatusCode.NoContent)
+                    context.response.status(HttpStatusCode.InternalServerError)
                 }
             }
         } catch (e: SerializationException) {
@@ -79,43 +102,56 @@ fun Route.gamingProfile() {
         }
     }
 
-    put("/{id}") {
-        val user = context.authenticate() ?: return@put
+    route("/{id}/tag") {
+        get {
+            val id = context.getRequestedObjectId("id") ?: return@get
+            val data = collection.findOne(GamingProfile::id eq id)
 
-        val id = parseObjectId(context.parameters["id"].orEmpty())
-        if (id == null) {
-            context.respond(HttpStatusCode.BadRequest, "malformed id parameter")
-            return@put
+            if (data == null) {
+                context.respond(HttpStatusCode.NotFound)
+            } else {
+                context.respond(data.tags)
+            }
         }
 
-        val doc = collection.findOne(
-            and(
+        post("/{tagId}") {
+            val id = context.getRequestedObjectId("id") ?: return@post
+            val tag = context.getRequestedObjectId("tagId") ?: return@post
+
+            val data = collection.findOne(GamingProfile::id eq id)
+
+            when {
+                data == null -> context.respond(HttpStatusCode.NotFound)
+                data.tags.any { it == tag } -> context.respond(HttpStatusCode.NotModified, "This profile already have this tag")
+                else -> {
+                    collection.updateMany(
+                        GamingProfile::id eq id,
+                        push(GamingProfile::tags, tag)
+                    )
+                }
+            }
+        }
+
+        delete("/{tagId}") {
+            val id = context.getRequestedObjectId("id") ?: return@delete
+            val tag = context.getRequestedObjectId("tagId") ?: return@delete
+
+            collection.updateMany(
                 GamingProfile::id eq id,
-                GamingProfile::user eq user.uid
-            )
-        )
-
-        if (doc?.user != user.uid) {
-            context.respond(HttpStatusCode.Forbidden)
-            return@put
+                pull(GamingProfile::tags, tag)
+            ).apply {
+                when {
+                    modifiedCount > 0 -> context.respond(HttpStatusCode.OK)
+                    matchedCount == 0L -> context.respond(HttpStatusCode.NotFound)
+                    else -> context.respond(HttpStatusCode.NotModified)
+                }
+            }
         }
-
-        context.genericPut(
-            collection = collection,
-            idProp = GamingProfile::id,
-            validator = { validate() },
-            updateFields = { arrayOf(it::hoursPerWeek, it::tags) }
-        )
     }
 
     delete("/{id}") {
         val user = context.authenticate() ?: return@delete
-
-        val id = parseObjectId(context.parameters["id"].orEmpty())
-        if (id == null) {
-            context.respond(HttpStatusCode.BadRequest, "malformed id parameter")
-            return@delete
-        }
+        val id = context.getRequestedObjectId("id")
 
         val doc = collection.findOne(
             and(

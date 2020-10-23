@@ -19,8 +19,8 @@
 
 package dev.nathanpb.wmd.server.routes
 
+import dev.nathanpb.wmd.server.getRequestedObjectId
 import dev.nathanpb.wmd.utils.combine
-import dev.nathanpb.wmd.utils.parseObjectId
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
@@ -35,7 +35,7 @@ suspend fun ApplicationCall.genericGetAll(collection: CoroutineCollection<*>) {
 }
 
 suspend fun ApplicationCall.genericGetOne(idParamKey: String = "id", idProp: KProperty<*>, collection: CoroutineCollection<*>) {
-    val id = parseObjectId(parameters[idParamKey].orEmpty()) ?: return
+    val id = getRequestedObjectId(parameters[idParamKey].orEmpty()) ?: return
 
     collection.findOne(idProp eq id)?.let {
         respond(it)
@@ -50,7 +50,7 @@ suspend inline fun <reified T: Any> ApplicationCall.genericPut(
     updateFields: (T)->Array<KProperty<*>>
 ) {
     try {
-        val id = parseObjectId(parameters[idParamKey].orEmpty()) ?: return
+        val id = getRequestedObjectId(parameters[idParamKey].orEmpty()) ?: return
 
         val sample = receive<T>()
         if (!validator(sample)) {
@@ -77,7 +77,7 @@ suspend fun <T: Any> ApplicationCall.genericDelete(
     collection: CoroutineCollection<T>,
     idProp: KProperty<*>,
 ) {
-    val id = parseObjectId(parameters[idParamKey].orEmpty()) ?: return
+    val id = getRequestedObjectId(parameters[idParamKey].orEmpty()) ?: return
 
     val deleteResult = collection.deleteOne(idProp eq id)
 
