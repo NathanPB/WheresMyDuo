@@ -30,3 +30,7 @@ html, body, #root {
 textarea {
     resize: none;
 }
+
+.pointer {
+    cursor: pointer;
+}

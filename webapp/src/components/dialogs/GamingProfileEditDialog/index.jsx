@@ -24,6 +24,8 @@ import { Dialog } from 'primereact/dialog';
 import Styles from './index.module.scss';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
+import Tag from '../../misc/Tag';
+import TagAddButton from '../../misc/TagAddButton';
 
 export default function GamingProfileEditDialog({ id, visible, setVisible, notify }) {
   const api = React.useContext(ApiContext)
@@ -33,13 +35,7 @@ export default function GamingProfileEditDialog({ id, visible, setVisible, notif
   const [game, setGame] = React.useState()
   const [artwork, setArtwork] = React.useState()
 
-  React.useEffect(() => {
-    if (api && id) {
-      api.getGamingProfile(id)
-        .then(response => setData(response.data))
-
-    }
-  }, [api, id])
+  React.useEffect(reload, [api, id])
 
   React.useEffect(() => {
     if (data?.game) {
@@ -61,6 +57,21 @@ export default function GamingProfileEditDialog({ id, visible, setVisible, notif
         })
     }
   }, [data?.game])
+
+  function reload() {
+    if (api && id) {
+      api.getGamingProfile(id)
+        .then(response => setData(response.data))
+    }
+  }
+
+  function requestRemoveTag(tagId) {
+    api.gamingProfileDeleteTag(id, tagId).then(reload)
+  }
+
+  function requestAddTag(tag) {
+    api.gamingProfileAddTag(id, tag._id).then(reload)
+  }
 
   function discard() {
     setArtwork(undefined)
@@ -107,12 +118,16 @@ export default function GamingProfileEditDialog({ id, visible, setVisible, notif
           <div className={Styles.Header}>
             <h1>{game?.name}</h1>
           </div>
-          <Card title="Tags">
 
+          <Card title="Tags">
+            { data?.tags?.map(it => <Tag id={it} onRemoved={() => requestRemoveTag(it)}/>) }
+            <TagAddButton exclude={data?.tags || []} onAdded={requestAddTag} />
           </Card>
+
           <Card title="Weekly Hours">
 
           </Card>
+
         </div>
         <span className="p-badge" onClick={discard} title="Discard">
             <i className={`${Styles.Close} pi pi-times`}/>
