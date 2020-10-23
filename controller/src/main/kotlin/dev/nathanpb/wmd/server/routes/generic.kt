@@ -77,7 +77,7 @@ suspend fun <T: Any> ApplicationCall.genericDelete(
     collection: CoroutineCollection<T>,
     idProp: KProperty<*>,
 ) {
-    val id = getRequestedObjectId(parameters[idParamKey].orEmpty()) ?: return
+    val id = getRequestedObjectId(idParamKey) ?: return
 
     val deleteResult = collection.deleteOne(idProp eq id)
 

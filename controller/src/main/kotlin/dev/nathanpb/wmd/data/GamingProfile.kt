@@ -22,7 +22,6 @@ package dev.nathanpb.wmd.data
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.bson.types.ObjectId
 import org.litote.kmongo.Id
 import org.litote.kmongo.id.MongoId
 import org.litote.kmongo.newId
@@ -33,7 +32,7 @@ data class GamingProfile (
     val user: String,
     val game: Int,
     val hoursPerWeek: List<Int> = listOf(),
-    val tags: List<@Contextual ObjectId> = listOf(),
+    val tags: List<@Contextual Id<Tag>> = listOf(),
     val createdAt: Long = System.currentTimeMillis()
 ) {
     fun validate(): Boolean {

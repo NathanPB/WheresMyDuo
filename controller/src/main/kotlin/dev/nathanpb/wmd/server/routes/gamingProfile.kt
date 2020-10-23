@@ -151,7 +151,7 @@ fun Route.gamingProfile() {
 
     delete("/{id}") {
         val user = context.authenticate() ?: return@delete
-        val id = context.getRequestedObjectId("id")
+        val id = context.getRequestedObjectId("id") ?: return@delete
 
         val doc = collection.findOne(
             and(
