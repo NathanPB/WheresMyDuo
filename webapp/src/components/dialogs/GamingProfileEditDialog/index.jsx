@@ -73,7 +73,7 @@ export default function GamingProfileEditDialog({ id, visible, setVisible, notif
     api.gamingProfileAddTag(id, tag._id).then(reload)
   }
 
-  function discard() {
+  function hide() {
     setArtwork(undefined)
     setGame(undefined)
     setVisible(false)
@@ -82,7 +82,7 @@ export default function GamingProfileEditDialog({ id, visible, setVisible, notif
   function handleDelete() {
     api.deleteGamingProfile(id)
       .then(() => {
-        discard()
+        hide()
         notify()
       })
   }
@@ -96,14 +96,14 @@ export default function GamingProfileEditDialog({ id, visible, setVisible, notif
         onClick={handleDelete}
         style={{ marginRight: 8 }}
       />
-      <Button icon="pi pi-save" label="Close" onClick={() => setVisible(false)}/>
+      <Button icon="pi pi-save" label="Close" onClick={hide}/>
     </>
   }
 
   return (
     <Dialog
       visible={visible}
-      onHide={() => setVisible(false)}
+      onHide={hide}
       className={Styles.Dialog}
 
       contentStyle={artwork ? { backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.81)), url(https:${artwork})` } : undefined}
