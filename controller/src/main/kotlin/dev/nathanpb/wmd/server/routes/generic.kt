@@ -35,7 +35,7 @@ suspend fun ApplicationCall.genericGetAll(collection: CoroutineCollection<*>) {
 }
 
 suspend fun ApplicationCall.genericGetOne(idParamKey: String = "id", idProp: KProperty<*>, collection: CoroutineCollection<*>) {
-    val id = getRequestedObjectId(parameters[idParamKey].orEmpty()) ?: return
+    val id = getRequestedObjectId(idParamKey) ?: return
 
     collection.findOne(idProp eq id)?.let {
         respond(it)

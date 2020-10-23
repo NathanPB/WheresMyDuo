@@ -122,7 +122,7 @@ fun Route.gamingProfile() {
 
             when {
                 data == null -> context.respond(HttpStatusCode.NotFound)
-                data.tags.any { it == tag } -> context.respond(HttpStatusCode.NotModified, "This profile already have this tag")
+                data.tags.any { it.equals(tag) } -> context.respond(HttpStatusCode.NotModified, "This profile already have this tag")
                 else -> {
                     collection.updateMany(
                         GamingProfile::id eq id,
