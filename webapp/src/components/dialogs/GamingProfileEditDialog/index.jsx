@@ -96,7 +96,7 @@ export default function GamingProfileEditDialog({ id, visible, setVisible, notif
         onClick={handleDelete}
         style={{ marginRight: 8 }}
       />
-      <Button icon="pi pi-save" label="Save"/>
+      <Button icon="pi pi-save" label="Close" onClick={() => setVisible(false)}/>
     </>
   }
 
@@ -113,26 +113,21 @@ export default function GamingProfileEditDialog({ id, visible, setVisible, notif
       footer={footer()}
       modal
     >
-      <span className="p-overlay-badge">
-        <div>
-          <div className={Styles.Header}>
-            <h1>{game?.name}</h1>
-          </div>
-
-          <Card title="Tags">
-            { data?.tags?.map(it => <Tag id={it} onRemoved={() => requestRemoveTag(it)}/>) }
-            <TagAddButton exclude={data?.tags || []} onAdded={requestAddTag} />
-          </Card>
-
-          <Card title="Weekly Hours">
-
-          </Card>
-
+      <div>
+        <div className={Styles.Header}>
+          <h1>{game?.name}</h1>
         </div>
-        <span className="p-badge" onClick={discard} title="Discard">
-            <i className={`${Styles.Close} pi pi-times`}/>
-        </span>
-      </span>
+
+        <Card title="Tags">
+          { data?.tags?.map(it => <Tag id={it} onRemoved={() => requestRemoveTag(it)}/>) }
+          <TagAddButton exclude={data?.tags || []} onAdded={requestAddTag} />
+        </Card>
+
+        <Card title="Weekly Hours">
+
+        </Card>
+
+      </div>
     </Dialog>
   )
 }
