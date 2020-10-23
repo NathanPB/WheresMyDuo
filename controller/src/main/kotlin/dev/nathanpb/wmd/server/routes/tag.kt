@@ -28,13 +28,30 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.serialization.SerializationException
+import org.litote.kmongo.limit
+import org.litote.kmongo.match
 import org.litote.kmongo.newId
+import org.litote.kmongo.regex
 
 fun Route.tag() {
     val collection = mongoDb.getCollection<Tag>()
 
     get {
-        context.genericGetAll(collection)
+        val query = context.parameters["query"].orEmpty()
+        val limit = context.parameters["limit"]?.toIntOrNull()?.coerceIn(1..50) ?: 50
+
+        val queryList = if (query.isEmpty()) emptyArray() else arrayOf(
+            match(
+                Tag::displayName regex ".*${query}.*".toRegex(RegexOption.IGNORE_CASE)
+            ),
+        )
+
+        collection.aggregate<Tag>(
+            listOf(*queryList, limit(limit))
+        ).toList().let {
+            context.respond(it)
+        }
+
     }
 
     get("/{id}") {

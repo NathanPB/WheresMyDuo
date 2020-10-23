@@ -39,7 +39,14 @@ export default function create(token) {
     responseType: 'json'
   })
 
-  const getTags = () => axios.get('/tag')
+  const getTags = ({ query, limit } = {}) => {
+    const url = new URLSearchParams()
+    if (query) url.set('query', query)
+    if (limit) url.set('limit', limit)
+    const queryString = query || limit ? '?' + url.toString() : ''
+
+    return axios.get(`/tag${queryString}`)
+  }
   const getTag = (id) => axios.get(`/tag/${id}`)
   const createTag = (payload) => axios.post('/tag', payload)
   const editTag = (id, payload) => axios.put(`/tag/${id}`, payload)
@@ -48,8 +55,11 @@ export default function create(token) {
   const getGamingProfiles = (user) => axios.get(`/gamingProfile?user=${user}`)
   const getGamingProfile = (id) => axios.get(`/gamingProfile/${id}`)
   const createGamingProfile = (gameId) => axios.post(`/gamingProfile/${gameId}`)
-  const editGamingProfile = (id, payload) => axios.put(`/gamingProfile/${id}`, payload)
   const deleteGamingProfile = (id) => axios.delete(`/gamingProfile/${id}`)
+
+  const gamingProfileListTags = (id) => axios.get(`/gamingProfile/${id}/tag`)
+  const gamingProfileAddTag = (id, tagId) => axios.post(`/gamingProfile/${id}/tag/${tagId}`)
+  const gamingProfileDeleteTag = (id, tagId) => axios.delete(`/gamingProfile/${id}/tag/${tagId}`)
 
   return {
     isAdmin,
@@ -64,8 +74,11 @@ export default function create(token) {
     getGamingProfiles,
     getGamingProfile,
     createGamingProfile,
-    editGamingProfile,
-    deleteGamingProfile
+    deleteGamingProfile,
+
+    gamingProfileListTags,
+    gamingProfileAddTag,
+    gamingProfileDeleteTag
   }
 
 }
