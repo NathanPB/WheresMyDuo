@@ -118,25 +118,31 @@ fun Route.gamingProfile() {
         post("/{tagId}") {
             val id = context.getRequestedObjectId("id") ?: return@post
             val tag = context.getRequestedObjectId("tagId") ?: return@post
+            val user = context.authenticate() ?: return@post
 
-            val data = collection.countDocuments(GamingProfile::id eq id)
+            val data = collection.findOne(GamingProfile::id eq id)
 
-            if (data == 0L) {
+            if (data == null) {
                 context.respond(HttpStatusCode.NotFound)
                 return@post
-            } else {
-                collection.updateMany(
-                    and(
-                        GamingProfile::id eq id,
-                        not(GamingProfile::tags contains tag)
-                    ),
-                    push(GamingProfile::tags, tag)
-                ).apply {
-                    if (matchedCount == 0L) {
-                        context.respond(HttpStatusCode.NotModified, "This profile already have this tag")
-                    } else {
-                        context.respond(HttpStatusCode.OK)
-                    }
+            }
+
+            if (data.user != user.uid) {
+                context.respond(HttpStatusCode.Forbidden)
+                return@post
+            }
+
+            collection.updateMany(
+                and(
+                    GamingProfile::id eq id,
+                    not(GamingProfile::tags contains tag)
+                ),
+                push(GamingProfile::tags, tag)
+            ).apply {
+                if (matchedCount == 0L) {
+                    context.respond(HttpStatusCode.NotModified, "This profile already have this tag")
+                } else {
+                    context.respond(HttpStatusCode.OK)
                 }
             }
         }
