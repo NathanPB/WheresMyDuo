@@ -20,6 +20,7 @@
 .Dialog > :global(.p-dialog-content) {
   overflow: initial !important;
   padding: 0 !important;
+  height: 90vh;
 
   &, & > span {
     width: 70vw;
@@ -55,6 +56,22 @@
   top: 0;
   right: 0;
   cursor: pointer;
+}
+
+.CalendarCard {
+  & :global(.p-card-content) {
+    padding: 0;
+  }
+
+  & :global(.p-card-footer) {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0;
+
+    & > * {
+      height: 16px;
+    }
+  }
 }
 
 @keyframes wave {

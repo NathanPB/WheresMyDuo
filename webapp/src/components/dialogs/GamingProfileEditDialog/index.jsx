@@ -26,14 +26,19 @@ import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import Tag from '../../misc/Tag';
 import TagAddButton from '../../misc/TagAddButton';
+import Calendar from '../../misc/Calendar';
+import { TabPanel, TabView } from 'primereact/tabview';
 
 export default function GamingProfileEditDialog({ id, visible, setVisible, notify }) {
   const api = React.useContext(ApiContext)
+  const [tabIndex, setTabIndex] = React.useState(0)
 
   const [data, setData] = React.useState()
 
   const [game, setGame] = React.useState()
   const [artwork, setArtwork] = React.useState()
+
+  const [calendar, setCalendar] = React.useState([])
 
   React.useEffect(reload, [api, id])
 
@@ -61,8 +66,18 @@ export default function GamingProfileEditDialog({ id, visible, setVisible, notif
   function reload() {
     if (api && id) {
       api.getGamingProfile(id)
-        .then(response => setData(response.data))
+        .then(response =>  setData(response.data))
+      reloadCalendar()
     }
+  }
+
+  function reloadCalendar() {
+    api.gamingProfileGetCalendar(id)
+      .then(response => setCalendar(response.data))
+  }
+
+  function requestSaveCalendar() {
+    api.gamingProfileSetCalendar(id, calendar).then(reload)
   }
 
   function requestRemoveTag(tagId) {
@@ -113,21 +128,34 @@ export default function GamingProfileEditDialog({ id, visible, setVisible, notif
       footer={footer()}
       modal
     >
-      <div>
-        <div className={Styles.Header}>
-          <h1>{game?.name}</h1>
-        </div>
-
-        <Card title="Tags">
-          { data?.tags?.map(it => <Tag id={it} onRemoved={() => requestRemoveTag(it)}/>) }
-          <TagAddButton exclude={data?.tags || []} onAdded={requestAddTag} />
-        </Card>
-
-        <Card title="Weekly Hours">
-
-        </Card>
-
+      <div className={Styles.Header}>
+        <h1>{game?.name}</h1>
       </div>
+
+      <TabView activeIndex={tabIndex} onTabChange={e => setTabIndex(e.index)}>
+
+        <TabPanel header="Tags">
+          <Card>
+            { data?.tags?.map(it => <Tag id={it} onRemoved={() => requestRemoveTag(it)}/>) }
+            <TagAddButton exclude={data?.tags || []} onAdded={requestAddTag} />
+          </Card>
+        </TabPanel>
+
+        <TabPanel header="Calendar">
+          <Card
+            className={Styles.CalendarCard}
+            footer={
+              <>
+                <Button label="Discard" className="p-button-warning" onClick={reloadCalendar}/>
+                <Button label="Save" style={{ marginLeft: 8 }} onClick={requestSaveCalendar}/>
+              </>
+            }
+          >
+            <Calendar value={calendar} setValue={setCalendar}/>
+          </Card>
+        </TabPanel>
+
+      </TabView>
     </Dialog>
   )
 }

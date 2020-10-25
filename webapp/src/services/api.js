@@ -61,6 +61,9 @@ export default function create(token) {
   const gamingProfileAddTag = (id, tagId) => axios.post(`/gamingProfile/${id}/tag/${tagId}`)
   const gamingProfileDeleteTag = (id, tagId) => axios.delete(`/gamingProfile/${id}/tag/${tagId}`)
 
+  const gamingProfileGetCalendar = (id) => axios.get(`/gamingProfile/${id}/calendar`)
+  const gamingProfileSetCalendar = (id, calendar) => axios.put(`/gamingProfile/${id}/calendar`, calendar)
+
   return {
     isAdmin,
     igdb,
@@ -78,7 +81,10 @@ export default function create(token) {
 
     gamingProfileListTags,
     gamingProfileAddTag,
-    gamingProfileDeleteTag
+    gamingProfileDeleteTag,
+
+    gamingProfileGetCalendar,
+    gamingProfileSetCalendar
   }
 
 }

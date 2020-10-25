@@ -31,13 +31,7 @@ data class GamingProfile (
     @Contextual @SerialName("_id") @MongoId val id: Id<GamingProfile>? = newId(),
     val user: String,
     val game: Int,
-    val hoursPerWeek: List<Int> = listOf(),
+    val calendar: List<Int> = listOf(),
     val tags: List<@Contextual Id<Tag>> = listOf(),
     val createdAt: Long = System.currentTimeMillis()
-) {
-    fun validate(): Boolean {
-        return hoursPerWeek.size <= 168
-            && hoursPerWeek.all { it in 0..167 }
-            && hoursPerWeek.distinct().size == hoursPerWeek.size
-    }
-}
+)

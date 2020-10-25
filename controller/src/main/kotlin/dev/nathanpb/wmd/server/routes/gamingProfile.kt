@@ -26,6 +26,7 @@ import dev.nathanpb.wmd.mongoDb
 import dev.nathanpb.wmd.server.authenticate
 import dev.nathanpb.wmd.server.getRequestedObjectId
 import io.ktor.http.*
+import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.coroutines.runBlocking
@@ -153,6 +154,52 @@ fun Route.gamingProfile() {
                     matchedCount == 0L -> context.respond(HttpStatusCode.NotFound)
                     else -> context.respond(HttpStatusCode.NotModified)
                 }
+            }
+        }
+    }
+
+    route("/{id}/calendar") {
+        get {
+            val id = context.getRequestedObjectId("id") ?: return@get
+            val data = collection.findOne(GamingProfile::id eq id)
+
+            if (data == null) {
+                context.respond(HttpStatusCode.NotFound)
+            } else {
+                context.respond(data.calendar)
+            }
+        }
+
+        put {
+            val id = context.getRequestedObjectId("id") ?: return@put
+            val user = context.authenticate() ?: return@put
+            val data = collection.findOne(GamingProfile::id eq id)
+
+            if (data == null) {
+                context.respond(HttpStatusCode.NotFound)
+                return@put
+            }
+
+            if (data.user != user.uid) {
+                context.respond(HttpStatusCode.Forbidden)
+                return@put
+            }
+
+            val sample = context.receive<List<Int>>()
+            val sampleValidation = sample.size <= 168
+                && sample.all { it in 0..167 }
+                && sample.distinct().size == sample.size
+
+            if (!sampleValidation) {
+                context.respond(HttpStatusCode.BadRequest, "Calendar has invalid format")
+                return@put
+            }
+
+            val update = collection.save(data.copy(calendar = sample))
+            if (update?.wasAcknowledged() == true) {
+                context.respond(HttpStatusCode.OK)
+            } else {
+                context.respond(HttpStatusCode.NotModified)
             }
         }
     }
