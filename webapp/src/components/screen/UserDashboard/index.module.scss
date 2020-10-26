@@ -1,0 +1,84 @@
+/*!
+ * Copyright (c) 2020 - Nathan P. Bombana
+ *
+ * This file is part of Wheres My Duo.
+ *
+ * Wheres My Duo is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Wheres My Duo is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+.Main {
+  padding-top: 4em;
+}
+
+.TopMenu {
+  position: fixed;
+  width: 100%;
+  height: 4em;
+  border: 0;
+}
+
+.Avatar {
+  height: 42px;
+  width: 42px;
+  border-radius: 50%;
+}
+
+.Match {
+  margin-right: 8px;
+
+  & span:global(.pi):before {
+    font-size: 1.5rem;
+  }
+
+  @media (max-width: 320px) {
+
+    & {
+      min-width: initial !important;
+    }
+
+    & span:global(.pi) {
+      margin-right: 0 !important;
+    }
+
+    & span:global(.p-button-label) {
+      display: none;
+    }
+  }
+}
+
+.Search {
+  @media (max-width: 481px) {
+
+    & > div > span {
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+    }
+
+    & > div > input {
+      display: none !important;
+    }
+  }
+}
+
+.SearchPopup {
+  margin-top: 8px;
+  @media (min-width: 481px) {
+    display: none;
+  }
+
+  & > div {
+    padding: 0 !important;
+  }
+}

@@ -18,11 +18,9 @@
  */
 
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { UserContext, UserProvider } from './providers/UserProvider';
 import LogInScreen from './components/screen/LogInScreen';
-import { auth } from './services/firebase';
 
 import { ApiProvider } from './providers/ApiProvider';
 import useIsAdmin from './hooks/useIsAdmin';
@@ -34,7 +32,7 @@ import 'primereact/resources/primereact.css';
 import 'primereact/resources/themes/mdc-dark-deeppurple/theme.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
-import SelfProfileScreen from './components/screen/SelfProfileScreen';
+import UserDashboard from './components/screen/UserDashboard';
 
 function App() {
   const user = React.useContext(UserContext)
@@ -44,26 +42,14 @@ function App() {
     <Route path="/" component={LogInScreen}/>
   </>
 
-  const userRoutes = <>
-    <Route path="/" exact>
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <span onClick={() => auth.signOut()}>
-            Logout
-          </span>
-        </header>
-      </div>
-    </Route>
-    <Route path="/me" component={SelfProfileScreen} />
-  </>
+  const userRoutes = <Route path="/" component={UserDashboard}/>
 
   const adminRoutes = <Route path="/admin" component={AdminDashboard}/>
 
   return (
     <BrowserRouter>
-      { user ? userRoutes : guestRoutes }
       { isAdmin && adminRoutes }
+      { user ? userRoutes : guestRoutes }
     </BrowserRouter>
   )
 }
