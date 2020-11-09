@@ -19,19 +19,18 @@
 
 package dev.nathanpb.wmd.server.routes
 
+import dev.nathanpb.wmd.data.GamingProfile
 import dev.nathanpb.wmd.data.Tag
 import dev.nathanpb.wmd.mongoDb
 import dev.nathanpb.wmd.server.authenticate
+import dev.nathanpb.wmd.server.getRequestedObjectId
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.serialization.SerializationException
-import org.litote.kmongo.limit
-import org.litote.kmongo.match
-import org.litote.kmongo.newId
-import org.litote.kmongo.regex
+import org.litote.kmongo.*
 
 fun Route.tag() {
     val collection = mongoDb.getCollection<Tag>()
@@ -100,9 +99,23 @@ fun Route.tag() {
     delete("/{id}") {
         context.authenticate(true) ?: return@delete
 
-        context.genericDelete(
-            collection = collection,
-            idProp = Tag::id
-        )
+        val id = context.getRequestedObjectId("id") ?: return@delete
+        val force = context.request.queryParameters["force"] == "true"
+
+        if (!force) {
+            val count = collection.countDocuments(GamingProfile::tags contains arrayOf(id))
+            if (count > 0) {
+                context.respond(HttpStatusCode.Conflict, "The tag ${id.toHexString()} is in use. Use the query parameter &force=true to force-delete")
+                return@delete
+            }
+        }
+
+        val deleteResult = collection.deleteOne(Tag::id eq id)
+
+        if (deleteResult.wasAcknowledged() && deleteResult.deletedCount > 0) {
+            context.respond(HttpStatusCode.OK)
+        } else {
+            context.respond(HttpStatusCode.NoContent)
+        }
     }
 }
