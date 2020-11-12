@@ -45,11 +45,16 @@ suspend fun matchProfiles(profile: GamingProfile, limit: Int = 10): List<GamingP
         )
     ).toList().sortedWith { a, b ->
         // https://github.com/NathanPB/wmd-profile-matcher-specification#tag-containment-ratio
-        val tagContainment = {
-            val intersect = a.tags.intersect(b.tags)
-            val difference = a.tags - b.tags
-            intersect.size - difference.size
-        }()
+        val tagContainment = run {
+            fun ratioWith(secondProfile: GamingProfile): Int {
+                val intersect = profile.tags.intersect(secondProfile.tags)
+                val difference = profile.tags - secondProfile.tags
+                return intersect.size - difference.size
+            }
+
+            ratioWith(a) - ratioWith(b)
+        }
+
         tagContainment
     }
 
