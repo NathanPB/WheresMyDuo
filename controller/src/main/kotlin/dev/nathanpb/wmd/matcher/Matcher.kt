@@ -20,8 +20,10 @@
 package dev.nathanpb.wmd.matcher
 
 import dev.nathanpb.wmd.data.GamingProfile
+import dev.nathanpb.wmd.data.Tag
 import dev.nathanpb.wmd.mongoDb
 import org.litote.kmongo.*
+import kotlin.math.ln
 
 private val collection = mongoDb.getCollection<GamingProfile>()
 
@@ -43,19 +45,22 @@ suspend fun matchProfiles(profile: GamingProfile, limit: Int = 10): List<GamingP
                 GamingProfile::calendar in profile.calendar
             )
         )
-    ).toList().sortedWith { a, b ->
+    ).toList().sortedBy { comparingWith ->
         // https://github.com/NathanPB/wmd-profile-matcher-specification#tag-containment-ratio
-        val tagContainment = run {
-            fun ratioWith(secondProfile: GamingProfile): Int {
-                val intersect = profile.tags.intersect(secondProfile.tags)
-                val difference = profile.tags - secondProfile.tags
-                return intersect.size - difference.size
-            }
 
-            ratioWith(a) - ratioWith(b)
+        fun compareTags(compareTags: List<Id<Tag>>): Int {
+            val intersect = profile.tags.intersect(compareTags)
+            val difference = profile.tags - compareTags
+            return intersect.size - difference.size
         }
 
-        tagContainment
+        fun compareCalendar(compareCalendar: List<Int>): Int {
+            return compareCalendar.intersect(profile.calendar).size
+        }
+
+        compareTags(comparingWith.tags) * ln(
+            compareCalendar(comparingWith.calendar) + 1.0
+        ).plus(1)
     }
 
     return potentialMatches.take(limit)
