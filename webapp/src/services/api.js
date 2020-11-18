@@ -64,9 +64,12 @@ export default function create(token) {
   const gamingProfileGetCalendar = (id) => axios.get(`/gamingProfile/${id}/calendar`)
   const gamingProfileSetCalendar = (id, calendar) => axios.put(`/gamingProfile/${id}/calendar`, calendar)
 
+  const match = (profileId) => axios.get(`/match/${profileId}`)
+
   return {
     isAdmin,
     igdb,
+    match,
 
     getTags,
     getTag,
@@ -84,7 +87,7 @@ export default function create(token) {
     gamingProfileDeleteTag,
 
     gamingProfileGetCalendar,
-    gamingProfileSetCalendar
+    gamingProfileSetCalendar,
   }
 
 }

@@ -18,20 +18,22 @@
  */
 
 import React from 'react';
-import { Route, Switch } from 'react-router';
+import {Route, Switch} from 'react-router';
 import logo from '../../../logo.svg';
-import { auth } from '../../../services/firebase';
+import {auth} from '../../../services/firebase';
 import SelfProfileScreen from '../SelfProfileScreen';
 
 import Styles from './index.module.scss';
-import { Menubar } from 'primereact/menubar';
-import { InputText } from 'primereact/inputtext';
-import { TieredMenu } from 'primereact/tieredmenu';
-import { UserContext } from '../../../providers/UserProvider';
-import { Button } from 'primereact/button';
-import { OverlayPanel } from 'primereact/overlaypanel';
+import {Menubar} from 'primereact/menubar';
+import {InputText} from 'primereact/inputtext';
+import {TieredMenu} from 'primereact/tieredmenu';
+import {UserContext} from '../../../providers/UserProvider';
+import {Button} from 'primereact/button';
+import {OverlayPanel} from 'primereact/overlaypanel';
+import MatchScreen from "../MatchScreen";
+import MatchListScreen from "../MatchScreen/MatchListScreen";
 
-export default function UserDashboard() {
+export default function UserDashboard({ history }) {
 
   const user = React.useContext(UserContext)
   const tieredMenu = React.useRef()
@@ -42,6 +44,7 @@ export default function UserDashboard() {
       icon="pi pi-users"
       label="Match my profile!"
       className={Styles.Match}
+      onClick={() => history.push('/match')}
     />
     <div style={{ display: 'inline-block' }} className={Styles.Search}>
       <div className="p-inputgroup">
@@ -102,6 +105,8 @@ export default function UserDashboard() {
               </header>
             </div>
           </Route>
+          <Route path="/match/:id" component={MatchScreen}/>
+          <Route path="/match" component={MatchListScreen}/>
           <Route path="/me" component={SelfProfileScreen} />
         </Switch>
       </main>
