@@ -18,7 +18,6 @@
  */
 
 package dev.nathanpb.wmd.matcher
-
 import dev.nathanpb.wmd.data.GamingProfile
 import dev.nathanpb.wmd.data.Tag
 import dev.nathanpb.wmd.mongoDb
@@ -38,11 +37,11 @@ suspend fun matchProfiles(profile: GamingProfile, limit: Int = 10): List<GamingP
             GamingProfile::game eq profile.game,
             or(
                 GamingProfile::tags size 0,
-                GamingProfile::tags in profile.tags
+                GamingProfile::tags.`in`(profile.tags)
             ),
             or(
                 GamingProfile::calendar size 0,
-                GamingProfile::calendar in profile.calendar
+                GamingProfile::calendar.`in`(profile.calendar)
             )
         )
     ).toList().sortedBy { comparingWith ->
