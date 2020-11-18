@@ -19,10 +19,7 @@
 
 package dev.nathanpb.wmd.server
 
-import dev.nathanpb.wmd.server.routes.auth
-import dev.nathanpb.wmd.server.routes.gamingProfile
-import dev.nathanpb.wmd.server.routes.igdbProxy
-import dev.nathanpb.wmd.server.routes.tag
+import dev.nathanpb.wmd.server.routes.*
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
@@ -81,6 +78,10 @@ fun startServer() {
 
             route("/gamingProfile") {
                 gamingProfile()
+            }
+
+            route("/match") {
+                match()
             }
         }
     }.start()
