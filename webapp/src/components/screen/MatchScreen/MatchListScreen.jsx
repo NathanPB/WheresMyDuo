@@ -23,8 +23,7 @@ import {UserContext} from "../../../providers/UserProvider";
 import LoadingSpinner from "../../misc/LoadingSpinner";
 import {Button} from "primereact/button";
 import GamingProfileCard from "../GamingProfileCard";
-
-import * as Styles from './index.module.scss';
+import GamingProfileCardContainer from "../GamingProfileCard/GamingProfileCardContainer";
 
 export default function MatchListScreen({ history }) {
   const api = React.useContext(ApiContext)
@@ -70,14 +69,14 @@ export default function MatchListScreen({ history }) {
   return (
     <div style={{ padding: '0 1em' }}>
       <h1>Pick a game to match</h1>
-      <div className={Styles.GamingProfiles}>
+      <GamingProfileCardContainer>
         {
           gamingProfiles.map(profile => <GamingProfileCard
             gameId={profile.game}
             onClick={() => history.push(`match/${profile._id}`)}
           />)
         }
-      </div>
+      </GamingProfileCardContainer>
     </div>
 
   )

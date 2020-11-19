@@ -41,21 +41,10 @@
   transform: translateY(-3rem);
 }
 
-.GamingProfiles {
-
-  & > div > div {
-    display: flex;
-    overflow-x: auto;
-
-    & > *:not(:last-child) {
-      margin-right: 1em;
-    }
-  }
-}
-
 .NewCard {
   position: relative;
   min-height: 164px;
+  border: solid 1px #181818;
 
   & > * {
     font-size: 3rem;

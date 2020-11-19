@@ -21,7 +21,6 @@ import React from 'react';
 
 import Styles from './index.module.scss';
 import {UserContext} from '../../../providers/UserProvider';
-import {Card} from 'primereact/card';
 import GamingProfileCard from '../GamingProfileCard';
 
 import GamingProfileCardStyles from '../GamingProfileCard/index.module.scss';
@@ -30,6 +29,8 @@ import GamingProfileAddDialog from '../../dialogs/GamingProfileAddDialog';
 import GamingProfileEditDialog from '../../dialogs/GamingProfileEditDialog';
 import {useSelfProfile} from "../../../hooks/useSelfProfile";
 import SelfProfileInfoCard from "../../misc/SelfProfileInfoEditCard";
+import GamingProfileCardContainer from "../GamingProfileCard/GamingProfileCardContainer";
+import {TabPanel, TabView} from "primereact/tabview";
 
 export default function SelfProfileScreen() {
   const user = React.useContext(UserContext)
@@ -70,7 +71,7 @@ export default function SelfProfileScreen() {
         setVisible={setAddingProfile}
         onPicked={handleAddGamingProfile}
       />
-      <div className="p-grid" style={{ height: '100%', marginTop: 0 }}>
+      <div style={{ display: 'flex', height: '100%', marginTop: 0 }}>
         <div className={`${Styles.ProfileHalfScreenCard}`}>
           <div>
             <img
@@ -86,32 +87,33 @@ export default function SelfProfileScreen() {
           </div>
 
         </div>
-        <div className="p-col">
-          <Card
-            title={`${user.displayName}'s Games`}
-            className={Styles.GamingProfiles}
-            style={{ margin: '1em' }}
-          >
+        <TabView>
+          <TabPanel header="Gaming Profiles">
+            <div style={{ padding: 8 }}>
+              <GamingProfileCardContainer>
+                {
+                  gamingProfiles.map(profile => (
+                    <GamingProfileCard
+                      key={profile._id}
+                      gameId={profile.game}
+                      onClick={() => setGameProfileEdit(profile._id)}
+                    />
 
-            {
-              gamingProfiles.map(profile => (
-                <GamingProfileCard
-                  key={profile._id}
-                  gameId={profile.game}
-                  onClick={() => setGameProfileEdit(profile._id)}
-                />
+                  ))
+                }
 
-              )) }
-
-            <div
-              className={`${GamingProfileCardStyles.Card} ${Styles.NewCard}`}
-              onClick={() => setAddingProfile(true)}
-              title="New Game"
-            >
-              <i className="pi pi-plus"/>
+                <div
+                  className={`${GamingProfileCardStyles.Card} ${Styles.NewCard}`}
+                  onClick={() => setAddingProfile(true)}
+                  title="New Game"
+                >
+                  <i className="pi pi-plus"/>
+                </div>
+              </GamingProfileCardContainer>
             </div>
-          </Card>
-        </div>
+          </TabPanel>
+        </TabView>
+
       </div>
     </>
   )

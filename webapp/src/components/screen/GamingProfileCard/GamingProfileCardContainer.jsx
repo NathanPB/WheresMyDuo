@@ -1,4 +1,4 @@
-/*!
+/*
  * Copyright (c) 2020 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
@@ -16,3 +16,16 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+import React from "react";
+
+import * as Styles from './GamingProfileCardContainer.module.scss';
+
+export default function GamingProfileCardContainer({ children }) {
+
+  return (
+    <div className={Styles.GamingProfiles}>
+      { children }
+    </div>
+  )
+}
