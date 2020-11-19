@@ -1,0 +1,55 @@
+/*!
+ * Copyright (c) 2020 - Nathan P. Bombana
+ *
+ * This file is part of Wheres My Duo.
+ *
+ * Wheres My Duo is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Wheres My Duo is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+.Card {
+  overflow: hidden;
+  min-width: 128px;
+  background-color: #2d2d2d;
+  cursor: pointer;
+  border: solid 1px black;
+  height: 150px;
+}
+
+.Cover {
+  cursor: pointer;
+  border-radius: 2px;
+  width: 128px;
+  height: 150px;
+  min-height: 100%;
+}
+
+.Nickname {
+  display: block;
+  width: 128px;
+
+  background-color: #181818;
+  text-align: center;
+  font-size: 1.25rem;
+
+  transform: translateY(-2rem);
+}
+
+.Header {
+  display: block;
+  position: absolute;
+  color: #181818;
+  width: 128px;
+
+  transform: translateY(-150px);
+}

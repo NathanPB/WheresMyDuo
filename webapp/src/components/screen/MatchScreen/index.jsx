@@ -21,6 +21,8 @@ import React from "react";
 import LoadingSpinner from "../../misc/LoadingSpinner";
 import {useProfileMatcher} from "../../../hooks/useProfileMatcher";
 import {useGamingProfile} from "../../../hooks/useGamingProfile";
+import GamingProfileCardContainer from "../GamingProfileCard/GamingProfileCardContainer";
+import UserProfileCard from "../UserProfileCard";
 
 export default function MatchScreen({ match }) {
   const { id } = match.params
@@ -49,17 +51,55 @@ export default function MatchScreen({ match }) {
     )
   }
 
+  const getCommonCalendar = (match) => {
+    if (profile.calendar && match.calendar && profile.calendar.length > 0 && match.calendar.length > 0) {
+      return match.calendar.filter(it => profile.calendar.includes(it)).length;
+    }
+    return 0;
+  }
+
+  const getCommonTags = (match) => {
+    if (profile.tags && match.tags && profile.tags.length > 0 && match.tags.length > 0) {
+      return (100 * match.tags.length) / 100
+    }
+    return 0;
+  }
+
+
+  function makeHeader(match) {
+    const commonCalendar = getCommonCalendar(match)
+    const commonTags = getCommonTags(match)
+
+    return (
+      <div style={{ width: '100%', display: 'flex' }}>
+        { !commonTags && (
+          <div style={{ textAlign: 'center', flexGrow: 1 }} title={`Common Tags: ${commonTags}`}>
+            <i className="pi pi-tags"/><br/>
+            <span>{commonTags}</span>
+          </div>
+        ) }
+        { !!commonCalendar && (
+          <div style={{ textAlign: 'center', flexGrow: 1 }} title={`Common Weekly Hours: ${commonCalendar}h`}>
+            <i className="pi pi-clock"/><br/>
+            <span>{commonCalendar}h</span>
+          </div>
+        ) }
+      </div>
+    )
+  }
+
+
   return (
-    <ol>
-      {
-        matches.map(match => {
-          return (
-            <li>
-              <b>Common Time:</b> {profile.calendar.filter(it => match.calendar.includes(it)).length} hours per week
-            </li>
-          )
-        })
-      }
-    </ol>
+    <div style={{ padding: '1em' }}>
+      <GamingProfileCardContainer>
+        {
+          matches.map(match =>
+            <UserProfileCard
+              uid={match.user}
+              header={makeHeader(match)}
+            />)
+        }
+      </GamingProfileCardContainer>
+    </div>
   )
 }

@@ -36,20 +36,23 @@ fun Route.profile() {
     suspend fun getUserProfileOrCreate(uid: String): UserProfile {
         var profile = collection.findOne(UserProfile::uid eq uid)
         if (profile == null) {
-            val user = FirebaseAuth.getInstance().getUser(uid)
-
             var nickname = "Unknown"
             var photoURL = ""
 
-            if (user?.isDisabled == false) {
-                nickname = user.displayName
-                photoURL = user.photoUrl
-            }
+            try {
+                val user = FirebaseAuth.getInstance().getUser(uid)
 
-            profile = UserProfile(uid, nickname, photoURL)
-            collection.insertOne(profile)
+                if (user?.isDisabled == false) {
+                    nickname = user.displayName
+                    photoURL = user.photoUrl
+                }
+
+                profile = UserProfile(uid, nickname, photoURL)
+                collection.insertOne(profile)
+            } catch (e: Exception) {  }
+
         }
-        return profile
+        return profile ?: UserProfile(uid, "Unknown", "")
     }
 
     get {
@@ -67,11 +70,11 @@ fun Route.profile() {
             return@get
         }
 
-        val user = FirebaseAuth.getInstance().getUser(uid)
-        if (user == null || user.isDisabled) {
-            context.respond(HttpStatusCode.NotFound)
-            return@get
-        }
+//        val user = FirebaseAuth.getInstance().getUser(uid)
+//        if (user == null || user.isDisabled) {
+//            context.respond(HttpStatusCode.NotFound)
+//            return@get
+//        }
 
         val profile = getUserProfileOrCreate(uid).copy(
             favs = emptyList()
