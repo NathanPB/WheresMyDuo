@@ -35,14 +35,21 @@ suspend fun matchProfiles(profile: GamingProfile, limit: Int = 10): List<GamingP
         and(
             not(GamingProfile::user eq profile.user),
             GamingProfile::game eq profile.game,
-            or(
-                GamingProfile::tags size 0,
-                GamingProfile::tags.`in`(profile.tags)
-            ),
-            or(
-                GamingProfile::calendar size 0,
-                GamingProfile::calendar.`in`(profile.calendar)
-            )
+
+            if (profile.tags.isNotEmpty()) {
+                or(
+                    GamingProfile::tags size 0,
+                    GamingProfile::tags.`in`(profile.tags)
+                )
+            } else null,
+
+            if (profile.calendar.isNotEmpty()) {
+                or(
+                    GamingProfile::calendar size 0,
+                    GamingProfile::calendar.`in`(profile.calendar)
+                )
+            } else null
+
         )
     ).toList().sortedBy { comparingWith ->
         // https://github.com/NathanPB/wmd-profile-matcher-specification#tag-containment-ratio
