@@ -65,3 +65,14 @@
     transform: translate(-50%, -50%)
   }
 }
+
+.ProfileHalfScreenCard {
+  width: 100%;
+  padding-top: 1em;
+
+  @media (min-width: 769px) {
+    width: 400px;
+    background-color: black;
+    border-right: solid 4px #440473;
+  }
+}

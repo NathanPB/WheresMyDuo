@@ -64,6 +64,9 @@ export default function create(token) {
   const gamingProfileGetCalendar = (id) => axios.get(`/gamingProfile/${id}/calendar`)
   const gamingProfileSetCalendar = (id, calendar) => axios.put(`/gamingProfile/${id}/calendar`, calendar)
 
+  const getSelfProfile = () => axios.get('/profile/')
+  const saveSelfProfile = (payload) => axios.put('/profile', payload)
+
   const match = (profileId) => axios.get(`/match/${profileId}`)
 
   return {
@@ -88,6 +91,9 @@ export default function create(token) {
 
     gamingProfileGetCalendar,
     gamingProfileSetCalendar,
+
+    getSelfProfile,
+    saveSelfProfile
   }
 
 }

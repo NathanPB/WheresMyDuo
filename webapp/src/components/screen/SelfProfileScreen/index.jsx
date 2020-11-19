@@ -20,18 +20,21 @@
 import React from 'react';
 
 import Styles from './index.module.scss';
-import { UserContext } from '../../../providers/UserProvider';
-import { Card } from 'primereact/card';
+import {UserContext} from '../../../providers/UserProvider';
+import {Card} from 'primereact/card';
 import GamingProfileCard from '../GamingProfileCard';
 
 import GamingProfileCardStyles from '../GamingProfileCard/index.module.scss';
-import { ApiContext } from '../../../providers/ApiProvider';
+import {ApiContext} from '../../../providers/ApiProvider';
 import GamingProfileAddDialog from '../../dialogs/GamingProfileAddDialog';
 import GamingProfileEditDialog from '../../dialogs/GamingProfileEditDialog';
+import {useSelfProfile} from "../../../hooks/useSelfProfile";
+import SelfProfileInfoCard from "../../misc/SelfProfileInfoEditCard";
 
 export default function SelfProfileScreen() {
   const user = React.useContext(UserContext)
   const api = React.useContext(ApiContext)
+  const [profile] = useSelfProfile()
 
   const [gamingProfiles, setGamingProfiles] = React.useState([])
 
@@ -67,38 +70,48 @@ export default function SelfProfileScreen() {
         setVisible={setAddingProfile}
         onPicked={handleAddGamingProfile}
       />
-      <div className="p-p-3">
-        <img
-          alt="Your Avatar"
-          className={Styles.ProfilePic}
-          src={user.photoURL}
-        />
-        <span className={Styles.UserName}>{user.displayName}</span>
-      </div>
-      <div className="p-m-3">
-        <Card
-          title={`${user.displayName}'s Games`}
-          className={Styles.GamingProfiles}
-        >
-
-          {
-            gamingProfiles.map(profile => (
-              <GamingProfileCard
-                key={profile._id}
-                gameId={profile.game}
-                onClick={() => setGameProfileEdit(profile._id)}
-              />
-
-            )) }
-
-          <div
-            className={`${GamingProfileCardStyles.Card} ${Styles.NewCard}`}
-            onClick={() => setAddingProfile(true)}
-            title="New Game"
-          >
-            <i className="pi pi-plus"/>
+      <div className="p-grid" style={{ height: '100%', marginTop: 0 }}>
+        <div className={`${Styles.ProfileHalfScreenCard}`}>
+          <div>
+            <img
+              alt="Your Avatar"
+              className={Styles.ProfilePic}
+              src={user.photoURL}
+            />
+            <span className={Styles.UserName}>{(profile && profile.nickname) || user.displayName}</span>
           </div>
-        </Card>
+
+          <div>
+            <SelfProfileInfoCard style={{ margin: '1em' }} allowEdit/>
+          </div>
+
+        </div>
+        <div className="p-col">
+          <Card
+            title={`${user.displayName}'s Games`}
+            className={Styles.GamingProfiles}
+            style={{ margin: '1em' }}
+          >
+
+            {
+              gamingProfiles.map(profile => (
+                <GamingProfileCard
+                  key={profile._id}
+                  gameId={profile.game}
+                  onClick={() => setGameProfileEdit(profile._id)}
+                />
+
+              )) }
+
+            <div
+              className={`${GamingProfileCardStyles.Card} ${Styles.NewCard}`}
+              onClick={() => setAddingProfile(true)}
+              title="New Game"
+            >
+              <i className="pi pi-plus"/>
+            </div>
+          </Card>
+        </div>
       </div>
     </>
   )

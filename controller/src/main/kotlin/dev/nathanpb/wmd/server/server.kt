@@ -83,6 +83,10 @@ fun startServer() {
             route("/match") {
                 match()
             }
+
+            route("/profile") {
+                profile()
+            }
         }
     }.start()
 }
