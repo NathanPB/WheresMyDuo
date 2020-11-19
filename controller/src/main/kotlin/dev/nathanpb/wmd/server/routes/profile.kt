@@ -37,9 +37,16 @@ fun Route.profile() {
         var profile = collection.findOne(UserProfile::uid eq uid)
         if (profile == null) {
             val user = FirebaseAuth.getInstance().getUser(uid)
-            val nickname = if (user == null || user.isDisabled) user.displayName else "Unknown"
 
-            profile = UserProfile(uid, nickname)
+            var nickname = "Unknown"
+            var photoURL = ""
+
+            if (user?.isDisabled == false) {
+                nickname = user.displayName
+                photoURL = user.photoUrl
+            }
+
+            profile = UserProfile(uid, nickname, photoURL)
             collection.insertOne(profile)
         }
         return profile

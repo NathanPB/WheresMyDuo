@@ -76,7 +76,7 @@ export default function SelfProfileScreen() {
             <img
               alt="Your Avatar"
               className={Styles.ProfilePic}
-              src={user.photoURL}
+              src={(profile && profile.photoURL) || user.photoURL}
             />
             <span className={Styles.UserName}>{(profile && profile.nickname) || user.displayName}</span>
           </div>

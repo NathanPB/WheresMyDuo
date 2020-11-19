@@ -29,19 +29,21 @@ export default function SelfProfileInfoCard({ allowEdit, style }) {
   const [edit, setEdit] = React.useState(false)
 
   const [nickname, setNickname] = React.useState()
+  const [photoURL, setPhotoURL] = React.useState()
 
   function refresh() {
     if (api) {
       api.getSelfProfile()
         .then(response => {
           setNickname(response.data.nickname)
+          setPhotoURL(response.data.photoURL)
         }).catch(console.error)
     }
   }
 
   function handleSave() {
     if (nickname) {
-      api.saveSelfProfile({ nickname })
+      api.saveSelfProfile({ nickname, photoURL })
         .then(() => setEdit(false))
     }
   }
