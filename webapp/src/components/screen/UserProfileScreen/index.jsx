@@ -46,8 +46,8 @@ export default function UserProfileScreen({ uid }) {
 
   return (
     <>
-      <div style={{ display: 'flex', height: '100%', marginTop: 0 }}>
-        <div className={`${Styles.ProfileHalfScreenCard}`}>
+      <div className={Styles.ProfilePageWrapper}>
+        <div className={Styles.ProfileHalfScreenCard}>
           <div>
             <img
               alt={`${profile?.nickname}'s Avatar`}

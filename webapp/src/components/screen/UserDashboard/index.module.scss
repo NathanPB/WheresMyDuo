@@ -42,7 +42,7 @@
     font-size: 1.5rem;
   }
 
-  @media (max-width: 320px) {
+  @media (max-width: 340px) {
 
     & {
       min-width: initial !important;
@@ -59,7 +59,7 @@
 }
 
 .Search {
-  @media (max-width: 481px) {
+  @media (max-width: 560px) {
 
     & > div > span {
       cursor: pointer;
@@ -75,7 +75,7 @@
 
 .SearchPopup {
   margin-top: 8px;
-  @media (min-width: 481px) {
+  @media (min-width: 560px) {
     display: none;
   }
 

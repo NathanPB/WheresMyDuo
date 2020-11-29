@@ -55,6 +55,16 @@
   }
 }
 
+.ProfilePageWrapper {
+  display: flex;
+  height: 100%;
+  margin-top: 0;
+
+  @media (max-width: 769px) {
+    flex-direction: column;
+  }
+}
+
 .ProfileHalfScreenCard {
   width: 100%;
   padding-top: 1em;
