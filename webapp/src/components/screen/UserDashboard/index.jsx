@@ -32,6 +32,7 @@ import {Button} from 'primereact/button';
 import {OverlayPanel} from 'primereact/overlaypanel';
 import MatchScreen from "../MatchScreen";
 import MatchListScreen from "../MatchScreen/MatchListScreen";
+import UserProfileScreen from "../UserProfileScreen";
 
 export default function UserDashboard({ history }) {
 
@@ -108,6 +109,7 @@ export default function UserDashboard({ history }) {
           <Route path="/match/:id" component={MatchScreen}/>
           <Route path="/match" component={MatchListScreen}/>
           <Route path="/me" component={SelfProfileScreen} />
+          <Route path="/u/:id" component={({ match }) => <UserProfileScreen uid={match.params.id}/>}/>
         </Switch>
       </main>
     </>

@@ -24,7 +24,7 @@ import {useGamingProfile} from "../../../hooks/useGamingProfile";
 import GamingProfileCardContainer from "../GamingProfileCard/GamingProfileCardContainer";
 import UserProfileCard from "../UserProfileCard";
 
-export default function MatchScreen({ match }) {
+export default function MatchScreen({ history, match }) {
   const { id } = match.params
 
   const [profile, profileLoading] = useGamingProfile(id)
@@ -95,6 +95,7 @@ export default function MatchScreen({ match }) {
         {
           matches.map(match =>
             <UserProfileCard
+              onClick={() => history.push(`/u/${match.user}`)}
               uid={match.user}
               header={makeHeader(match)}
             />)

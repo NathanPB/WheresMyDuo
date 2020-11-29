@@ -96,4 +96,38 @@ fun Route.profile() {
         collection.save(sample)
         context.respond(HttpStatusCode.OK)
     }
+
+    post("/fav/{uid}") {
+        val user = context.authenticate() ?: return@post
+        val uid = context.parameters["uid"].orEmpty()
+
+        if (uid.isEmpty()) {
+            context.respond(HttpStatusCode.BadRequest)
+            return@post
+        }
+
+        val profile = getUserProfileOrCreate(user.uid).let {
+            it.copy(favs = (it.favs + uid).distinct())
+        }
+
+        collection.save(profile)
+        context.respond(HttpStatusCode.OK)
+    }
+
+    post("/unfav/{uid}") {
+        val user = context.authenticate() ?: return@post
+        val uid = context.parameters["uid"].orEmpty()
+
+        if (uid.isEmpty()) {
+            context.respond(HttpStatusCode.BadRequest)
+            return@post
+        }
+
+        val profile = getUserProfileOrCreate(user.uid).let {
+            it.copy(favs = it.favs - uid)
+        }
+
+        collection.save(profile)
+        context.respond(HttpStatusCode.OK)
+    }
 }

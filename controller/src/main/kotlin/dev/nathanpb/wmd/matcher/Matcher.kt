@@ -51,7 +51,7 @@ suspend fun matchProfiles(profile: GamingProfile, limit: Int = 10): List<GamingP
             } else null
 
         )
-    ).toList().sortedBy { comparingWith ->
+    ).toList().sortedByDescending { comparingWith ->
         // https://github.com/NathanPB/wmd-profile-matcher-specification#tag-containment-ratio
 
         fun compareTags(compareTags: List<Id<Tag>>): Int {

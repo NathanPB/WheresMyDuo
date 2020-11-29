@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright (c) 2020 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
@@ -17,28 +17,37 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React from "react";
-import {ApiContext} from "../providers/ApiProvider";
+.ProfilePic {
+  border-radius: 8px;
+  width: 256px;
+  height: auto;
+  max-width: 256px;
+  flex-grow: 1;
+  flex-shrink: 0;
 
-export function useUserProfile(id) {
-  const api = React.useContext(ApiContext)
+  display: block;
+  margin: 0 auto 0 auto;
+}
 
-  const [data, setData] = React.useState({ loading: false })
+.UserName {
+  display: block;
+  margin: 0 auto 0 auto;
+  width: 256px;
 
-  const refetch = () => {
-    if (api && id) {
-      setData({ loading: true })
-      api.getUserProfile(id)
-        .then(response => {
-          setData({ loading: false, profile: { ...response.data } })
-        }).catch(e => {
-        setData({ loading: false })
-        console.error(e)
-      })
-    }
+  background-color: #181818;
+  text-align: center;
+  font-size: 2rem;
+
+  transform: translateY(-3rem);
+}
+
+.ProfileHalfScreenCard {
+  width: 100%;
+  padding-top: 1em;
+
+  @media (min-width: 769px) {
+    width: 400px;
+    background-color: black;
+    border-right: solid 4px #440473;
   }
-
-  React.useEffect(refetch, [api, id])
-
-  return [data.profile, data.loading, refetch]
 }
