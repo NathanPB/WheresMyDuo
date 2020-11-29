@@ -61,3 +61,7 @@
     border-right: solid 4px #440473;
   }
 }
+
+.ProfileHalfScreenCard + div {
+  flex-grow: 100;
+}

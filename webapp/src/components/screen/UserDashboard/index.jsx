@@ -74,7 +74,7 @@ export default function UserDashboard({ history }) {
   ]
 
   const menuEnd = <>
-    <TieredMenu ref={tieredMenu} model={userMenu} popup/>
+    <TieredMenu appendTo={document.body} ref={tieredMenu} model={userMenu} popup/>
     <img
       src={user.photoURL}
       className={Styles.Avatar}
