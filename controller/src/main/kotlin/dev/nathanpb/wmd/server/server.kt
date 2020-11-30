@@ -87,6 +87,10 @@ fun startServer() {
             route("/profile") {
                 profile()
             }
+
+            route("/friendRequest") {
+                friendRequests()
+            }
         }
     }.start()
 }

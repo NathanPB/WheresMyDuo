@@ -27,37 +27,47 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.eq
 
+suspend fun getUserProfile(
+    uid: String,
+    collection: CoroutineCollection<UserProfile> = mongoDb.getCollection()
+): UserProfile? {
+    return collection.findOne(UserProfile::uid eq uid)
+}
+
+suspend fun getUserProfileOrCreate(
+    uid: String,
+    collection: CoroutineCollection<UserProfile> = mongoDb.getCollection()
+): UserProfile {
+    var profile = getUserProfile(uid, collection)
+    if (profile == null) {
+        var nickname = "Unknown"
+        var photoURL = ""
+
+        try {
+            val user = FirebaseAuth.getInstance().getUser(uid)
+
+            if (user?.isDisabled == false) {
+                nickname = user.displayName
+                photoURL = user.photoUrl
+            }
+
+            profile = UserProfile(uid, nickname, photoURL)
+            collection.insertOne(profile)
+        } catch (e: Exception) {  }
+
+    }
+    return profile ?: UserProfile(uid, "Unknown", "")
+}
 
 fun Route.profile() {
     val collection = mongoDb.getCollection<UserProfile>()
 
-    suspend fun getUserProfileOrCreate(uid: String): UserProfile {
-        var profile = collection.findOne(UserProfile::uid eq uid)
-        if (profile == null) {
-            var nickname = "Unknown"
-            var photoURL = ""
-
-            try {
-                val user = FirebaseAuth.getInstance().getUser(uid)
-
-                if (user?.isDisabled == false) {
-                    nickname = user.displayName
-                    photoURL = user.photoUrl
-                }
-
-                profile = UserProfile(uid, nickname, photoURL)
-                collection.insertOne(profile)
-            } catch (e: Exception) {  }
-
-        }
-        return profile ?: UserProfile(uid, "Unknown", "")
-    }
-
     get {
         val user = context.authenticate() ?: return@get
-        val profile = getUserProfileOrCreate(user.uid)
+        val profile = getUserProfileOrCreate(user.uid, collection)
         context.respond(profile)
     }
 
@@ -106,7 +116,7 @@ fun Route.profile() {
             return@post
         }
 
-        val profile = getUserProfileOrCreate(user.uid).let {
+        val profile = getUserProfileOrCreate(user.uid, collection).let {
             it.copy(favs = (it.favs + uid).distinct())
         }
 
@@ -123,7 +133,7 @@ fun Route.profile() {
             return@post
         }
 
-        val profile = getUserProfileOrCreate(user.uid).let {
+        val profile = getUserProfileOrCreate(user.uid, collection).let {
             it.copy(favs = it.favs - uid)
         }
 

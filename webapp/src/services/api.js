@@ -70,6 +70,12 @@ export default function create(token) {
 
   const match = (profileId) => axios.get(`/match/${profileId}`)
 
+  const getFriendRequests = () => axios.get('/friendRequest')
+  const sendFriendRequest = (to) => axios.post(`/friendRequest/${to}`)
+  const acceptFriendRequest = (id) => axios.put(`/friendRequest/${id}/accept`)
+  const denyFriendRequest = (id) => axios.put(`/friendRequest/${id}/deny`)
+  const deleteFriend = (id) => axios.delete(`/friendRequest/${id}`)
+
   return {
     isAdmin,
     igdb,
@@ -95,7 +101,13 @@ export default function create(token) {
 
     getSelfProfile,
     getUserProfile,
-    saveSelfProfile
+    saveSelfProfile,
+
+    getFriendRequests,
+    sendFriendRequest,
+    acceptFriendRequest,
+    denyFriendRequest,
+    deleteFriend
   }
 
 }

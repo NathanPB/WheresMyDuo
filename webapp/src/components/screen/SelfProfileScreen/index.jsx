@@ -31,11 +31,14 @@ import {useSelfProfile} from "../../../hooks/useSelfProfile";
 import SelfProfileInfoCard from "../../misc/SelfProfileInfoEditCard";
 import GamingProfileCardContainer from "../GamingProfileCard/GamingProfileCardContainer";
 import {TabPanel, TabView} from "primereact/tabview";
+import {useSelfFriendRequests} from "../../../hooks/useSelfFriendRequests";
+import UserProfileCard from "../UserProfileCard";
 
-export default function SelfProfileScreen() {
+export default function SelfProfileScreen({ history }) {
   const user = React.useContext(UserContext)
   const api = React.useContext(ApiContext)
   const [profile] = useSelfProfile()
+  const [friendRequests] = useSelfFriendRequests()
 
   const [gamingProfiles, setGamingProfiles] = React.useState([])
 
@@ -111,6 +114,68 @@ export default function SelfProfileScreen() {
                 </div>
               </GamingProfileCardContainer>
             </div>
+          </TabPanel>
+          <TabPanel header="Friends">
+            {
+              friendRequests && friendRequests.length > 0 && (
+                <>
+                  <h1>Friend Requests</h1>
+                  <GamingProfileCardContainer>
+                    {
+                      friendRequests.map(request => {
+
+                        const header = <div style={{ width: '100%', display: 'flex' }}>
+                          <i
+                            style={{ textAlign: 'center', flexGrow: 1, color: '#673AB7', fontSize: '1.5rem' }}
+                            title="Accept Friend Request"
+                            className="pi pi-check"
+                            onClick={() => {
+                              api.acceptFriendRequest(request._id)
+                                .then(() => window.location.reload())
+                            }}
+                          />
+                          <i
+                            style={{ textAlign: 'center', flexGrow: 1, color: '#673AB7', fontSize: '1.5rem' }}
+                            title="Deny Friend Request"
+                            className="pi pi-times"
+                            onClick={() => {
+                              api.denyFriendRequest(request._id)
+                                .then(() => window.location.reload())
+                            }}
+                          />
+                        </div>
+
+                        return (
+                          <UserProfileCard
+                            onClick={() => history.push(`/u/${request.from}`)}
+                            uid={request.from}
+                            header={header}
+                          />
+                        )
+                      })
+                    }
+                  </GamingProfileCardContainer>
+                </>
+              )
+            }
+            <h1>Friends</h1>
+            {
+              (profile && profile.friends && profile.friends.length > 0)
+                ? (
+                  <GamingProfileCardContainer>
+                    {
+                      profile.friends.map(uid => {
+                        return (
+                          <UserProfileCard
+                            onClick={() => history.push(`/u/${uid}`)}
+                            uid={uid}
+                          />
+                        )
+                      })
+                    }
+                  </GamingProfileCardContainer>
+                ) : <span>It seems like you have to meet someone, why don't you see <a href="/match">our recomendations?</a></span>
+            }
           </TabPanel>
         </TabView>
 

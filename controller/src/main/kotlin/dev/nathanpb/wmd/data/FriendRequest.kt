@@ -17,26 +17,18 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React from "react";
-import {ApiContext} from "../providers/ApiProvider";
+package dev.nathanpb.wmd.data
 
-export function useSelfProfile() {
-  const api = React.useContext(ApiContext)
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import org.litote.kmongo.Id
+import org.litote.kmongo.id.MongoId
+import org.litote.kmongo.newId
 
-  const [data, setData] = React.useState({ loading: false })
-
-  React.useEffect(() => {
-    if (api) {
-      setData({ loading: true })
-      api.getSelfProfile()
-        .then(response => {
-          setData({ loading: false, profile: { friends: [], favs: [], ...response.data } })
-        }).catch(e => {
-        setData({ loading: false })
-        console.error(e)
-      })
-    }
-  }, [api])
-
-  return [data.profile, data.loading]
-}
+@Serializable
+data class FriendRequest (
+    @Contextual @SerialName("_id") @MongoId val id: Id<FriendRequest>? = newId(),
+    val from: String,
+    val to: String
+)

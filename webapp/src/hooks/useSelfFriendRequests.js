@@ -20,7 +20,7 @@
 import React from "react";
 import {ApiContext} from "../providers/ApiProvider";
 
-export function useSelfProfile() {
+export function useSelfFriendRequests() {
   const api = React.useContext(ApiContext)
 
   const [data, setData] = React.useState({ loading: false })
@@ -28,15 +28,14 @@ export function useSelfProfile() {
   React.useEffect(() => {
     if (api) {
       setData({ loading: true })
-      api.getSelfProfile()
-        .then(response => {
-          setData({ loading: false, profile: { friends: [], favs: [], ...response.data } })
-        }).catch(e => {
+      api.getFriendRequests()
+        .then(response => setData({ loading: false, requests: response.data }))
+        .catch(e => {
         setData({ loading: false })
         console.error(e)
       })
     }
   }, [api])
 
-  return [data.profile, data.loading]
+  return [data.requests, data.loading]
 }

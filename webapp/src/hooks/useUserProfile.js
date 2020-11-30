@@ -30,7 +30,7 @@ export function useUserProfile(id) {
       setData({ loading: true })
       api.getUserProfile(id)
         .then(response => {
-          setData({ loading: false, profile: { ...response.data } })
+          setData({ loading: false, profile: { friends: [], ...response.data } })
         }).catch(e => {
         setData({ loading: false })
         console.error(e)

@@ -109,7 +109,7 @@ export default function UserDashboard({ history }) {
           <Route path="/match/:id" component={MatchScreen}/>
           <Route path="/match" component={MatchListScreen}/>
           <Route path="/me" component={SelfProfileScreen} />
-          <Route path="/u/:id" component={({ match }) => <UserProfileScreen uid={match.params.id}/>}/>
+          <Route path="/u/:id" component={({ match, history }) => <UserProfileScreen uid={match.params.id} history={history}/>}/>
         </Switch>
       </main>
     </>
