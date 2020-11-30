@@ -56,9 +56,11 @@
   padding-top: 1em;
 
   @media (min-width: 769px) {
+    overflow-y: scroll;
     width: 400px;
     background-color: black;
     border-right: solid 4px #440473;
+    height: 100%;
   }
 }
 
