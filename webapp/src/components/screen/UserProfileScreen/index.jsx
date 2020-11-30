@@ -31,6 +31,7 @@ import {useSelfProfile} from "../../../hooks/useSelfProfile";
 import {useSelfFriendRequests} from "../../../hooks/useSelfFriendRequests";
 import {Button} from "primereact/button";
 import UserProfileCard from "../UserProfileCard";
+import {InputTextarea} from "primereact/inputtextarea";
 
 export default function UserProfileScreen({ uid, history }) {
   const currentUser = React.useContext(UserContext)
@@ -70,6 +71,23 @@ export default function UserProfileScreen({ uid, history }) {
               {profile?.nickname}
             </span>
           </div>
+          <hr/>
+          {
+            profile && profile.contactInfo && (
+              <>
+                <div style={{ marginBottom: '1em' }}>
+                  <h3 style={{ textAlign: 'center' }}>Contact Information</h3>
+                  <InputTextarea
+                    style={{ display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
+                    value={profile.contactInfo}
+                    readOnly
+                  />
+                </div>
+                <hr/>
+              </>
+
+            )
+          }
           <div>
             {
               (

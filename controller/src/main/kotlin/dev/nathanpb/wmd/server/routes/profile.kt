@@ -73,7 +73,7 @@ fun Route.profile() {
 
     // TODO allow by friend request
     get("/{uid}") {
-        context.authenticate() ?: return@get
+        val authUser = context.authenticate() ?: return@get
         val uid = context.parameters["uid"].orEmpty()
         if (uid.isEmpty()) {
             context.respond(HttpStatusCode.BadRequest)
@@ -89,7 +89,9 @@ fun Route.profile() {
         val profile = getUserProfileOrCreate(uid).copy(
             favs = emptyList()
         )
-        context.respond(profile)
+        context.respond(profile.copy(
+            contactInfo = if (authUser.uid in profile.friends) profile.contactInfo else ""
+        ))
     }
 
     put {

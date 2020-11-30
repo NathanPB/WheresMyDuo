@@ -22,6 +22,7 @@ import {Card} from "primereact/card";
 import {InputText} from "primereact/inputtext";
 import {ApiContext} from "../../providers/ApiProvider";
 import {Button} from "primereact/button";
+import {InputTextarea} from "primereact/inputtextarea";
 
 export default function SelfProfileInfoCard({ allowEdit, style }) {
   const api = React.useContext(ApiContext)
@@ -30,6 +31,7 @@ export default function SelfProfileInfoCard({ allowEdit, style }) {
 
   const [nickname, setNickname] = React.useState()
   const [photoURL, setPhotoURL] = React.useState()
+  const [contactInfo, setContactInfo] = React.useState("")
 
   function refresh() {
     if (api) {
@@ -37,13 +39,14 @@ export default function SelfProfileInfoCard({ allowEdit, style }) {
         .then(response => {
           setNickname(response.data.nickname)
           setPhotoURL(response.data.photoURL)
+          setContactInfo(response.data.contactInfo)
         }).catch(console.error)
     }
   }
 
   function handleSave() {
     if (nickname) {
-      api.saveSelfProfile({ nickname, photoURL })
+      api.saveSelfProfile({ nickname, photoURL, contactInfo })
         .then(() => setEdit(false))
     }
   }
@@ -68,6 +71,16 @@ export default function SelfProfileInfoCard({ allowEdit, style }) {
           <InputText value={nickname} onChange={e => setNickname(e.target.value)} readOnly={!edit}/>
         </div>
 
+        <div className="p-field">
+          <label>Contact Information:</label>
+          <InputTextarea
+            value={contactInfo}
+            onChange={e => setContactInfo(e.target.value)}
+            placeholder="Describe where your friends can find you"
+            readOnly={!edit}
+          />
+        </div>
+
         { edit && (
           <div className="p-grid">
             <div className="p-col-4">
@@ -78,6 +91,7 @@ export default function SelfProfileInfoCard({ allowEdit, style }) {
             </div>
           </div>
         ) }
+
 
         { (!edit && allowEdit) && <Button icon="pi pi-pencil" label="Edit" onClick={() => setEdit(true)}/> }
 
