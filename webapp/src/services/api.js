@@ -76,6 +76,8 @@ export default function create(token) {
   const denyFriendRequest = (id) => axios.put(`/friendRequest/${id}/deny`)
   const deleteFriend = (id) => axios.delete(`/friendRequest/${id}`)
 
+  const queryUsers = (query) => axios.get(`/profile/query?query=${encodeURI(query)}`)
+
   return {
     isAdmin,
     igdb,
@@ -107,7 +109,9 @@ export default function create(token) {
     sendFriendRequest,
     acceptFriendRequest,
     denyFriendRequest,
-    deleteFriend
+    deleteFriend,
+
+    queryUsers
   }
 
 }

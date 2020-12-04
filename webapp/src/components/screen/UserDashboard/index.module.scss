@@ -59,6 +59,11 @@
 }
 
 .Search {
+
+  & > div > span > input {
+    border-radius: 0 !important;
+  }
+
   @media (max-width: 560px) {
 
     & > div > span {
@@ -67,7 +72,7 @@
       border-radius: 4px;
     }
 
-    & > div > input {
+    & > div > span:last-child {
       display: none !important;
     }
   }
@@ -81,5 +86,14 @@
 
   & > div {
     padding: 0 !important;
+  }
+}
+
+.AutoCompleteUserQuery li {
+  padding: 0 !important;
+
+  & > span {
+    display: block;
+    margin: 0.75rem;
   }
 }

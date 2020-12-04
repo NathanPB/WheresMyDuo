@@ -27,8 +27,8 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import org.litote.kmongo.*
 import org.litote.kmongo.coroutine.CoroutineCollection
-import org.litote.kmongo.eq
 
 suspend fun getUserProfile(
     uid: String,
@@ -69,6 +69,32 @@ fun Route.profile() {
         val user = context.authenticate() ?: return@get
         val profile = getUserProfileOrCreate(user.uid, collection)
         context.respond(profile)
+    }
+
+    get("/query") {
+        val authUser = context.authenticate() ?: return@get
+
+        val query = context.request.queryParameters["query"].orEmpty()
+        val result = collection.aggregate<UserProfile>(
+            listOf(
+                match(
+                    and(
+                        not(UserProfile::uid eq authUser.uid),
+                        UserProfile::nickname regex ".*${query}.*".toRegex(RegexOption.IGNORE_CASE)
+                    )
+                ),
+                limit(20)
+            )
+        ).toList()
+
+        context.respond(
+            result.map {
+                it.copy(
+                    favs = emptyList(),
+                    contactInfo = if (authUser.uid in it.friends) it.contactInfo else ""
+                )
+            }
+        )
     }
 
     // TODO allow by friend request

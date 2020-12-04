@@ -25,7 +25,6 @@ import SelfProfileScreen from '../SelfProfileScreen';
 
 import Styles from './index.module.scss';
 import {Menubar} from 'primereact/menubar';
-import {InputText} from 'primereact/inputtext';
 import {TieredMenu} from 'primereact/tieredmenu';
 import {UserContext} from '../../../providers/UserProvider';
 import {Button} from 'primereact/button';
@@ -33,12 +32,30 @@ import {OverlayPanel} from 'primereact/overlaypanel';
 import MatchScreen from "../MatchScreen";
 import MatchListScreen from "../MatchScreen/MatchListScreen";
 import UserProfileScreen from "../UserProfileScreen";
+import {AutoComplete} from "primereact/autocomplete";
+import {ApiContext} from "../../../providers/ApiProvider";
 
 export default function UserDashboard({ history }) {
-
   const user = React.useContext(UserContext)
+  const api = React.useContext(ApiContext)
+
   const tieredMenu = React.useRef()
   const searchMenu = React.useRef()
+
+  const [userQuery, setUserQuery] = React.useState('')
+  const [queriedUsers, setQueriedUsers] = React.useState([])
+
+  function onUserSearch(event) {
+    if (api) {
+      api.queryUsers(event.query.trim())
+        .then(response => setQueriedUsers(response.data))
+    }
+  }
+
+  function onUserSelected(user) {
+    history.push(`/u/${user._id}`)
+    setUserQuery('')
+  }
 
   const menuStart = <>
     <Button
@@ -52,11 +69,31 @@ export default function UserDashboard({ history }) {
         <span className="p-inputgroup-addon" onClick={(e) => searchMenu.current.toggle(e)}>
           <i className="pi pi-search"/>
         </span>
-        <InputText/>
+        <AutoComplete
+          panelClassName={Styles.AutoCompleteUserQuery}
+          field="nickname"
+          value={userQuery}
+          suggestions={queriedUsers}
+          completeMethod={onUserSearch}
+          itemTemplate={data => <span onClick={() => onUserSelected(data)}>{data.nickname}</span>}
+          onChange={e => setUserQuery(e.value)}
+          appendTo={document.body}
+          dropdown
+        />
       </div>
     </div>
     <OverlayPanel ref={searchMenu} className={Styles.SearchPopup}>
-      <InputText/>
+      <AutoComplete
+        field="nickname"
+        value={userQuery}
+        suggestions={queriedUsers}
+        completeMethod={onUserSearch}
+        onChange={e => setUserQuery(e.value)}
+        itemTemplate={data => <span onClick={() => onUserSelected(data)}>{data.nickname}</span>}
+        appendTo={document.body}
+        panelClassName={Styles.AutoCompleteUserQuery}
+        dropdown
+      />
     </OverlayPanel>
   </>
 
