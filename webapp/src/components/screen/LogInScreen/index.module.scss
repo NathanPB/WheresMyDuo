@@ -1,0 +1,75 @@
+/*!
+ * Copyright (c) 2020 - Nathan P. Bombana
+ *
+ * This file is part of Wheres My Duo.
+ *
+ * Wheres My Duo is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Wheres My Duo is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+.LoginScreen {
+  height: 100%;
+
+  @media (max-width: 480px) {
+    margin-top: 2rem;
+  }
+}
+
+.LoginCard {
+
+  text-align: center;
+
+  @media (min-width: 481px) {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 350px;
+    height: 90vh;
+
+    background: var(--surface-a);
+    border-radius: 8px;
+    padding: 1em;
+
+    -webkit-box-shadow: 10px 10px 10px -6px rgba(68,4,115,1);
+    -moz-box-shadow: 10px 10px 10px -6px rgba(68,4,115,1);
+    box-shadow: 10px 10px 10px -6px rgba(68,4,115,1);
+  }
+}
+
+.Subtitle {
+  font-size: 1.25rem;
+}
+
+.WMD {
+  font-weight: bold;
+  font-size: 2.5rem;
+  & > span {
+    color: rgba(68,4,115,1);
+  }
+}
+
+.LoginText {
+  cursor: pointer;
+  margin-top: 64px;
+
+  & > span {
+    font-size: 1.25rem;
+  }
+
+  & > i {
+    margin-top: .75rem;
+    font-size: 7.25rem;
+  }
+}

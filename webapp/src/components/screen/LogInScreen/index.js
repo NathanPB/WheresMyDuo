@@ -19,11 +19,29 @@
 
 import React from 'react';
 
-import { auth, googleAuthProvider } from '../../../services/firebase';
+import {auth, googleAuthProvider} from '../../../services/firebase';
+
+import * as Styles from './index.module.scss';
 
 export default function LogInScreen() {
 
+  function handleLogin() {
+    auth.signInWithRedirect(googleAuthProvider)
+  }
+
   return (
-    <button onClick={() => auth.signInWithRedirect(googleAuthProvider)}>Login with Google</button>
+    <main className={Styles.LoginScreen}>
+      <article className={Styles.LoginCard}>
+        <span className={Styles.Subtitle}>Welcome to</span><br/>
+        <span className={Styles.WMD}>WheresMy<span>Duo</span></span>
+        <hr/>
+
+        <div className={Styles.LoginText}>
+          <span onClick={handleLogin}>Login with Google</span>
+          <br/>
+          <i onClick={handleLogin} className="pi pi-google"/>
+        </div>
+      </article>
+    </main>
   )
 }
