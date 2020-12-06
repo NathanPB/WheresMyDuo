@@ -21,12 +21,13 @@ import React from 'react';
 
 import Styles from './index.module.scss';
 
-import { Menubar } from 'primereact/menubar';
-import { Button } from 'primereact/button';
-import { Route, Switch } from 'react-router-dom';
+import {Menubar} from 'primereact/menubar';
+import {Button} from 'primereact/button';
+import {Route, Switch} from 'react-router-dom';
 import TagsMaintenance from './maintenance/TagsMaintenance';
-import { TieredMenu } from 'primereact/tieredmenu';
-import { auth } from '../../../services/firebase';
+import {TieredMenu} from 'primereact/tieredmenu';
+import {auth} from '../../../services/firebase';
+import AnalyticsScreen from "./analytics";
 
 export default function AdminDashboard({ history, match }) {
 
@@ -53,7 +54,13 @@ export default function AdminDashboard({ history, match }) {
   const asideMenu = [
     {
       label: 'Tags',
+      icon: 'pi pi-tag',
       command: () => history.push(`${match.path}/tags`)
+    },
+    {
+      label: 'Analytics',
+      icon: 'pi pi-chart',
+      command: () => history.push(`${match.path}/analytics`)
     }
   ]
 
@@ -71,9 +78,10 @@ export default function AdminDashboard({ history, match }) {
             <TieredMenu model={asideMenu}/>
         </aside>
         <main>
-            <Switch>
-              <Route path={`${match.path}/tags`} component={TagsMaintenance}/>
-            </Switch>
+          <Switch>
+            <Route path={`${match.path}/tags`} component={TagsMaintenance} exact/>
+            <Route path={`${match.path}/analytics`} component={AnalyticsScreen} exact/>
+          </Switch>
         </main>
       </div>
     </div>

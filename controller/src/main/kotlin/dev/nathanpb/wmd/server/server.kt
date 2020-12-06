@@ -91,6 +91,10 @@ fun startServer() {
             route("/friendRequest") {
                 friendRequests()
             }
+
+            route("/analytics") {
+                analytics()
+            }
         }
     }.start()
 }

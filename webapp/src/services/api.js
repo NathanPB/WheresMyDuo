@@ -78,6 +78,9 @@ export default function create(token) {
 
   const queryUsers = (query) => axios.get(`/profile/query?query=${encodeURI(query)}`)
 
+  const analyticsTagDistribution = () => axios.get('/analytics/tag_distribution')
+  const analyticsGameDistribution = () => axios.get('/analytics/game_distribution')
+
   return {
     isAdmin,
     igdb,
@@ -111,7 +114,10 @@ export default function create(token) {
     denyFriendRequest,
     deleteFriend,
 
-    queryUsers
+    queryUsers,
+
+    analyticsTagDistribution,
+    analyticsGameDistribution
   }
 
 }
