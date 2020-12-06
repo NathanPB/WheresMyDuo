@@ -60,7 +60,7 @@ export default function MatchScreen({ history, match }) {
 
   const getCommonTags = (match) => {
     if (profile.tags && match.tags && profile.tags.length > 0 && match.tags.length > 0) {
-      return (100 * match.tags.length) / 100
+      return match.tags.length
     }
     return 0;
   }
@@ -72,7 +72,7 @@ export default function MatchScreen({ history, match }) {
 
     return (
       <div style={{ width: '100%', display: 'flex' }}>
-        { !commonTags && (
+        { !!commonTags && (
           <div style={{ textAlign: 'center', flexGrow: 1 }} title={`Common Tags: ${commonTags}`}>
             <i className="pi pi-tags"/><br/>
             <span>{commonTags}</span>
