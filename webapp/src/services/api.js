@@ -50,7 +50,10 @@ export default function create(token) {
   const getTag = (id) => axios.get(`/tag/${id}`)
   const createTag = (payload) => axios.post('/tag', payload)
   const editTag = (id, payload) => axios.put(`/tag/${id}`, payload)
-  const deleteTag = (id) => axios.delete(`/tag/${id}`)
+  const deleteTag = (id, force = false) => {
+    const query = force ? '?force=true' : ''
+    return axios.delete(`/tag/${id}${query}`)
+  }
 
   const getGamingProfiles = (user) => axios.get(`/gamingProfile?user=${user}`)
   const getGamingProfile = (id) => axios.get(`/gamingProfile/${id}`)

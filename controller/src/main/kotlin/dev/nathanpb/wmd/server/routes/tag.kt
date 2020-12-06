@@ -31,9 +31,11 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.serialization.SerializationException
 import org.litote.kmongo.*
+import org.litote.kmongo.id.toId
 
 fun Route.tag() {
     val collection = mongoDb.getCollection<Tag>()
+    val gamingProfileCollection = mongoDb.getCollection<GamingProfile>()
 
     get {
         val query = context.parameters["query"].orEmpty()
@@ -103,7 +105,7 @@ fun Route.tag() {
         val force = context.request.queryParameters["force"] == "true"
 
         if (!force) {
-            val count = collection.countDocuments(GamingProfile::tags contains arrayOf(id))
+            val count = gamingProfileCollection.countDocuments(GamingProfile::tags contains id.toId())
             if (count > 0) {
                 context.respond(HttpStatusCode.Conflict, "The tag ${id.toHexString()} is in use. Use the query parameter &force=true to force-delete")
                 return@delete

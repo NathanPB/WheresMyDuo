@@ -18,16 +18,16 @@
  */
 
 import React from 'react';
-import { Button } from 'primereact/button';
-import { DataTable } from 'primereact/datatable';
-import { ApiContext } from '../../../../providers/ApiProvider';
-import { Column } from 'primereact/column';
-import { Checkbox } from 'primereact/checkbox';
+import {Button} from 'primereact/button';
+import {DataTable} from 'primereact/datatable';
+import {ApiContext} from '../../../../providers/ApiProvider';
+import {Column} from 'primereact/column';
+import {Checkbox} from 'primereact/checkbox';
 
 import Styles from './TagsMaintenance.module.scss';
-import { Dialog } from 'primereact/dialog';
-import { InputText } from 'primereact/inputtext';
-import { InputTextarea } from 'primereact/inputtextarea';
+import {Dialog} from 'primereact/dialog';
+import {InputText} from 'primereact/inputtext';
+import {InputTextarea} from 'primereact/inputtextarea';
 
 export default function TagsMaintenance() {
   const api = React.useContext(ApiContext)
@@ -48,7 +48,16 @@ export default function TagsMaintenance() {
     if (items.length) {
       const message = items.length === 1 ? 'Are you sure you want to delete?' : `Are you sure you want to delete ${items.length} items?`;
       if (window.confirm(message)) {
-        Promise.all(items.map(api.deleteTag)).then(reload)
+        Promise.all(items.map(api.deleteTag))
+          .then(reload)
+          .catch(e => {
+            if (e.response.status === 409) {
+              if (window.confirm("A tag is being used by one or more users. Do you want to force delete?")) {
+                Promise.all(items.map(it => api.deleteTag(it, true)))
+                  .then(reload)
+              }
+            }
+          })
       }
     } else {
       window.alert("Please select at least one item to delete")
