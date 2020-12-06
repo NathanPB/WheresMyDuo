@@ -59,7 +59,7 @@ export default function AdminDashboard({ history, match }) {
     },
     {
       label: 'Analytics',
-      icon: 'pi pi-chart',
+      icon: 'pi pi-chart-bar',
       command: () => history.push(`${match.path}/analytics`)
     }
   ]
