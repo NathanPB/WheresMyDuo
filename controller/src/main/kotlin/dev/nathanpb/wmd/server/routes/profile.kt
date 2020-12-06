@@ -126,12 +126,17 @@ fun Route.profile() {
             uid = user.uid
         )
 
-        if (sample.nickname.isEmpty()) {
+        val profile = getUserProfileOrCreate(user.uid, collection).copy(
+            nickname = sample.nickname,
+            contactInfo = sample.contactInfo
+        )
+
+        if (profile.nickname.isEmpty()) {
             context.respond(HttpStatusCode.BadRequest, "Nickname cannot be empty")
             return@put
         }
 
-        collection.save(sample)
+        collection.save(profile)
         context.respond(HttpStatusCode.OK)
     }
 
