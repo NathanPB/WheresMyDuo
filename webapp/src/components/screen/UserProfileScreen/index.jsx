@@ -36,7 +36,13 @@ import {InputTextarea} from "primereact/inputtextarea";
 export default function UserProfileScreen({ uid, history }) {
   const currentUser = React.useContext(UserContext)
   const api = React.useContext(ApiContext)
-  const [profile] = useUserProfile(uid)
+  const [profile] = useUserProfile(uid, (e) => {
+    if (e.response.status === 404) {
+      window.location.href = '/me'
+    } else {
+      console.error(e)
+    }
+  })
 
   const [gamingProfiles, setGamingProfiles] = React.useState([])
 
@@ -46,7 +52,7 @@ export default function UserProfileScreen({ uid, history }) {
 
   function reloadGamingProfiles() {
     if (api) {
-      api.getGamingProfiles(currentUser.uid)
+      api.getGamingProfiles(uid)
         .then(response => setGamingProfiles(response.data))
     }
   }

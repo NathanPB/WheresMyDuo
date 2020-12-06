@@ -20,7 +20,7 @@
 import React from "react";
 import {ApiContext} from "../providers/ApiProvider";
 
-export function useUserProfile(id) {
+export function useUserProfile(id, onError) {
   const api = React.useContext(ApiContext)
 
   const [data, setData] = React.useState({ loading: false })
@@ -33,7 +33,7 @@ export function useUserProfile(id) {
           setData({ loading: false, profile: { friends: [], ...response.data } })
         }).catch(e => {
         setData({ loading: false })
-        console.error(e)
+        onError ? onError(e) : console.log(e)
       })
     }
   }

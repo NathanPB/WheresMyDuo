@@ -112,10 +112,14 @@ fun Route.profile() {
 //            return@get
 //        }
 
-        val profile = getUserProfileOrCreate(uid).copy(
-            favs = emptyList()
-        )
+        val profile = getUserProfile(uid, collection)
+        if (profile == null) {
+            context.respond(HttpStatusCode.NotFound)
+            return@get
+        }
+
         context.respond(profile.copy(
+            favs = emptyList(),
             contactInfo = if (authUser.uid in profile.friends) profile.contactInfo else ""
         ))
     }
