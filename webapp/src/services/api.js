@@ -80,6 +80,8 @@ export default function create(token) {
 
   const analyticsTagDistribution = () => axios.get('/analytics/tag_distribution')
   const analyticsGameDistribution = () => axios.get('/analytics/game_distribution')
+  const analyticsHourDistribution = () => axios.get('/analytics/hour_distribution')
+  const analyticsDayDistribution = () => axios.get('/analytics/day_distribution')
 
   return {
     isAdmin,
@@ -117,7 +119,9 @@ export default function create(token) {
     queryUsers,
 
     analyticsTagDistribution,
-    analyticsGameDistribution
+    analyticsGameDistribution,
+    analyticsHourDistribution,
+    analyticsDayDistribution
   }
 
 }

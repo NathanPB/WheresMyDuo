@@ -37,6 +37,12 @@ fun Route.analytics() {
     @Serializable
     data class TagDistribution(@Contextual val tag: Tag, val value: Long)
 
+    @Serializable
+    data class HourDistribution(@Contextual val hour: Int, val value: Int)
+
+    @Serializable
+    data class DayDistribution(@Contextual val day: Int, val value: Int)
+
     val gamingProfileCollection = mongoDb.getCollection<GamingProfile>()
     val tagsCollection = mongoDb.getCollection<Tag>()
 
@@ -66,5 +72,33 @@ fun Route.analytics() {
 
         val result = col.aggregate(listOf(group, limit(50))).toList()
         context.respond(result)
+    }
+
+    get("/hour_distribution") {
+        context.authenticate(true) ?: return@get
+
+        val data = (0..23).map { h ->
+            val hours = (0..6).map { it * 24 + h }
+            HourDistribution(
+                h,
+                gamingProfileCollection.countDocuments(GamingProfile::calendar.`in`(hours)).toInt()
+            )
+        }
+
+        context.respond(data)
+    }
+
+    get("day_distribution") {
+        context.authenticate(true) ?: return@get
+
+        val data = (0..6).map { h ->
+            val hours = (0..23).map { it * 24 + h }
+            DayDistribution(
+                h,
+                gamingProfileCollection.countDocuments(GamingProfile::calendar.`in`(hours)).toInt()
+            )
+        }
+
+        context.respond(data)
     }
 }

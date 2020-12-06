@@ -19,10 +19,11 @@
 
 import React from "react";
 import {TabPanel, TabView} from "primereact/tabview";
-import {Chart} from "primereact/chart";
 import TagDistribution from "./TagDistribution";
 import GameDistribution from "./GameDistribution";
 import 'chartjs-plugin-labels';
+import HourDistribution from "./HourDistribution";
+import DayDistribution from "./DayDistribution";
 
 export default function AnalyticsScreen() {
   return (
@@ -34,7 +35,7 @@ export default function AnalyticsScreen() {
               <h1>Distribution of Tags</h1>
               <TagDistribution/>
             </div>
-            <div className="p-col">
+            <div className="p-col-12 p-md-6">
               <h1>Distribution of Games</h1>
               <GameDistribution/>
             </div>
@@ -44,74 +45,11 @@ export default function AnalyticsScreen() {
           <div className="p-grid">
             <div className="p-col-12 p-md-6">
               <h1>Peak Hours</h1>
-              <Chart
-                type="line"
-                data={{
-                  labels: [...Array(24).keys()],
-                  datasets: [
-                    {
-                      label: '',
-                      fill: true,
-                      data: [300, 50, 100],
-                      borderColor: '#440473',
-                      backgroundColor: '#44047350'
-                    }
-                  ]
-                }}
-                options={{
-                  legend: {
-                    onClick: (e) => e.stopPropagation()
-                  },
-                  scales: {
-                    xAxes: [{
-                      scaleLabel: {
-                        display: true,
-                        labelString: 'Hour of the day'
-                      }
-                    }],
-                    yAxes: [{
-                      scaleLabel: {
-                        display: true,
-                        labelString: 'Active Profiles'
-                      }
-                    }]
-                  }
-                }}
-              />
+              <HourDistribution/>
             </div>
-            <div className="p-col">
+            <div className="p-col-12 p-md-6">
               <h1>Peak Weekdays</h1>
-              <Chart
-                type="bar"
-                data={{
-                  labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-                  datasets: [
-                    {
-                      data: [1, 2, 3, 4, 5, 6, 7],
-                      label: '',
-                      fill: true,
-                      backgroundColor: '#440473'
-                    }
-                  ]
-                }}
-                options={{
-                  legend: {
-                    onClick: (e) => e.stopPropagation()
-                  },
-                  xAxes: [{
-                    scaleLabel: {
-                      display: true,
-                      labelString: 'Day of the week'
-                    }
-                  }],
-                  yAxes: [{
-                    scaleLabel: {
-                      display: true,
-                      labelString: 'Active Profiles'
-                    }
-                  }]
-                }}
-              />
+              <DayDistribution/>
             </div>
           </div>
         </TabPanel>
