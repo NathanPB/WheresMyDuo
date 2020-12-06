@@ -12,21 +12,49 @@ services:
   controller:
     build: "./controller"
     restart: always
-    ports:
-      - "8080:8080"
+    expose:
+      - 8080
     environment:
       MONGO_CONN_STRING: mongodb://mongodb
       WAIT_HOSTS: mongodb:27017
       WAIT_HOSTS_TIMEOUT: 300
       WAIT_SLEEP_INTERVAL: 10
       WAIT_HOST_CONNECT_TIMEOUT: 30
+      VIRTUAL_HOST: ${SERVER_VIRTUAL_HOST}
+      VIRTUAL_PORT: 8080
+      VIRTUAL_PROTO: https
     networks:
       - backend
   webapp:
     restart: always
     build: "./webapp"
+    expose:
+      - 80
+    environment:
+      VIRTUAL_HOST: ${WEB_VIRTUAL_HOST}
+      VIRTUAL_PORT: 8080
+      VIRTUAL_PROTO: https
+  nginx-proxy-letsencrypt:
+    image: "jrcs/letsencrypt-nginx-proxy-companion:latest"
+    restart: always
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      DEFAULT_EMAIL: ${DEFAULT_EMAIL}
+  nginx-proxy:
+    image: "jwilder/nginx-proxy:alpine"
+    restart: always
     ports:
-      - "80:80"
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx/certs:/etc/nginx/certs:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/vhost.d:/etc/nginx/vhost.d
+      - ./nginx/html:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
 networks:
   backend:
     driver: bridge
