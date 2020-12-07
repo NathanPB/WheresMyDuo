@@ -39,14 +39,34 @@ export default function GameDistribution() {
       api.analyticsGameDistribution()
         .then(({ data }) => {
 
+          let dataSorted = data.sort((a, b) => b.count - a.count)
+          if (dataSorted.length > 10) {
+            dataSorted = dataSorted.reduce((buff, curr, index) => {
+              if (index < 10) {
+                return [ ...buff, curr ]
+              } else if (index > 10) {
+                const last = buff[10]
+                console.log(last)
+                return [ ...buff.slice(0, 10), { ...last, count: last.count + curr.count } ]
+              } else {
+                return [ ...buff, { _id: -1, count: curr.count } ]
+              }
+            }, [])
+          }
+
           api.igdb
+            .limit(50)
             .fields(['id', 'name'])
-            .where(`id = (${data.map(it => it._id).join()})`)
+            .where(`id = (${dataSorted.slice(0, 10  ).map(it => it._id).join()})`)
             .request('/games')
             .then(({ data: games }) => {
-              setLabels(data.map(it => games.find(game => game.id === it._id)?.name))
-              setDataset(data.map(it => it.count))
-              setBackgroundColor(data.map(it => stc(it._id)))
+
+              setLabels([
+                ...dataSorted.slice(0, 10).map(it => games.find(game => game.id === it._id)?.name),
+                ...(dataSorted.length >= 10 ? ['Others'] : [])
+              ])
+              setDataset(dataSorted.map(it => it.count))
+              setBackgroundColor(dataSorted.map(it => stc(it._id)))
               setLoading(false)
             })
         })
