@@ -50,7 +50,7 @@ suspend inline fun <reified T: Any> ApplicationCall.genericPut(
     updateFields: (T)->Array<KProperty<*>>
 ) {
     try {
-        val id = getRequestedObjectId(parameters[idParamKey].orEmpty()) ?: return
+        val id = getRequestedObjectId(idParamKey) ?: return
 
         val sample = receive<T>()
         if (!validator(sample)) {
