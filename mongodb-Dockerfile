@@ -1,1 +1,1 @@
-FROM mongo:4.2.10-bionic
+FROM

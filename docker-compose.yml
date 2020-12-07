@@ -1,9 +1,7 @@
 version: "3.8"
 services:
   mongodb:
-    build:
-      context: "."
-      dockerfile: "./mongodb-Dockerfile"
+    image: "mongo:4.2.10-bionic"
     restart: always
     networks:
       - backend
