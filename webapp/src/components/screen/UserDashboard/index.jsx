@@ -77,6 +77,7 @@ export default function UserDashboard({ history }) {
           completeMethod={onUserSearch}
           itemTemplate={data => <span onClick={() => onUserSelected(data)}>{data.nickname}</span>}
           onChange={e => setUserQuery(e.value)}
+          onSelect={e => onUserSelected(e.value)}
           appendTo={document.body}
           dropdown
         />
