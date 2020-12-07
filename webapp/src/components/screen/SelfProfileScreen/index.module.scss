@@ -63,6 +63,12 @@
   @media (max-width: 769px) {
     flex-direction: column;
   }
+
+  @media (min-width: 769px) {
+    & > *:last-child {
+      padding-left: 404px;
+    }
+  }
 }
 
 .ProfileHalfScreenCard {
@@ -70,11 +76,17 @@
   padding-top: 1em;
 
   @media (min-width: 769px) {
+    position: fixed;
+    overflow-y: auto;
     height: 100%;
     width: 400px;
+    min-width: 400px;
     background-color: black;
     border-right: solid 4px #440473;
-    overflow-y: scroll;
+
+    & > * {
+      width: 400px;
+    }
   }
 }
 

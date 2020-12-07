@@ -157,44 +157,46 @@ export default function UserProfileScreen({ uid, history }) {
             }
           </div>
         </div>
-        <TabView>
-          <TabPanel header="Gaming Profiles">
-            <div style={{ padding: 8 }}>
-              <GamingProfileCardContainer>
-                {
-                  gamingProfiles.map(profile => (
-                    <GamingProfileCard
-                      key={profile._id}
-                      gameId={profile.game}
-                    />
-                  ))
-                }
-              </GamingProfileCardContainer>
-            </div>
-          </TabPanel>
+        <div>
+          <TabView>
+            <TabPanel header="Gaming Profiles">
+              <div style={{ padding: 8 }}>
+                <GamingProfileCardContainer>
+                  {
+                    gamingProfiles.map(profile => (
+                      <GamingProfileCard
+                        key={profile._id}
+                        gameId={profile.game}
+                      />
+                    ))
+                  }
+                </GamingProfileCardContainer>
+              </div>
+            </TabPanel>
 
-          <TabPanel header="Friends">
-            {
-              profile && (
-                <>
-                  <h1>Friends</h1>
-                  <GamingProfileCardContainer>
-                    {
-                      profile.friends.map(uid => {
-                        return (
-                          <UserProfileCard
-                            onClick={() => history.push(`/u/${uid}`)}
-                            uid={uid}
-                          />
-                        )
-                      })
-                    }
-                  </GamingProfileCardContainer>
-                </>
-              )
-            }
-          </TabPanel>
-        </TabView>
+            <TabPanel header="Friends">
+              {
+                profile && (
+                  <>
+                    <h1>Friends</h1>
+                    <GamingProfileCardContainer>
+                      {
+                        profile.friends.map(uid => {
+                          return (
+                            <UserProfileCard
+                              onClick={() => history.push(`/u/${uid}`)}
+                              uid={uid}
+                            />
+                          )
+                        })
+                      }
+                    </GamingProfileCardContainer>
+                  </>
+                )
+              }
+            </TabPanel>
+          </TabView>
+        </div>
 
       </div>
     </>

@@ -90,94 +90,96 @@ export default function SelfProfileScreen({ history }) {
           </div>
 
         </div>
-        <TabView>
-          <TabPanel header="Gaming Profiles">
-            <div style={{ padding: 8 }}>
-              <GamingProfileCardContainer>
-                {
-                  gamingProfiles.map(profile => (
-                    <GamingProfileCard
-                      key={profile._id}
-                      gameId={profile.game}
-                      onClick={() => setGameProfileEdit(profile._id)}
-                    />
+        <div>
+          <TabView>
+            <TabPanel header="Gaming Profiles">
+              <div style={{ padding: 8 }}>
+                <GamingProfileCardContainer>
+                  {
+                    gamingProfiles.map(profile => (
+                      <GamingProfileCard
+                        key={profile._id}
+                        gameId={profile.game}
+                        onClick={() => setGameProfileEdit(profile._id)}
+                      />
 
-                  ))
-                }
+                    ))
+                  }
 
-                <div
-                  className={`${GamingProfileCardStyles.Card} ${Styles.NewCard}`}
-                  onClick={() => setAddingProfile(true)}
-                  title="New Game"
-                >
-                  <i className="pi pi-plus"/>
-                </div>
-              </GamingProfileCardContainer>
-            </div>
-          </TabPanel>
-          <TabPanel header="Friends">
-            {
-              friendRequests && friendRequests.length > 0 && (
-                <>
-                  <h1>Friend Requests</h1>
-                  <GamingProfileCardContainer>
-                    {
-                      friendRequests.map(request => {
+                  <div
+                    className={`${GamingProfileCardStyles.Card} ${Styles.NewCard}`}
+                    onClick={() => setAddingProfile(true)}
+                    title="New Game"
+                  >
+                    <i className="pi pi-plus"/>
+                  </div>
+                </GamingProfileCardContainer>
+              </div>
+            </TabPanel>
+            <TabPanel header="Friends">
+              {
+                friendRequests && friendRequests.length > 0 && (
+                  <>
+                    <h1>Friend Requests</h1>
+                    <GamingProfileCardContainer>
+                      {
+                        friendRequests.map(request => {
 
-                        const header = <div style={{ width: '100%', display: 'flex' }}>
-                          <i
-                            style={{ textAlign: 'center', flexGrow: 1, color: '#673AB7', fontSize: '1.5rem' }}
-                            title="Accept Friend Request"
-                            className="pi pi-check"
-                            onClick={() => {
-                              api.acceptFriendRequest(request._id)
-                                .then(() => window.location.reload())
-                            }}
-                          />
-                          <i
-                            style={{ textAlign: 'center', flexGrow: 1, color: '#673AB7', fontSize: '1.5rem' }}
-                            title="Deny Friend Request"
-                            className="pi pi-times"
-                            onClick={() => {
-                              api.denyFriendRequest(request._id)
-                                .then(() => window.location.reload())
-                            }}
-                          />
-                        </div>
+                          const header = <div style={{ width: '100%', display: 'flex' }}>
+                            <i
+                              style={{ textAlign: 'center', flexGrow: 1, color: '#673AB7', fontSize: '1.5rem' }}
+                              title="Accept Friend Request"
+                              className="pi pi-check"
+                              onClick={() => {
+                                api.acceptFriendRequest(request._id)
+                                  .then(() => window.location.reload())
+                              }}
+                            />
+                            <i
+                              style={{ textAlign: 'center', flexGrow: 1, color: '#673AB7', fontSize: '1.5rem' }}
+                              title="Deny Friend Request"
+                              className="pi pi-times"
+                              onClick={() => {
+                                api.denyFriendRequest(request._id)
+                                  .then(() => window.location.reload())
+                              }}
+                            />
+                          </div>
 
-                        return (
-                          <UserProfileCard
-                            onClick={() => history.push(`/u/${request.from}`)}
-                            uid={request.from}
-                            header={header}
-                          />
-                        )
-                      })
-                    }
-                  </GamingProfileCardContainer>
-                </>
-              )
-            }
-            <h1>Friends</h1>
-            {
-              (profile && profile.friends && profile.friends.length > 0)
-                ? (
-                  <GamingProfileCardContainer>
-                    {
-                      profile.friends.map(uid => {
-                        return (
-                          <UserProfileCard
-                            onClick={() => history.push(`/u/${uid}`)}
-                            uid={uid}
-                          />
-                        )
-                      })
-                    }
-                  </GamingProfileCardContainer>
-                ) : <span>It seems like you have to meet someone, why don't you see <a href="/match">our recomendations?</a></span>
-            }
-          </TabPanel>
-        </TabView>
+                          return (
+                            <UserProfileCard
+                              onClick={() => history.push(`/u/${request.from}`)}
+                              uid={request.from}
+                              header={header}
+                            />
+                          )
+                        })
+                      }
+                    </GamingProfileCardContainer>
+                  </>
+                )
+              }
+              <h1>Friends</h1>
+              {
+                (profile && profile.friends && profile.friends.length > 0)
+                  ? (
+                    <GamingProfileCardContainer>
+                      {
+                        profile.friends.map(uid => {
+                          return (
+                            <UserProfileCard
+                              onClick={() => history.push(`/u/${uid}`)}
+                              uid={uid}
+                            />
+                          )
+                        })
+                      }
+                    </GamingProfileCardContainer>
+                  ) : <span>It seems like you have to meet someone, why don't you see <a href="/match">our recomendations?</a></span>
+              }
+            </TabPanel>
+          </TabView>
+        </div>
 
       </div>
     </>
