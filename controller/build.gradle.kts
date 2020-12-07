@@ -15,7 +15,7 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation("io.ktor:ktor-server-netty:1.4.1")
     implementation("io.ktor:ktor-serialization:1.4.1")
-    implementation("com.google.firebase:firebase-admin:7.0.0")
+    implementation("com.google.firebase:firebase-admin:6.13.0")
     implementation("com.github.NathanPB:BootingBits:1.0-SNAPSHOT")
     implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.1.2")
     implementation("org.litote.kmongo:kmongo-id-serialization:4.1.2")
@@ -29,7 +29,7 @@ dependencies {
 
 tasks.withType<Jar> {
     manifest {
-        attributes["Main-Class"] = "MainKt"
+        attributes["Main-Class"] = "dev.nathanpb.wmd.MainKt"
     }
     configurations["compileClasspath"].forEach { file: File ->
         from(zipTree(file.absoluteFile))
