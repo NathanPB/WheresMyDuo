@@ -20,7 +20,7 @@
 import React from 'react';
 
 import Styles from './index.module.scss';
-import { ApiContext } from '../../../providers/ApiProvider';
+import {ApiContext} from '../../../providers/ApiProvider';
 
 export default function GamingProfileCard({ gameId, onClick }) {
 
@@ -43,7 +43,11 @@ export default function GamingProfileCard({ gameId, onClick }) {
         alt={gameData?.name}
         className={Styles.Cover}
         src={`https:${gameData?.cover?.url?.replace('t_thumb', 't_cover_big')}`}
-        onErrorCapture={e => e.target.src = `https:${gameData?.cover?.url}`}
+        onErrorCapture={e => {
+          if (gameData?.cover?.url && e.target.src !== gameData?.cover?.url) {
+            e.target.src = `https:${gameData?.cover?.url}`
+          }
+        }}
       />
       <span
         style={gameData?.name?.length > 15 ? { fontSize: '.7rem' } : undefined}
