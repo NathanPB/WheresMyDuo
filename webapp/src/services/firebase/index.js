@@ -19,9 +19,11 @@
 
 import firebase from 'firebase/app';
 import 'firebase/auth'
+import 'firebase/analytics'
 
 const config = require(`../../firebase-config.json`)
 firebase.initializeApp(config)
+firebase.analytics()
 
 export const auth = firebase.auth()
 export const googleAuthProvider = new firebase.auth.GoogleAuthProvider()
