@@ -99,7 +99,7 @@ export default function UserProfileScreen({ uid, history }) {
               (
                 selfFriendRequests
                 && selfProfile
-                && selfFriendRequests.some(it => it.to === selfProfile._id)
+                && selfFriendRequests.some(it => it.to === selfProfile._id && it.from === uid)
               ) && (
                 <>
                   <h3 style={{ textAlign: 'center' }}>Friend Request Received</h3>
@@ -109,7 +109,7 @@ export default function UserProfileScreen({ uid, history }) {
                       label="Accept"
                       style={{ marginRight: 4 }}
                       onClick={() => {
-                        const request = selfFriendRequests.find(it => it.to === selfProfile._id)
+                        const request = selfFriendRequests.find(it => it.to === selfProfile._id && it.from === uid)
                         api.acceptFriendRequest(request._id)
                           .then(() => window.location.reload())
                       }}
@@ -118,7 +118,7 @@ export default function UserProfileScreen({ uid, history }) {
                       icon="pi pi-times"
                       style={{ marginLeft: 4 }}
                       onClick={() => {
-                        const request = selfFriendRequests.find(it => it.to === selfProfile._id)
+                        const request = selfFriendRequests.find(it => it.to === selfProfile._id && it.from === uid)
                         api.denyFriendRequest(request._id)
                           .then(() => window.location.reload())
                       }}
