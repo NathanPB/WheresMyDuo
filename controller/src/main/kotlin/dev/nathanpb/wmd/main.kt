@@ -30,6 +30,8 @@ import kotlinx.coroutines.runBlocking
 import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.coroutine.coroutine
+import org.litote.kmongo.id.IdGenerator
+import org.litote.kmongo.id.ObjectIdGenerator
 import org.litote.kmongo.reactivestreams.KMongo
 
 /*
@@ -90,6 +92,11 @@ fun main() {
                             IGDBWrapper.setCredentials(twitchClientId, igdbToken?.token ?: error("Could not acquire the Twitch token"))
                         }
                     }
+                }
+            }
+            subphase("Performing configurations") {
+                subphase("Configuring KMongo ID generator") {
+                    IdGenerator.defaultGenerator = ObjectIdGenerator
                 }
             }
             subphase("Starting HTTP api") {
