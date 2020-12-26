@@ -33,6 +33,7 @@ import UserProfileCard from "../UserProfileCard";
 import {gql, useQuery} from "@apollo/client";
 import {UserContext} from "../../../providers/UserProvider";
 import {FriendRequestAnswerButtons} from "../../misc/FriendRequestPanel";
+import LoadingWrapper from "../../misc/LoadingWrapper";
 
 export default function SelfProfileScreen({ history }) {
   const api = React.useContext(ApiContext)
@@ -92,19 +93,22 @@ export default function SelfProfileScreen({ history }) {
       />
       <div className={Styles.ProfilePageWrapper}>
         <div className={Styles.ProfileHalfScreenCard}>
-          <div>
-            <img
-              alt="Your Avatar"
-              className={Styles.ProfilePic}
-              src={data?.me?.photoURL}
-            />
-            <span className={Styles.UserName}>{data?.me?.nickname}</span>
-          </div>
+          <LoadingWrapper isLoading={loading} render={() => (
+            <>
+              <div>
+                <img
+                  alt="Your Avatar"
+                  className={Styles.ProfilePic}
+                  src={data.me.photoURL}
+                />
+                <span className={Styles.UserName}>{data.me.nickname}</span>
+              </div>
 
-          <div>
-            <SelfProfileInfoCard style={{ margin: '1em' }} allowEdit/>
-          </div>
-
+              <div>
+                <SelfProfileInfoCard style={{ margin: '1em' }} allowEdit/>
+              </div>
+            </>
+          )}/>
         </div>
         <div>
           <TabView>
@@ -133,48 +137,53 @@ export default function SelfProfileScreen({ history }) {
               </div>
             </TabPanel>
             <TabPanel header="Friends">
-              {
-                data?.me?.incomingFriendRequests?.length > 0 && (
-                  <>
-                    <h1>Friend Requests</h1>
-                    <GamingProfileCardContainer>
-                      {
-                        data.me.incomingFriendRequests.map(request => {
-                          return (
-                            <UserProfileCard
-                              onClick={() => history.push(`/u/${request.from.uid}`)}
-                              uid={request.from.uid}
-                              header={
-                                <FriendRequestAnswerButtons
-                                  friendRequestId={request.id}
-                                  onAnswer={() => window.location.reload()}
+              <LoadingWrapper isLoading={loading} render={() => (
+                <>
+                  {
+                    data.me.incomingFriendRequests.length > 0 && (
+                      <>
+                        <h1>Friend Requests</h1>
+                        <GamingProfileCardContainer>
+                          {
+                            data.me.incomingFriendRequests.map(request => {
+                              return (
+                                <UserProfileCard
+                                  onClick={() => history.push(`/u/${request.from.uid}`)}
+                                  uid={request.from.uid}
+                                  header={
+                                    <FriendRequestAnswerButtons
+                                      friendRequestId={request.id}
+                                      onAnswer={() => window.location.reload()}
+                                    />
+                                  }
                                 />
-                              }
-                            />
-                          )
-                        })
-                      }
-                    </GamingProfileCardContainer>
-                  </>
-                )
-              }
-              <h1>Friends</h1>
-              {
-                (data?.me?.friends?.length > 0) ? (
-                    <GamingProfileCardContainer>
-                      {
-                        data.me.friends.map(friend => {
-                          return (
-                            <UserProfileCard
-                              onClick={() => history.push(`/u/${friend.uid}`)}
-                              uid={friend.uid}
-                            />
-                          )
-                        })
-                      }
-                    </GamingProfileCardContainer>
-                  ) : <span>It seems like you have to meet someone, why don't you see <a href="/match">our recomendations?</a></span>
-              }
+                              )
+                            })
+                          }
+                        </GamingProfileCardContainer>
+                      </>
+                    )
+                  }
+
+                  <h1>Friends</h1>
+                  {
+                    (data.me.friends.length > 0) ? (
+                      <GamingProfileCardContainer>
+                        {
+                          data.me.friends.map(friend => {
+                            return (
+                              <UserProfileCard
+                                onClick={() => history.push(`/u/${friend.uid}`)}
+                                uid={friend.uid}
+                              />
+                            )
+                          })
+                        }
+                      </GamingProfileCardContainer>
+                    ) : <span>It seems like you have to meet someone, why don't you see <a href="/match">our recomendations?</a></span>
+                  }
+                </>
+                )}/>
             </TabPanel>
           </TabView>
         </div>
