@@ -18,35 +18,33 @@
  */
 
 import React from 'react';
-import { ApiContext } from '../../providers/ApiProvider';
-import { AutoComplete } from 'primereact/autocomplete';
+import {AutoComplete} from 'primereact/autocomplete';
+import {gql, useQuery} from "@apollo/client";
+
+const QUERY_TAGS = gql`
+query QueryTags($query: String!) {
+  tags(query: $query) { id, displayName }
+}`
 
 export default function TagPicker({ id, value, setValue, exclude = [], style = {} }) {
-  const api = React.useContext(ApiContext)
-  const [data, setData] = React.useState()
-
-
-  React.useEffect(() => onSearch({ query: '' }), [])
+  const [query, setQuery] = React.useState('')
+  const { data } = useQuery(QUERY_TAGS, { variables: { query } })
+  const ref = React.useRef()
 
   function onSearch(event) {
-    const query = event.query.trim()
-    if (api) {
-      api.getTags(query ? { query, limit: 10 } : undefined)
-        .then(response => setData(
-          response.data.filter(it => !(exclude || []).includes(it._id)))
-        )
-    }
+    setQuery(event.query.trim())
+    ref.current.showOverlay()
   }
 
   return (
     <AutoComplete
       id={id}
+      ref={ref}
       field="displayName"
       value={value}
-      suggestions={data}
+      suggestions={data?.tags?.filter(it => !exclude.includes(it.id))}
       completeMethod={onSearch}
       onChange={e => setValue(e.value)}
-      itemTemplate={data => data.displayName}
       appendTo={document.body}
       style={{ width: '100%', ...style }}
       dropdown

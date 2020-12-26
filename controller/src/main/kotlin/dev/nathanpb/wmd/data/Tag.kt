@@ -22,20 +22,13 @@ package dev.nathanpb.wmd.data
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.litote.kmongo.Id
 import org.litote.kmongo.id.MongoId
-import org.litote.kmongo.newId
+import java.util.*
 
 @Serializable
 data class Tag (
-    @Contextual @SerialName("_id") @MongoId val id: Id<Tag>? = newId(),
+    @Contextual @SerialName("_id") @MongoId val id: String = UUID.randomUUID().toString(),
     val displayName: String,
     val description: String? = null,
     val createdAt: Long = System.currentTimeMillis()
-) {
-
-    fun validate(): Boolean {
-        return displayName.isNotEmpty()
-    }
-
-}
+)

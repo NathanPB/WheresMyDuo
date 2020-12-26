@@ -39,22 +39,6 @@ export default function create(token) {
     responseType: 'json'
   })
 
-  const getTags = ({ query, limit } = {}) => {
-    const url = new URLSearchParams()
-    if (query) url.set('query', query)
-    if (limit) url.set('limit', limit)
-    const queryString = query || limit ? '?' + url.toString() : ''
-
-    return axios.get(`/tag${queryString}`)
-  }
-  const getTag = (id) => axios.get(`/tag/${id}`)
-  const createTag = (payload) => axios.post('/tag', payload)
-  const editTag = (id, payload) => axios.put(`/tag/${id}`, payload)
-  const deleteTag = (id, force = false) => {
-    const query = force ? '?force=true' : ''
-    return axios.delete(`/tag/${id}${query}`)
-  }
-
   const getGamingProfiles = (user) => axios.get(`/gamingProfile?user=${user}`)
   const getGamingProfile = (id) => axios.get(`/gamingProfile/${id}`)
   const createGamingProfile = (gameId) => axios.post(`/gamingProfile/${gameId}`)
@@ -78,13 +62,7 @@ export default function create(token) {
     isAdmin,
     igdb,
     match,
-
-    getTags,
-    getTag,
-    createTag,
-    editTag,
-    deleteTag,
-
+    
     getGamingProfiles,
     getGamingProfile,
     createGamingProfile,

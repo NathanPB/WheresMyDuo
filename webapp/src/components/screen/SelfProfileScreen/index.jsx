@@ -34,6 +34,8 @@ import {gql, useQuery} from "@apollo/client";
 import {UserContext} from "../../../providers/UserProvider";
 import {FriendRequestAnswerButtons} from "../../misc/FriendRequestPanel";
 import LoadingWrapper from "../../misc/LoadingWrapper";
+import {Dialog} from "primereact/dialog";
+import TagPicker from "../../selectors/TagPicker";
 
 export default function SelfProfileScreen({ history }) {
   const api = React.useContext(ApiContext)
@@ -78,8 +80,12 @@ export default function SelfProfileScreen({ history }) {
     }
   }
 
+  const [a, setA] = React.useState()
   return (
     <>
+      <Dialog visible modal>
+        <TagPicker value={a} setValue={setA}/>
+      </Dialog>
       <GamingProfileEditDialog
         id={gameProfileEdit}
         visible={!!gameProfileEdit}

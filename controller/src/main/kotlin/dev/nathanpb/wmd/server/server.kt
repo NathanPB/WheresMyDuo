@@ -22,6 +22,7 @@ package dev.nathanpb.wmd.server
 import com.apurebase.kgraphql.GraphQL
 import dev.nathanpb.wmd.server.graphql.friendRequests
 import dev.nathanpb.wmd.server.graphql.getUserProfileOrCreate
+import dev.nathanpb.wmd.server.graphql.tags
 import dev.nathanpb.wmd.server.graphql.users
 import dev.nathanpb.wmd.server.routes.*
 import io.ktor.application.*
@@ -72,25 +73,22 @@ fun startServer() {
             useDefaultPrettyPrinter = true
 
             context { call ->
-                val user = call.authenticate(requireAdmin = false)
-                user?.let {
-                    + runBlocking { getUserProfileOrCreate(user.uid) }
+                call.authenticate(requireAdmin = false)?.let {
+                    + runBlocking { getUserProfileOrCreate(it.uid) }
+                    + it
                 }
             }
 
             schema {
                 users()
                 friendRequests()
+                tags()
             }
         }
 
         routing {
             route("igdb/*") {
                 igdbProxy()
-            }
-
-            route("/tag") {
-                tag()
             }
 
             route("/auth") {
