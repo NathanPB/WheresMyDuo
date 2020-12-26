@@ -26,81 +26,27 @@ import GamingProfileCard from '../GamingProfileCard';
 import {ApiContext} from '../../../providers/ApiProvider';
 import GamingProfileCardContainer from "../GamingProfileCard/GamingProfileCardContainer";
 import {TabPanel, TabView} from "primereact/tabview";
-import {Button} from "primereact/button";
 import UserProfileCard from "../UserProfileCard";
 import {InputTextarea} from "primereact/inputtextarea";
-import {gql, useMutation, useQuery} from "@apollo/client";
+import {gql, useQuery} from "@apollo/client";
 import LoadingSpinner from "../../misc/LoadingSpinner";
+import {FriendRequestPanel} from "../../misc/FriendRequestPanel";
 
-const REMOVE_FRIEND = gql`
- mutation RemoveFriend($uid: String!) {
-    removeFriend(uid: $uid) { uid }
-  }
-`
-
-const ANSWER_FRIEND_REQUEST = gql`
-  mutation AnswerFriendRequest($id: String!, $flag: Boolean!) {
-    answerFriendRequest(id: $id, flag: $flag) { id }
-  }
-`
-
-const SEND_FRIEND_REQUEST = gql`
-  mutation SendFriendRequest($uid: String! $to: String!){
-    sendFriendRequest(to: $uid) { id } 
-  }
-`
 
 const QUERY = gql`
   query PageData($uid: String!) {
-    user(uid: $uid) { nickname, photoURL, friends, contactInfo }
-    friendRequest: friendRequestBetweenMeAnd(other: $uid) { id, to, from }
+    user(uid: $uid) { nickname, photoURL, contactInfo, friends { uid } }
+    friendRequest: friendRequestBetweenMeAnd(other: $uid) { id, to { uid }, from { uid } }
   } 
 `
-
 
 export default function UserProfileScreen({ uid, history }) {
   const currentUser = React.useContext(UserContext)
   const api = React.useContext(ApiContext)
 
   const [gamingProfiles, setGamingProfiles] = React.useState([])
-  const [ongoingFriendRequest, setOngoingFriendRequest] = React.useState(false)
-
-  const { data, loading } = useQuery(QUERY, { variables: { uid } })
-
-  React.useEffect(() => {
-    if (!loading) {
-      setOngoingFriendRequest(data.friendRequest?.from === currentUser.uid)
-    }
-  }, [loading])
-
-  const [removeFriend] = useMutation(REMOVE_FRIEND)
-  const [answerFriendRequest] = useMutation(ANSWER_FRIEND_REQUEST)
-  const [sendFriendRequest] = useMutation(SEND_FRIEND_REQUEST)
-
-  function handleRemoveFriend() {
-    if (window.confirm(`Are you sure you want to remove ${data.user.nickname} from your friends?`)) {
-      removeFriend({ variables: { uid } })
-        .then(() => window.location.reload())
-    }
-  }
-
-  function handleAcceptFriendRequest() {
-    answerFriendRequest({ variables: { id: data.friendRequest.id, flag: true } })
-      .then(() => window.location.reload())
-  }
-
-  function handleDenyFriendRequest() {
-    answerFriendRequest({ variables: { id: data.friendRequest.id, flag: false } })
-      .then(() => window.location.reload())
-  }
-
-  function handleSendFriendRequest() {
-    if (!ongoingFriendRequest) {
-      sendFriendRequest({ variables: { uid } })
-        .then(() => setOngoingFriendRequest(true))
-    }
-  }
-
+  const { data, loading, error } = useQuery(QUERY, { variables: { uid } })
+  console.log(data, loading, error)
 
   function reloadGamingProfiles() {
     if (api) {
@@ -119,6 +65,7 @@ export default function UserProfileScreen({ uid, history }) {
     <>
       <div className={Styles.ProfilePageWrapper}>
         <div className={Styles.ProfileHalfScreenCard}>
+
           { loading ? <LoadingSpinner/> : (
             <div>
               <img
@@ -153,52 +100,18 @@ export default function UserProfileScreen({ uid, history }) {
           {
             !loading && (
               <div>
-                {
-                  data.user.friends.includes(currentUser.uid) && (
-                    <Button
-                      label="Remove Friend"
-                      style={{display: 'block', marginRight: 'auto', marginLeft: 'auto'}}
-                      onClick={handleRemoveFriend}
-                    />
-                  )
-                }
-
-                {
-                  (
-                    !data.user.friends.includes(currentUser.uid)
-                    && (!data.friendRequest || ongoingFriendRequest)
-                  ) && (
-                    <Button
-                      label={ongoingFriendRequest ? "Ongoing Friend Request" : "Send Friend Request"}
-                      style={{ display: 'block', marginRight: 'auto', marginLeft: 'auto' }}
-                      onClick={handleSendFriendRequest}
-                    />
-                  )
-                }
-
-                {
-                  data?.friendRequest?.to === currentUser.uid && (
-                    <>
-                      <h3 style={{ textAlign: 'center' }}>Friend Request Received</h3>
-                      <div style={{ display: 'flex', justifyContent: 'center' }}>
-                        <Button
-                          icon="pi pi-check"
-                          label="Accept"
-                          style={{ marginRight: 4 }}
-                          onClick={handleAcceptFriendRequest}
-                        />
-                        <Button
-                          icon="pi pi-times"
-                          style={{ marginLeft: 4 }}
-                          onClick={handleDenyFriendRequest}
-                        />
-                      </div>
-                    </>
-                  )
-                }
+                <FriendRequestPanel
+                  friendRequest={data.friendRequest}
+                  uid={uid}
+                  nickname={data.user.nickname}
+                  areFriends={data.user.friends.some(it => it.uid === currentUser.uid)}
+                  onAnswer={() => window.location.reload()}
+                  onDelete={() => window.location.reload()}
+                />
               </div>
             )
           }
+
         </div>
         <div>
           <TabView>
@@ -224,11 +137,11 @@ export default function UserProfileScreen({ uid, history }) {
                     <h1>Friends</h1>
                     <GamingProfileCardContainer>
                       {
-                        data.user.friends.map(uid => {
+                        data.user.friends.map(friend => {
                           return (
                             <UserProfileCard
-                              onClick={() => history.push(`/u/${uid}`)}
-                              uid={uid}
+                              onClick={() => history.push(`/u/${friend.uid}`)}
+                              uid={friend.uid}
                             />
                           )
                         })

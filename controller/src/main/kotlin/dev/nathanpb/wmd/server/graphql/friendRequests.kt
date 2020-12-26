@@ -30,7 +30,16 @@ import org.litote.kmongo.or
 
 fun SchemaBuilder.friendRequests() {
     val collection = mongoDb.getCollection<FriendRequest>()
-    type<FriendRequest>()
+
+    type<FriendRequest> {
+        property<UserProfile?>("from") {
+            resolver { getUserProfile(it.from) }
+        }
+
+        property<UserProfile?>("to") {
+            resolver { getUserProfile(it.to) }
+        }
+    }
 
     fun involvesUser(uid: String) = or(FriendRequest::to eq uid, FriendRequest::from eq uid)
     fun betweenUsers(a: String, b: String) = or(
@@ -55,20 +64,6 @@ fun SchemaBuilder.friendRequests() {
         resolver { ctx: Context ->
             val user = ctx.get<UserProfile>() ?: error("Not Authenticated")
             collection.find(involvesUser(user.uid)).toList()
-        }
-    }
-
-    query("friendRequestsToMe") {
-        resolver { ctx: Context ->
-            val user = ctx.get<UserProfile>() ?: error("Not Authenticated")
-            collection.find(FriendRequest::to eq user.uid).toList()
-        }
-    }
-
-    query("friendRequestsFromMe") {
-        resolver { ctx: Context ->
-            val user = ctx.get<UserProfile>() ?: error("Not Authenticated")
-            collection.find(FriendRequest::from eq user.uid).toList()
         }
     }
 

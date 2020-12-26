@@ -32,15 +32,27 @@ import {TabPanel, TabView} from "primereact/tabview";
 import UserProfileCard from "../UserProfileCard";
 import {gql, useQuery} from "@apollo/client";
 import {UserContext} from "../../../providers/UserProvider";
+import {FriendRequestAnswerButtons} from "../../misc/FriendRequestPanel";
 
 export default function SelfProfileScreen({ history }) {
   const api = React.useContext(ApiContext)
   const currentUser = React.useContext(UserContext)
 
-  const { data } = useQuery(gql`
+  const { data, loading, error } = useQuery(gql`
     {
-      me { nickname, photoURL, friends } 
-      friendRequestsToMe { id, from }
+      me {
+        nickname
+        photoURL
+        friends {
+          uid
+        }
+        incomingFriendRequests {
+          id
+          from {
+            uid
+          }
+        }
+      }
     }
   `)
 
@@ -122,39 +134,22 @@ export default function SelfProfileScreen({ history }) {
             </TabPanel>
             <TabPanel header="Friends">
               {
-                data?.friendRequestsToMe?.length > 0 && (
+                data?.me?.incomingFriendRequests?.length > 0 && (
                   <>
                     <h1>Friend Requests</h1>
                     <GamingProfileCardContainer>
                       {
-                        data.friendRequestsToMe.map(request => {
-
-                          const header = <div style={{ width: '100%', display: 'flex' }}>
-                            <i
-                              style={{ textAlign: 'center', flexGrow: 1, color: '#673AB7', fontSize: '1.5rem' }}
-                              title="Accept Friend Request"
-                              className="pi pi-check"
-                              onClick={() => {
-                                api.acceptFriendRequest(request._id)
-                                  .then(() => window.location.reload())
-                              }}
-                            />
-                            <i
-                              style={{ textAlign: 'center', flexGrow: 1, color: '#673AB7', fontSize: '1.5rem' }}
-                              title="Deny Friend Request"
-                              className="pi pi-times"
-                              onClick={() => {
-                                api.denyFriendRequest(request._id)
-                                  .then(() => window.location.reload())
-                              }}
-                            />
-                          </div>
-
+                        data.me.incomingFriendRequests.map(request => {
                           return (
                             <UserProfileCard
-                              onClick={() => history.push(`/u/${request.from}`)}
-                              uid={request.from}
-                              header={header}
+                              onClick={() => history.push(`/u/${request.from.uid}`)}
+                              uid={request.from.uid}
+                              header={
+                                <FriendRequestAnswerButtons
+                                  friendRequestId={request.id}
+                                  onAnswer={() => window.location.reload()}
+                                />
+                              }
                             />
                           )
                         })
@@ -168,11 +163,11 @@ export default function SelfProfileScreen({ history }) {
                 (data?.me?.friends?.length > 0) ? (
                     <GamingProfileCardContainer>
                       {
-                        data.me.friends.map(uid => {
+                        data.me.friends.map(friend => {
                           return (
                             <UserProfileCard
-                              onClick={() => history.push(`/u/${uid}`)}
-                              uid={uid}
+                              onClick={() => history.push(`/u/${friend.uid}`)}
+                              uid={friend.uid}
                             />
                           )
                         })

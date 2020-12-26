@@ -22,6 +22,7 @@ package dev.nathanpb.wmd.server.graphql
 import com.apurebase.kgraphql.Context
 import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
 import com.google.firebase.auth.FirebaseAuth
+import dev.nathanpb.wmd.data.FriendRequest
 import dev.nathanpb.wmd.data.UserProfile
 import dev.nathanpb.wmd.mongoDb
 import org.litote.kmongo.*
@@ -62,7 +63,61 @@ suspend fun getUserProfileOrCreate(
 
 fun SchemaBuilder.users() {
     val collection = mongoDb.getCollection<UserProfile>()
-    type<UserProfile>()
+
+    type<UserProfile> {
+        property(UserProfile::uid) {}
+        property(UserProfile::nickname) {}
+        property(UserProfile::photoURL) {}
+        property<List<UserProfile>>("friends") {
+            resolver {
+                collection.find(UserProfile::uid.`in`(it.friends)).toList()
+            }
+        }
+        property<String?>("contactInfo") {
+            resolver { profile: UserProfile, ctx: Context ->
+                val user = ctx.get<UserProfile>() ?: error("Not Authenticated")
+                return@resolver profile.contactInfo.takeIf {
+                    user.uid == profile.uid || user.uid in profile.friends
+                }
+            }
+
+            /*
+            TODO make this access rule work properly
+            accessRule { profile, ctx ->
+                val user = ctx.get<UserProfile>() ?: return@accessRule IllegalStateException("Not Authenticated")
+                if (user.uid != profile.uid && user.uid !in profile.friends) {
+                    return@accessRule IllegalStateException("This user is not friends with you")
+                }
+
+                return@accessRule null
+            }
+            */
+        }
+
+        property<List<FriendRequest>>("incomingFriendRequests") {
+            accessRule { userProfile, context ->
+                IllegalStateException().takeIf {
+                    userProfile.uid != context.get<UserProfile>()?.uid
+                }
+            }
+
+            resolver {
+                mongoDb.getCollection<FriendRequest>().find(FriendRequest::to eq it.uid).toList()
+            }
+        }
+
+        property<List<FriendRequest>>("ongoingFriendRequests") {
+            accessRule { userProfile, context ->
+                IllegalStateException().takeIf {
+                    userProfile.uid != context.get<UserProfile>()?.uid
+                }
+            }
+
+            resolver {
+                mongoDb.getCollection<FriendRequest>().find(FriendRequest::from eq it.uid).toList()
+            }
+        }
+    }
 
     query("me") {
         resolver { ctx: Context -> ctx.get<UserProfile>() ?: error("Not Authenticated")}
