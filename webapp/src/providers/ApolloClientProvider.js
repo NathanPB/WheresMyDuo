@@ -18,24 +18,29 @@
  */
 
 import React from "react";
-import {ApiContext} from "../providers/ApiProvider";
+import {auth} from "../services/firebase";
+import {createClient} from '../services/apollo';
 
-export function useSelfFriendRequests() {
-  const api = React.useContext(ApiContext)
 
-  const [data, setData] = React.useState({ loading: false })
+export const ApolloClientContext = React.createContext({ client: null })
 
-  React.useEffect(() => {
-    if (api) {
-      setData({ loading: true })
-      api.getFriendRequests()
-        .then(response => setData({ loading: false, requests: response.data }))
-        .catch(e => {
-        setData({ loading: false })
-        console.error(e)
-      })
+export function ApolloClientProvider({ children }) {
+  const [client, setClient] = React.useState(createClient(undefined))
+
+  async function onUserUpdated(newUser) {
+    if (newUser) {
+      const tokenInfo = await newUser.getIdToken()
+      setClient(createClient(tokenInfo))
+    } else {
+      setClient(createClient(undefined))
     }
-  }, [api])
+  }
 
-  return [data.requests, data.loading]
+  React.useEffect(() => void auth.onAuthStateChanged(onUserUpdated), [])
+
+  return (
+    <ApolloClientContext.Provider value={client}>
+      { children }
+    </ApolloClientContext.Provider>
+  );
 }

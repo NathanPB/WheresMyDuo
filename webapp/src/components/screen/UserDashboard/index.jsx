@@ -33,27 +33,35 @@ import MatchScreen from "../MatchScreen";
 import MatchListScreen from "../MatchScreen/MatchListScreen";
 import UserProfileScreen from "../UserProfileScreen";
 import {AutoComplete} from "primereact/autocomplete";
-import {ApiContext} from "../../../providers/ApiProvider";
+import {gql, useQuery} from "@apollo/client";
 
 export default function UserDashboard({ history }) {
   const user = React.useContext(UserContext)
-  const api = React.useContext(ApiContext)
 
   const tieredMenu = React.useRef()
   const searchMenu = React.useRef()
 
   const [userQuery, setUserQuery] = React.useState('')
-  const [queriedUsers, setQueriedUsers] = React.useState([])
 
-  function onUserSearch(event) {
-    if (api) {
-      api.queryUsers(event.query.trim())
-        .then(response => setQueriedUsers(response.data))
+  const { data } = useQuery(gql`
+    query GetUser($query: String!) { 
+      users(query: $query) { uid, nickname }
     }
-  }
+  `, { variables: { query: userQuery } })
+
+  const desktopSearch = React.useRef()
+  const mobileSearch = React.useRef()
+
+  React.useEffect(() => {
+    if (userQuery) {
+      if (desktopSearch.current) desktopSearch.current.showOverlay()
+      if (mobileSearch.current) mobileSearch.current.showOverlay()
+    }
+  }, [userQuery])
+
 
   function onUserSelected(user) {
-    history.push(`/u/${user._id}`)
+    history.push(`/u/${user.uid}`)
     setUserQuery('')
   }
 
@@ -70,12 +78,13 @@ export default function UserDashboard({ history }) {
           <i className="pi pi-search"/>
         </span>
         <AutoComplete
+          ref={desktopSearch}
           panelClassName={Styles.AutoCompleteUserQuery}
           field="nickname"
           value={userQuery}
-          suggestions={queriedUsers}
-          completeMethod={onUserSearch}
-          itemTemplate={data => <span onClick={() => onUserSelected(data)}>{data.nickname}</span>}
+          completeMethod={() => {}}
+          suggestions={data?.users || []}
+          onFocus={() => desktopSearch.current?.showOverlay()}
           onChange={e => setUserQuery(e.value)}
           onSelect={e => onUserSelected(e.value)}
           appendTo={document.body}
@@ -85,12 +94,14 @@ export default function UserDashboard({ history }) {
     </div>
     <OverlayPanel ref={searchMenu} className={Styles.SearchPopup}>
       <AutoComplete
+        ref={mobileSearch}
         field="nickname"
         value={userQuery}
-        suggestions={queriedUsers}
-        completeMethod={onUserSearch}
+        completeMethod={() => {}}
+        suggestions={data?.users || []}
         onChange={e => setUserQuery(e.value)}
-        itemTemplate={data => <span onClick={() => onUserSelected(data)}>{data.nickname}</span>}
+        onSelect={e => onUserSelected(e.value)}
+        onFocus={() => mobileSearch.current?.showOverlay()}
         appendTo={document.body}
         panelClassName={Styles.AutoCompleteUserQuery}
         dropdown

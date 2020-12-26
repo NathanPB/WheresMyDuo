@@ -25,7 +25,7 @@ import org.litote.kmongo.id.MongoId
 
 @Serializable
 data class UserProfile (
-    @SerialName("_id") @MongoId val uid: String? = null,
+    @SerialName("_id") @MongoId val uid: String,
     val nickname: String,
     val photoURL: String,
     val favs: List<String> = emptyList(),

@@ -19,13 +19,13 @@
 
 import React from 'react';
 import './App.css';
-import { UserContext, UserProvider } from './providers/UserProvider';
+import {UserContext, UserProvider} from './providers/UserProvider';
 import LogInScreen from './components/screen/LogInScreen';
 
-import { ApiProvider } from './providers/ApiProvider';
+import {ApiProvider} from './providers/ApiProvider';
 import useIsAdmin from './hooks/useIsAdmin';
-import { Route } from 'react-router';
-import { BrowserRouter } from 'react-router-dom';
+import {Route} from 'react-router';
+import {BrowserRouter} from 'react-router-dom';
 import AdminDashboard from './components/screen/AdminDashboard';
 
 import 'primereact/resources/primereact.css';
@@ -33,9 +33,12 @@ import 'primereact/resources/themes/mdc-dark-deeppurple/theme.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import UserDashboard from './components/screen/UserDashboard';
+import {ApolloClientContext, ApolloClientProvider} from "./providers/ApolloClientProvider";
+import {ApolloProvider} from "@apollo/client";
 
 function App() {
   const user = React.useContext(UserContext)
+  const apolloClient = React.useContext(ApolloClientContext)
   const isAdmin = useIsAdmin()
 
   const guestRoutes = <>
@@ -47,10 +50,12 @@ function App() {
   const adminRoutes = <Route path="/admin" component={AdminDashboard}/>
 
   return (
-    <BrowserRouter>
-      { isAdmin && adminRoutes }
-      { user ? userRoutes : guestRoutes }
-    </BrowserRouter>
+    <ApolloProvider client={apolloClient}>
+      <BrowserRouter>
+        { isAdmin && adminRoutes }
+        { user ? userRoutes : guestRoutes }
+      </BrowserRouter>
+    </ApolloProvider>
   )
 }
 
@@ -58,7 +63,9 @@ export default function() {
   return (
     <UserProvider>
       <ApiProvider>
-        <App/>
+        <ApolloClientProvider>
+          <App/>
+        </ApolloClientProvider>
       </ApiProvider>
     </UserProvider>
   )

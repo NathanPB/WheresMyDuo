@@ -20,29 +20,31 @@
 import React from 'react';
 
 import Styles from './index.module.scss';
-import {useUserProfile} from "../../../hooks/useUserProfile";
+import {gql, useQuery} from "@apollo/client";
 
 export default function UserProfileCard({ uid, header, onClick }) {
 
-  const [userData] = useUserProfile(uid)
+  const { data, loading } = useQuery(gql`
+    query GetUser($uid: String!) { user(uid: $uid) { nickname, photoURL } }
+  `, { variables: { uid } })
 
-  if (!userData) {
+  if (loading || !data) {
     return null
   }
 
   return (
     <div className={Styles.Card} onClick={onClick}>
       <img
-        alt={userData?.name}
+        alt={data.user.nickname}
         className={Styles.Cover}
-        src={userData?.photoURL}
+        src={data.user.photoURL}
       />
       <div className={Styles.Header}>{ header || null }</div>
       <span
-        style={userData.nickname.length > 15 ? { fontSize: '.7rem' } : undefined}
+        style={data.user.nickname.length > 15 ? { fontSize: '.7rem' } : undefined}
         className={Styles.Nickname}
       >
-        {userData?.nickname}
+        {data.user.nickname}
       </span>
     </div>
   )

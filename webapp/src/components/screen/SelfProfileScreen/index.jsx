@@ -20,25 +20,29 @@
 import React from 'react';
 
 import Styles from './index.module.scss';
-import {UserContext} from '../../../providers/UserProvider';
 import GamingProfileCard from '../GamingProfileCard';
 
 import GamingProfileCardStyles from '../GamingProfileCard/index.module.scss';
 import {ApiContext} from '../../../providers/ApiProvider';
 import GamingProfileAddDialog from '../../dialogs/GamingProfileAddDialog';
 import GamingProfileEditDialog from '../../dialogs/GamingProfileEditDialog';
-import {useSelfProfile} from "../../../hooks/useSelfProfile";
 import SelfProfileInfoCard from "../../misc/SelfProfileInfoEditCard";
 import GamingProfileCardContainer from "../GamingProfileCard/GamingProfileCardContainer";
 import {TabPanel, TabView} from "primereact/tabview";
-import {useSelfFriendRequests} from "../../../hooks/useSelfFriendRequests";
 import UserProfileCard from "../UserProfileCard";
+import {gql, useQuery} from "@apollo/client";
+import {UserContext} from "../../../providers/UserProvider";
 
 export default function SelfProfileScreen({ history }) {
-  const user = React.useContext(UserContext)
   const api = React.useContext(ApiContext)
-  const [profile] = useSelfProfile()
-  const [friendRequests] = useSelfFriendRequests()
+  const currentUser = React.useContext(UserContext)
+
+  const { data } = useQuery(gql`
+    {
+      me { nickname, photoURL, friends } 
+      friendRequestsToMe { id, from }
+    }
+  `)
 
   const [gamingProfiles, setGamingProfiles] = React.useState([])
 
@@ -47,7 +51,7 @@ export default function SelfProfileScreen({ history }) {
 
   function reloadGamingProfiles() {
     if (api) {
-      api.getGamingProfiles(user.uid)
+      api.getGamingProfiles(currentUser?.uid)
         .then(response => setGamingProfiles(response.data))
     }
   }
@@ -80,9 +84,9 @@ export default function SelfProfileScreen({ history }) {
             <img
               alt="Your Avatar"
               className={Styles.ProfilePic}
-              src={(profile && profile.photoURL) || user.photoURL}
+              src={data?.me?.photoURL}
             />
-            <span className={Styles.UserName}>{(profile && profile.nickname) || user.displayName}</span>
+            <span className={Styles.UserName}>{data?.me?.nickname}</span>
           </div>
 
           <div>
@@ -118,12 +122,12 @@ export default function SelfProfileScreen({ history }) {
             </TabPanel>
             <TabPanel header="Friends">
               {
-                friendRequests && friendRequests.length > 0 && (
+                data?.friendRequestsToMe?.length > 0 && (
                   <>
                     <h1>Friend Requests</h1>
                     <GamingProfileCardContainer>
                       {
-                        friendRequests.map(request => {
+                        data.friendRequestsToMe.map(request => {
 
                           const header = <div style={{ width: '100%', display: 'flex' }}>
                             <i
@@ -161,11 +165,10 @@ export default function SelfProfileScreen({ history }) {
               }
               <h1>Friends</h1>
               {
-                (profile && profile.friends && profile.friends.length > 0)
-                  ? (
+                (data?.me?.friends?.length > 0) ? (
                     <GamingProfileCardContainer>
                       {
-                        profile.friends.map(uid => {
+                        data.me.friends.map(uid => {
                           return (
                             <UserProfileCard
                               onClick={() => history.push(`/u/${uid}`)}

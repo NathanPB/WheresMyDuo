@@ -67,19 +67,7 @@ export default function create(token) {
   const gamingProfileGetCalendar = (id) => axios.get(`/gamingProfile/${id}/calendar`)
   const gamingProfileSetCalendar = (id, calendar) => axios.put(`/gamingProfile/${id}/calendar`, calendar)
 
-  const getSelfProfile = () => axios.get('/profile/')
-  const getUserProfile = (id) => axios.get(`/profile/${id}`)
-  const saveSelfProfile = (payload) => axios.put('/profile', payload)
-
   const match = (profileId) => axios.get(`/match/${profileId}`)
-
-  const getFriendRequests = () => axios.get('/friendRequest')
-  const sendFriendRequest = (to) => axios.post(`/friendRequest/${to}`)
-  const acceptFriendRequest = (id) => axios.put(`/friendRequest/${id}/accept`)
-  const denyFriendRequest = (id) => axios.put(`/friendRequest/${id}/deny`)
-  const deleteFriend = (id) => axios.delete(`/friendRequest/${id}`)
-
-  const queryUsers = (query) => axios.get(`/profile/query?query=${encodeURI(query)}`)
 
   const analyticsTagDistribution = () => axios.get('/analytics/tag_distribution')
   const analyticsGameDistribution = () => axios.get('/analytics/game_distribution')
@@ -108,18 +96,6 @@ export default function create(token) {
 
     gamingProfileGetCalendar,
     gamingProfileSetCalendar,
-
-    getSelfProfile,
-    getUserProfile,
-    saveSelfProfile,
-
-    getFriendRequests,
-    sendFriendRequest,
-    acceptFriendRequest,
-    denyFriendRequest,
-    deleteFriend,
-
-    queryUsers,
 
     analyticsTagDistribution,
     analyticsGameDistribution,

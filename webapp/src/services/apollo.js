@@ -17,26 +17,14 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React from "react";
-import {ApiContext} from "../providers/ApiProvider";
+import {ApolloClient, InMemoryCache} from "@apollo/client";
 
-export function useSelfProfile() {
-  const api = React.useContext(ApiContext)
-
-  const [data, setData] = React.useState({ loading: false })
-
-  React.useEffect(() => {
-    if (api) {
-      setData({ loading: true })
-      api.getSelfProfile()
-        .then(response => {
-          setData({ loading: false, profile: { friends: [], favs: [], ...response.data } })
-        }).catch(e => {
-        setData({ loading: false })
-        console.error(e)
-      })
+export function createClient(apiKey) {
+  return new ApolloClient({
+    uri: `${process.env.REACT_APP_API_BASE_URL}/graphql`,
+    cache: new InMemoryCache(),
+    headers: {
+      Authorization: apiKey
     }
-  }, [api])
-
-  return [data.profile, data.loading]
+  })
 }

@@ -26,29 +26,81 @@ import GamingProfileCard from '../GamingProfileCard';
 import {ApiContext} from '../../../providers/ApiProvider';
 import GamingProfileCardContainer from "../GamingProfileCard/GamingProfileCardContainer";
 import {TabPanel, TabView} from "primereact/tabview";
-import {useUserProfile} from "../../../hooks/useUserProfile";
-import {useSelfProfile} from "../../../hooks/useSelfProfile";
-import {useSelfFriendRequests} from "../../../hooks/useSelfFriendRequests";
 import {Button} from "primereact/button";
 import UserProfileCard from "../UserProfileCard";
 import {InputTextarea} from "primereact/inputtextarea";
+import {gql, useMutation, useQuery} from "@apollo/client";
+import LoadingSpinner from "../../misc/LoadingSpinner";
+
+const REMOVE_FRIEND = gql`
+ mutation RemoveFriend($uid: String!) {
+    removeFriend(uid: $uid) { uid }
+  }
+`
+
+const ANSWER_FRIEND_REQUEST = gql`
+  mutation AnswerFriendRequest($id: String!, $flag: Boolean!) {
+    answerFriendRequest(id: $id, flag: $flag) { id }
+  }
+`
+
+const SEND_FRIEND_REQUEST = gql`
+  mutation SendFriendRequest($uid: String! $to: String!){
+    sendFriendRequest(to: $uid) { id } 
+  }
+`
+
+const QUERY = gql`
+  query PageData($uid: String!) {
+    user(uid: $uid) { nickname, photoURL, friends, contactInfo }
+    friendRequest: friendRequestBetweenMeAnd(other: $uid) { id, to, from }
+  } 
+`
+
 
 export default function UserProfileScreen({ uid, history }) {
   const currentUser = React.useContext(UserContext)
   const api = React.useContext(ApiContext)
-  const [profile] = useUserProfile(uid, (e) => {
-    if (e.response.status === 404) {
-      window.location.href = '/me'
-    } else {
-      console.error(e)
-    }
-  })
 
   const [gamingProfiles, setGamingProfiles] = React.useState([])
-
-  const [selfProfile] = useSelfProfile()
-  const [selfFriendRequests] = useSelfFriendRequests()
   const [ongoingFriendRequest, setOngoingFriendRequest] = React.useState(false)
+
+  const { data, loading } = useQuery(QUERY, { variables: { uid } })
+
+  React.useEffect(() => {
+    if (!loading) {
+      setOngoingFriendRequest(data.friendRequest?.from === currentUser.uid)
+    }
+  }, [loading])
+
+  const [removeFriend] = useMutation(REMOVE_FRIEND)
+  const [answerFriendRequest] = useMutation(ANSWER_FRIEND_REQUEST)
+  const [sendFriendRequest] = useMutation(SEND_FRIEND_REQUEST)
+
+  function handleRemoveFriend() {
+    if (window.confirm(`Are you sure you want to remove ${data.user.nickname} from your friends?`)) {
+      removeFriend({ variables: { uid } })
+        .then(() => window.location.reload())
+    }
+  }
+
+  function handleAcceptFriendRequest() {
+    answerFriendRequest({ variables: { id: data.friendRequest.id, flag: true } })
+      .then(() => window.location.reload())
+  }
+
+  function handleDenyFriendRequest() {
+    answerFriendRequest({ variables: { id: data.friendRequest.id, flag: false } })
+      .then(() => window.location.reload())
+  }
+
+  function handleSendFriendRequest() {
+    if (!ongoingFriendRequest) {
+      sendFriendRequest({ variables: { uid } })
+        .then(() => setOngoingFriendRequest(true))
+    }
+  }
+
 
   function reloadGamingProfiles() {
     if (api) {
@@ -67,95 +119,86 @@ export default function UserProfileScreen({ uid, history }) {
     <>
       <div className={Styles.ProfilePageWrapper}>
         <div className={Styles.ProfileHalfScreenCard}>
-          <div>
-            <img
-              alt={`${profile?.nickname}'s Avatar`}
-              className={Styles.ProfilePic}
-              src={profile?.photoURL}
-            />
-            <span className={Styles.UserName}>
-              {profile?.nickname}
-            </span>
-          </div>
+          { loading ? <LoadingSpinner/> : (
+            <div>
+              <img
+                alt={`${data.user.nickname}'s Avatar`}
+                className={Styles.ProfilePic}
+                src={data.user.photoURL}
+              />
+              <span className={Styles.UserName}>
+                {data.user.nickname}
+              </span>
+            </div>
+          ) }
+
           <hr/>
+
           {
-            profile && profile.contactInfo && (
+            (!loading && data.user.contactInfo) && (
               <>
                 <div style={{ marginBottom: '1em' }}>
                   <h3 style={{ textAlign: 'center' }}>Contact Information</h3>
                   <InputTextarea
                     style={{ display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
-                    value={profile.contactInfo}
+                    value={data.user.contactInfo}
                     readOnly
                   />
                 </div>
                 <hr/>
               </>
-
             )
           }
-          <div>
-            {
-              (
-                selfFriendRequests
-                && selfProfile
-                && selfFriendRequests.some(it => it.to === selfProfile._id && it.from === uid)
-              ) && (
-                <>
-                  <h3 style={{ textAlign: 'center' }}>Friend Request Received</h3>
-                  <div style={{ display: 'flex', justifyContent: 'center' }}>
-                    <Button
-                      icon="pi pi-check"
-                      label="Accept"
-                      style={{ marginRight: 4 }}
-                      onClick={() => {
-                        const request = selfFriendRequests.find(it => it.to === selfProfile._id && it.from === uid)
-                        api.acceptFriendRequest(request._id)
-                          .then(() => window.location.reload())
-                      }}
-                    />
-                    <Button
-                      icon="pi pi-times"
-                      style={{ marginLeft: 4 }}
-                      onClick={() => {
-                        const request = selfFriendRequests.find(it => it.to === selfProfile._id && it.from === uid)
-                        api.denyFriendRequest(request._id)
-                          .then(() => window.location.reload())
-                      }}
-                    />
-                  </div>
-                </>
-              )
-            }
-            {
-              (profile && selfFriendRequests && selfProfile && !selfFriendRequests.some(it => it.to === selfProfile._id)) && (
-                selfProfile.friends.includes(profile._id)
-                  ? (
+
+          {
+            !loading && (
+              <div>
+                {
+                  data.user.friends.includes(currentUser.uid) && (
                     <Button
                       label="Remove Friend"
-                      style={{ display: 'block', marginRight: 'auto', marginLeft: 'auto' }}
-                      onClick={() => {
-                        if (window.confirm(`Are you sure you want to remove ${profile.nickname} from your friends?`)) {
-                          api.deleteFriend(profile._id)
-                            .then(() => window.location.reload())
-                        }
-                      }}
+                      style={{display: 'block', marginRight: 'auto', marginLeft: 'auto'}}
+                      onClick={handleRemoveFriend}
                     />
-                  ) : (
+                  )
+                }
+
+                {
+                  (
+                    !data.user.friends.includes(currentUser.uid)
+                    && (!data.friendRequest || ongoingFriendRequest)
+                  ) && (
                     <Button
                       label={ongoingFriendRequest ? "Ongoing Friend Request" : "Send Friend Request"}
                       style={{ display: 'block', marginRight: 'auto', marginLeft: 'auto' }}
-                      onClick={() => {
-                        if (!ongoingFriendRequest) {
-                          api.sendFriendRequest(profile._id)
-                            .then(() => setOngoingFriendRequest(true))
-                        }
-                      }}
+                      onClick={handleSendFriendRequest}
                     />
                   )
-              )
-            }
-          </div>
+                }
+
+                {
+                  data?.friendRequest?.to === currentUser.uid && (
+                    <>
+                      <h3 style={{ textAlign: 'center' }}>Friend Request Received</h3>
+                      <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <Button
+                          icon="pi pi-check"
+                          label="Accept"
+                          style={{ marginRight: 4 }}
+                          onClick={handleAcceptFriendRequest}
+                        />
+                        <Button
+                          icon="pi pi-times"
+                          style={{ marginLeft: 4 }}
+                          onClick={handleDenyFriendRequest}
+                        />
+                      </div>
+                    </>
+                  )
+                }
+              </div>
+            )
+          }
         </div>
         <div>
           <TabView>
@@ -176,12 +219,12 @@ export default function UserProfileScreen({ uid, history }) {
 
             <TabPanel header="Friends">
               {
-                profile && (
+                !loading && (
                   <>
                     <h1>Friends</h1>
                     <GamingProfileCardContainer>
                       {
-                        profile.friends.map(uid => {
+                        data.user.friends.map(uid => {
                           return (
                             <UserProfileCard
                               onClick={() => history.push(`/u/${uid}`)}
@@ -197,7 +240,6 @@ export default function UserProfileScreen({ uid, history }) {
             </TabPanel>
           </TabView>
         </div>
-
       </div>
     </>
   )

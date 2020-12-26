@@ -9,6 +9,7 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenCentral()
     maven(url = "https://jitpack.io")
+    jcenter()
 }
 
 dependencies {
@@ -25,6 +26,8 @@ dependencies {
     implementation("com.github.kittinunf.fuel:fuel-coroutines:2.3.0")
     implementation("com.github.kittinunf.fuel:fuel-kotlinx-serialization:2.3.0")
     implementation("com.github.husnjak:IGDB-API-JVM:1.0.1")
+    implementation("com.apurebase:kgraphql:0.16.0")
+    implementation("com.apurebase:kgraphql-ktor:0.16.0")
 }
 
 tasks.withType<Jar> {

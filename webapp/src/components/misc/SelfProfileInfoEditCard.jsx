@@ -23,24 +23,23 @@ import {InputText} from "primereact/inputtext";
 import {ApiContext} from "../../providers/ApiProvider";
 import {Button} from "primereact/button";
 import {InputTextarea} from "primereact/inputtextarea";
+import {gql, useQuery} from "@apollo/client";
 
 export default function SelfProfileInfoCard({ allowEdit, style }) {
   const api = React.useContext(ApiContext)
 
   const [edit, setEdit] = React.useState(false)
+  const { data, loading } = useQuery(gql`{ me { nickname, photoURL, contactInfo } }`)
 
   const [nickname, setNickname] = React.useState()
   const [photoURL, setPhotoURL] = React.useState()
   const [contactInfo, setContactInfo] = React.useState("")
 
   function refresh() {
-    if (api) {
-      api.getSelfProfile()
-        .then(response => {
-          setNickname(response.data.nickname)
-          setPhotoURL(response.data.photoURL)
-          setContactInfo(response.data.contactInfo)
-        }).catch(console.error)
+    if (!loading && !edit) {
+      setNickname(data.me.nickname)
+      setPhotoURL(data.me.photoURL)
+      setContactInfo(data.me.contactInfo)
     }
   }
 
@@ -53,14 +52,9 @@ export default function SelfProfileInfoCard({ allowEdit, style }) {
 
   function handleDiscard() {
     setEdit(false)
-    refresh()
   }
 
-  React.useEffect(refresh, [api])
-
-  React.useEffect(() => {
-    if (!edit) refresh()
-  }, [api, edit])
+  React.useEffect(refresh, [loading, edit])
 
   return (
     <Card style={style}>

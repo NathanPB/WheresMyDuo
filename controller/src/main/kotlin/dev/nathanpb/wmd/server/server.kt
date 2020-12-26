@@ -19,6 +19,10 @@
 
 package dev.nathanpb.wmd.server
 
+import com.apurebase.kgraphql.GraphQL
+import dev.nathanpb.wmd.server.graphql.friendRequests
+import dev.nathanpb.wmd.server.graphql.getUserProfileOrCreate
+import dev.nathanpb.wmd.server.graphql.users
 import dev.nathanpb.wmd.server.routes.*
 import io.ktor.application.*
 import io.ktor.features.*
@@ -27,6 +31,7 @@ import io.ktor.routing.*
 import io.ktor.serialization.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.litote.kmongo.id.serialization.IdKotlinXSerializationModule
 
@@ -63,6 +68,22 @@ fun startServer() {
             anyHost()
         }
 
+        install(GraphQL) {
+            useDefaultPrettyPrinter = true
+
+            context { call ->
+                val user = call.authenticate(requireAdmin = false)
+                user?.let {
+                    + runBlocking { getUserProfileOrCreate(user.uid) }
+                }
+            }
+
+            schema {
+                users()
+                friendRequests()
+            }
+        }
+
         routing {
             route("igdb/*") {
                 igdbProxy()
@@ -82,14 +103,6 @@ fun startServer() {
 
             route("/match") {
                 match()
-            }
-
-            route("/profile") {
-                profile()
-            }
-
-            route("/friendRequest") {
-                friendRequests()
             }
 
             route("/analytics") {
