@@ -19,18 +19,33 @@
 
 import React from "react";
 import LoadingSpinner from "../../misc/LoadingSpinner";
-import {useProfileMatcher} from "../../../hooks/useProfileMatcher";
-import {useGamingProfile} from "../../../hooks/useGamingProfile";
 import GamingProfileCardContainer from "../GamingProfileCard/GamingProfileCardContainer";
 import UserProfileCard from "../UserProfileCard";
+import {gql, useQuery} from "@apollo/client";
+
+const MATCH = gql`
+query Match($profileId: String!) {
+  profile: gamingProfile(id: $profileId) {
+    calendar
+    tags {
+      id
+    }
+  }
+  match(profileId: $profileId) {
+    calendar
+    user {
+      uid
+    }
+    tags {
+      id
+    }
+  }
+}`
 
 export default function MatchScreen({ history, match }) {
-  const { id } = match.params
+  const { data, loading } = useQuery(MATCH, { variables: { profileId: match.params.id } })
 
-  const [profile, profileLoading] = useGamingProfile(id)
-  const [matches, matchLoading] = useProfileMatcher(id)
-
-  if (matchLoading || profileLoading) {
+  if (loading) {
     return (
       <div style={{ textAlign: 'center' }}>
         <h1>We are matching your profile!</h1>
@@ -40,7 +55,7 @@ export default function MatchScreen({ history, match }) {
     )
   }
 
-  if (!profile || !matches || matches.length === 0) {
+  if (data.match.length === 0) {
     return (
       <>
         <div style={{ textAlign: 'center' }}>
@@ -52,15 +67,15 @@ export default function MatchScreen({ history, match }) {
   }
 
   const getCommonCalendar = (match) => {
-    if (profile.calendar && match.calendar && profile.calendar.length > 0 && match.calendar.length > 0) {
-      return match.calendar.filter(it => profile.calendar.includes(it)).length;
+    if (data.profile.calendar.length > 0 && match.calendar.length > 0) {
+      return match.calendar.filter(it => data.profile.calendar.includes(it)).length;
     }
     return 0;
   }
 
   const getCommonTags = (match) => {
-    if (profile.tags && match.tags && profile.tags.length > 0 && match.tags.length > 0) {
-      return match.tags.length
+    if (data.profile.tags.length > 0 && match.tags.length > 0) {
+      return match.tags.filter(it => data.profile.tags.some(it2 => it2.id === it.id)).length
     }
     return 0;
   }
@@ -93,10 +108,10 @@ export default function MatchScreen({ history, match }) {
     <div style={{ padding: '1em' }}>
       <GamingProfileCardContainer>
         {
-          matches.map(match =>
+          data.match.map(match =>
             <UserProfileCard
-              onClick={() => history.push(`/u/${match.user}`)}
-              uid={match.user}
+              onClick={() => history.push(`/u/${match.user.uid}`)}
+              uid={match.user.uid}
               header={makeHeader(match)}
             />)
         }

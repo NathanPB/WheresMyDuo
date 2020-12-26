@@ -19,7 +19,6 @@
 
 package dev.nathanpb.wmd.matcher
 import dev.nathanpb.wmd.data.GamingProfile
-import dev.nathanpb.wmd.data.Tag
 import dev.nathanpb.wmd.mongoDb
 import org.litote.kmongo.*
 import kotlin.math.ln
@@ -54,7 +53,7 @@ suspend fun matchProfiles(profile: GamingProfile, limit: Int = 10): List<GamingP
     ).toList().sortedByDescending { comparingWith ->
         // https://github.com/NathanPB/wmd-profile-matcher-specification#tag-containment-ratio
 
-        fun compareTags(compareTags: List<Id<Tag>>): Int {
+        fun compareTags(compareTags: List<String>): Int {
             val intersect = profile.tags.intersect(compareTags)
             val difference = profile.tags - compareTags
             return intersect.size - difference.size

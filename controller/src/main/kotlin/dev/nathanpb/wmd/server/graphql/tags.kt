@@ -102,7 +102,7 @@ fun SchemaBuilder.tags() {
             }
 
             if (!force) {
-                val count = mongoDb.getCollection<GamingProfile>().countDocuments(GamingProfile::tags contains id.toId())
+                val count = mongoDb.getCollection<GamingProfile>().countDocuments(GamingProfile::tags contains id)
                 if (count > 0) {
                     error("Tag $id is already in use. Use force: true to force delete")
                 }

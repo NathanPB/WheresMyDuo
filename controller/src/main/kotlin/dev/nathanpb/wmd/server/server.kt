@@ -20,11 +20,10 @@
 package dev.nathanpb.wmd.server
 
 import com.apurebase.kgraphql.GraphQL
-import dev.nathanpb.wmd.server.graphql.friendRequests
-import dev.nathanpb.wmd.server.graphql.getUserProfileOrCreate
-import dev.nathanpb.wmd.server.graphql.tags
-import dev.nathanpb.wmd.server.graphql.users
-import dev.nathanpb.wmd.server.routes.*
+import dev.nathanpb.wmd.server.graphql.*
+import dev.nathanpb.wmd.server.routes.analytics
+import dev.nathanpb.wmd.server.routes.auth
+import dev.nathanpb.wmd.server.routes.igdbProxy
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
@@ -83,6 +82,7 @@ fun startServer() {
                 users()
                 friendRequests()
                 tags()
+                gamingProfiles()
             }
         }
 
@@ -93,14 +93,6 @@ fun startServer() {
 
             route("/auth") {
                 auth()
-            }
-
-            route("/gamingProfile") {
-                gamingProfile()
-            }
-
-            route("/match") {
-                match()
             }
 
             route("/analytics") {

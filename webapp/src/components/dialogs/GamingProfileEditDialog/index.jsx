@@ -18,36 +18,58 @@
  */
 
 import React from 'react';
-import { ApiContext } from '../../../providers/ApiProvider';
-import { Dialog } from 'primereact/dialog';
+import {ApiContext} from '../../../providers/ApiProvider';
+import {Dialog} from 'primereact/dialog';
 
 import Styles from './index.module.scss';
-import { Card } from 'primereact/card';
-import { Button } from 'primereact/button';
-import Tag from '../../misc/Tag';
-import TagAddButton from '../../misc/TagAddButton';
+import {Card} from 'primereact/card';
+import {Button} from 'primereact/button';
 import Calendar from '../../misc/Calendar';
-import { TabPanel, TabView } from 'primereact/tabview';
+import {TabPanel, TabView} from 'primereact/tabview';
+import {gql, useMutation, useQuery} from "@apollo/client";
+import GamingProfileTagsForm from "../../forms/GamingProfileTagsForm";
+import LoadingWrapper from "../../misc/LoadingWrapper";
+
+const QUERY_GAMING_PROFILE = gql`
+query QueryGamingProfile($id: String!) {
+  gamingProfile(id: $id) {
+    game
+    calendar
+    tags {
+      id
+      displayName
+    }
+  }
+}`
+
+const UPDATE_GAMING_PROFILE = gql`
+mutation UpdateGamingProfile($id: String!, $tags: [String!], $calendar: [Int!]) {
+  updateGamingProfile(id: $id, tags: $tags, calendar: $calendar) { id }
+}`
+
+const DELETE_GAMING_PROFILE = gql`
+mutation DeleteGamingProfile($id: String!) {
+  deleteGamingProfile(id: $id)
+}
+`
 
 export default function GamingProfileEditDialog({ id, visible, setVisible, notify }) {
   const api = React.useContext(ApiContext)
-  const [tabIndex, setTabIndex] = React.useState(0)
 
-  const [data, setData] = React.useState()
+  const { data: loadedData, loading } = useQuery(QUERY_GAMING_PROFILE, { variables: { id } })
 
+  const [data, setData] = React.useState({})
   const [game, setGame] = React.useState()
   const [artwork, setArtwork] = React.useState()
 
-  const [calendar, setCalendar] = React.useState([])
-
-  React.useEffect(reload, [api, id])
-
   React.useEffect(() => {
-    if (data?.game) {
+    if (!loading) {
+      setData(loadedData.gamingProfile)
+
       api.igdb
         .limit(1)
         .fields(['name', 'artworks', 'artworks.url'])
-        .where(`id = ${data?.game}`)
+        .where(`id = ${loadedData.gamingProfile?.game}`)
         .request('/games')
         .then(response => {
           setGame(response.data[0])
@@ -61,32 +83,10 @@ export default function GamingProfileEditDialog({ id, visible, setVisible, notif
           }
         })
     }
-  }, [data?.game])
+  }, [api, loading])
 
-  function reload() {
-    if (api && id) {
-      api.getGamingProfile(id)
-        .then(response =>  setData(response.data))
-      reloadCalendar()
-    }
-  }
-
-  function reloadCalendar() {
-    api.gamingProfileGetCalendar(id)
-      .then(response => setCalendar(response.data))
-  }
-
-  function requestSaveCalendar() {
-    api.gamingProfileSetCalendar(id, calendar).then(reload)
-  }
-
-  function requestRemoveTag(tagId) {
-    api.gamingProfileDeleteTag(id, tagId).then(reload)
-  }
-
-  function requestAddTag(tag) {
-    api.gamingProfileAddTag(id, tag._id).then(reload)
-  }
+  const [deleteGamingProfile] = useMutation(DELETE_GAMING_PROFILE, { variables: { id } })
+  const [updateGamingProfile] = useMutation(UPDATE_GAMING_PROFILE, { variables: { id } })
 
   function hide() {
     setArtwork(undefined)
@@ -94,12 +94,18 @@ export default function GamingProfileEditDialog({ id, visible, setVisible, notif
     setVisible(false)
   }
 
-  function handleDelete() {
-    api.deleteGamingProfile(id)
-      .then(() => {
-        hide()
-        notify()
-      })
+  function finish() {
+    hide()
+    notify()
+  }
+
+  function handleSave() {
+    updateGamingProfile({
+      variables: {
+        tags: data?.tags?.map(it => it.id),
+        calendar: data?.calendar
+      }
+    }).then(finish)
   }
 
   function footer() {
@@ -108,10 +114,14 @@ export default function GamingProfileEditDialog({ id, visible, setVisible, notif
         icon="pi pi-trash"
         label="Delete"
         className="p-button-danger"
-        onClick={handleDelete}
+        onClick={() => deleteGamingProfile().then(finish)}
         style={{ marginRight: 8 }}
       />
-      <Button icon="pi pi-save" label="Close" onClick={hide}/>
+      <Button
+       icon="pi pi-save"
+       label="Save"
+       onClick={handleSave}
+      />
     </>
   }
 
@@ -124,38 +134,31 @@ export default function GamingProfileEditDialog({ id, visible, setVisible, notif
       contentStyle={artwork ? { backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.81)), url(https:${artwork})` } : undefined}
       contentClassName={Styles.Content}
 
-      showHeader={false}
       footer={footer()}
+      closeable
       modal
     >
+
       <div className={Styles.Header}>
         <h1>{game?.name}</h1>
       </div>
 
-      <TabView activeIndex={tabIndex} onTabChange={e => setTabIndex(e.index)}>
+      <LoadingWrapper isLoading={loading} render={() => (
+        <TabView>
+          <TabPanel header="Tags">
+            <Card>
+              <GamingProfileTagsForm value={data?.tags} setValue={(tags) => setData({ ...data, tags })}/>
+            </Card>
+          </TabPanel>
 
-        <TabPanel header="Tags">
-          <Card>
-            { data?.tags?.map(it => <Tag id={it} onRemoved={() => requestRemoveTag(it)}/>) }
-            <TagAddButton exclude={data?.tags || []} onAdded={requestAddTag} />
-          </Card>
-        </TabPanel>
+          <TabPanel header="Calendar">
+            <Card className={Styles.CalendarCard}>
+              <Calendar value={data?.calendar} setValue={(calendar) => setData({ ...data, calendar })}/>
+            </Card>
+          </TabPanel>
 
-        <TabPanel header="Calendar">
-          <Card
-            className={Styles.CalendarCard}
-            footer={
-              <>
-                <Button label="Discard" className="p-button-warning" onClick={reloadCalendar}/>
-                <Button label="Save" style={{ marginLeft: 8 }} onClick={requestSaveCalendar}/>
-              </>
-            }
-          >
-            <Calendar value={calendar} setValue={setCalendar}/>
-          </Card>
-        </TabPanel>
-
-      </TabView>
+        </TabView>
+      )}/>
     </Dialog>
   )
 }

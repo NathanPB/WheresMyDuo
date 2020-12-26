@@ -23,7 +23,6 @@ import Styles from './index.module.scss';
 import {UserContext} from '../../../providers/UserProvider';
 import GamingProfileCard from '../GamingProfileCard';
 
-import {ApiContext} from '../../../providers/ApiProvider';
 import GamingProfileCardContainer from "../GamingProfileCard/GamingProfileCardContainer";
 import {TabPanel, TabView} from "primereact/tabview";
 import UserProfileCard from "../UserProfileCard";
@@ -35,26 +34,23 @@ import LoadingWrapper from "../../misc/LoadingWrapper";
 
 const QUERY = gql`
   query PageData($uid: String!) {
-    user(uid: $uid) { nickname, photoURL, contactInfo, friends { uid } }
+    user(uid: $uid) {
+     nickname
+     photoURL
+     contactInfo
+     friends { uid }
+     gamingProfiles {
+       id
+       game
+     }
+    }
     friendRequest: friendRequestBetweenMeAnd(other: $uid) { id, to { uid }, from { uid } }
   } 
 `
 
 export default function UserProfileScreen({ uid, history }) {
   const currentUser = React.useContext(UserContext)
-  const api = React.useContext(ApiContext)
-
-  const [gamingProfiles, setGamingProfiles] = React.useState([])
   const { data, loading } = useQuery(QUERY, { variables: { uid } })
-
-  function reloadGamingProfiles() {
-    if (api) {
-      api.getGamingProfiles(uid)
-        .then(response => setGamingProfiles(response.data))
-    }
-  }
-
-  React.useEffect(reloadGamingProfiles, [api])
 
   if (uid === currentUser.uid) {
     window.location.href = "/me"
@@ -110,42 +106,40 @@ export default function UserProfileScreen({ uid, history }) {
 
         </div>
         <div>
-          <TabView>
-            <TabPanel header="Gaming Profiles">
-              <div style={{ padding: 8 }}>
-                <GamingProfileCardContainer>
-                  {
-                    gamingProfiles.map(profile => (
-                      <GamingProfileCard
-                        key={profile._id}
-                        gameId={profile.game}
-                      />
-                    ))
-                  }
-                </GamingProfileCardContainer>
-              </div>
-            </TabPanel>
-
-            <TabPanel header="Friends">
-              <LoadingWrapper isLoading={loading} render={() => (
-                <>
-                  <h1>Friends</h1>
+          <LoadingWrapper isLoading={loading} render={() => (
+            <TabView>
+              <TabPanel header="Gaming Profiles">
+                <div style={{ padding: 8 }}>
                   <GamingProfileCardContainer>
                     {
-                      data.user.friends.map(friend => {
-                        return (
-                          <UserProfileCard
-                            onClick={() => history.push(`/u/${friend.uid}`)}
-                            uid={friend.uid}
-                          />
-                        )
-                      })
+                      data.user.gamingProfiles.map(profile => (
+                        <GamingProfileCard
+                          key={profile.id}
+                          gameId={profile.game}
+                        />
+                      ))
                     }
                   </GamingProfileCardContainer>
-                </>
-              )}/>
-            </TabPanel>
-          </TabView>
+                </div>
+              </TabPanel>
+
+              <TabPanel header="Friends">
+                <h1>Friends</h1>
+                <GamingProfileCardContainer>
+                  {
+                    data.user.friends.map(friend => {
+                      return (
+                        <UserProfileCard
+                          onClick={() => history.push(`/u/${friend.uid}`)}
+                          uid={friend.uid}
+                        />
+                      )
+                    })
+                  }
+                </GamingProfileCardContainer>
+              </TabPanel>
+            </TabView>
+          )}/>
         </div>
       </div>
     </>

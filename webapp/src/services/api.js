@@ -39,20 +39,6 @@ export default function create(token) {
     responseType: 'json'
   })
 
-  const getGamingProfiles = (user) => axios.get(`/gamingProfile?user=${user}`)
-  const getGamingProfile = (id) => axios.get(`/gamingProfile/${id}`)
-  const createGamingProfile = (gameId) => axios.post(`/gamingProfile/${gameId}`)
-  const deleteGamingProfile = (id) => axios.delete(`/gamingProfile/${id}`)
-
-  const gamingProfileListTags = (id) => axios.get(`/gamingProfile/${id}/tag`)
-  const gamingProfileAddTag = (id, tagId) => axios.post(`/gamingProfile/${id}/tag/${tagId}`)
-  const gamingProfileDeleteTag = (id, tagId) => axios.delete(`/gamingProfile/${id}/tag/${tagId}`)
-
-  const gamingProfileGetCalendar = (id) => axios.get(`/gamingProfile/${id}/calendar`)
-  const gamingProfileSetCalendar = (id, calendar) => axios.put(`/gamingProfile/${id}/calendar`, calendar)
-
-  const match = (profileId) => axios.get(`/match/${profileId}`)
-
   const analyticsTagDistribution = () => axios.get('/analytics/tag_distribution')
   const analyticsGameDistribution = () => axios.get('/analytics/game_distribution')
   const analyticsHourDistribution = () => axios.get('/analytics/hour_distribution')
@@ -61,19 +47,6 @@ export default function create(token) {
   return {
     isAdmin,
     igdb,
-    match,
-    
-    getGamingProfiles,
-    getGamingProfile,
-    createGamingProfile,
-    deleteGamingProfile,
-
-    gamingProfileListTags,
-    gamingProfileAddTag,
-    gamingProfileDeleteTag,
-
-    gamingProfileGetCalendar,
-    gamingProfileSetCalendar,
 
     analyticsTagDistribution,
     analyticsGameDistribution,

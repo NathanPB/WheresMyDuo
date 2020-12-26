@@ -18,68 +18,56 @@
  */
 
 import React from "react";
-import {ApiContext} from "../../../providers/ApiProvider";
-import {UserContext} from "../../../providers/UserProvider";
-import LoadingSpinner from "../../misc/LoadingSpinner";
 import {Button} from "primereact/button";
 import GamingProfileCard from "../GamingProfileCard";
 import GamingProfileCardContainer from "../GamingProfileCard/GamingProfileCardContainer";
+import {gql, useQuery} from "@apollo/client";
+import LoadingWrapper from "../../misc/LoadingWrapper";
+
+const QUERY_GAMING_PROFILES = gql`{
+  me {
+    gamingProfiles {
+      id
+      game
+    }
+  }
+}`
 
 export default function MatchListScreen({ history }) {
-  const api = React.useContext(ApiContext)
-  const user = React.useContext(UserContext)
+  const { loading, data } = useQuery(QUERY_GAMING_PROFILES)
 
-  const [gamingProfiles, setGamingProfiles] = React.useState([])
-  const [loading, setLoading] = React.useState(false)
-
-  React.useEffect(() => {
-    if (api) {
-      setLoading(true)
-      api.getGamingProfiles(user.uid)
-        .then(response => {
-          setLoading(false)
-          setGamingProfiles(response.data)
-        }).catch(e => {
-        setLoading(false)
-        console.error(e)
-      })
+  return <LoadingWrapper isLoading={loading} render={() => {
+    if (data.me.gamingProfiles.length === 0) {
+      return (
+        <div style={{ textAlign: 'center' }}>
+          <h1>Oh No :(</h1>
+          <h2>It seems that you have not entered any games yet</h2>
+          <span>You can go to your profile page and add your favorite games, so we will know what to suggest you.</span>
+          <br/>
+          <Button
+            label="Go to Profile"
+            onClick={() => history.push('/me')}
+            style={{ marginTop: 8 }}
+          />
+        </div>
+      )
     }
-  }, [api, user.uid])
 
-  if (loading) {
-    return <LoadingSpinner/>
-  }
-
-  if (gamingProfiles.length === 0) {
     return (
-      <div style={{ textAlign: 'center' }}>
-        <h1>Oh No :(</h1>
-        <h2>It seems that you have not entered any games yet</h2>
-        <span>You can go to your profile page and add your favorite games, so we will know what to suggest you.</span>
-        <br/>
-        <Button
-          label="Go to Profile"
-          onClick={() => history.push('/me')}
-          style={{ marginTop: 8 }}
-        />
+      <div style={{ padding: '0 1em' }}>
+        <h1>Pick a game to match</h1>
+        <GamingProfileCardContainer>
+          {
+            data.me.gamingProfiles.map(profile => <GamingProfileCard
+              gameId={profile.game}
+              onClick={() => history.push(`match/${profile.id}`)}
+            />)
+          }
+        </GamingProfileCardContainer>
       </div>
     )
-  }
 
-  return (
-    <div style={{ padding: '0 1em' }}>
-      <h1>Pick a game to match</h1>
-      <GamingProfileCardContainer>
-        {
-          gamingProfiles.map(profile => <GamingProfileCard
-            gameId={profile.game}
-            onClick={() => history.push(`match/${profile._id}`)}
-          />)
-        }
-      </GamingProfileCardContainer>
-    </div>
-
-  )
+  }}/>
 
 }
 

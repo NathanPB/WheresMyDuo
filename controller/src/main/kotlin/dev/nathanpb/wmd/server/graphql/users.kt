@@ -23,6 +23,7 @@ import com.apurebase.kgraphql.Context
 import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
 import com.google.firebase.auth.FirebaseAuth
 import dev.nathanpb.wmd.data.FriendRequest
+import dev.nathanpb.wmd.data.GamingProfile
 import dev.nathanpb.wmd.data.UserProfile
 import dev.nathanpb.wmd.mongoDb
 import org.litote.kmongo.*
@@ -62,7 +63,8 @@ suspend fun getUserProfileOrCreate(
 }
 
 fun SchemaBuilder.users() {
-    val collection = mongoDb.getCollection<UserProfile>()
+    val collection by lazy { mongoDb.getCollection<UserProfile>() }
+    val gamingProfilesCollection by lazy { mongoDb.getCollection<GamingProfile>() }
 
     type<UserProfile> {
         property(UserProfile::uid) {}
@@ -115,6 +117,12 @@ fun SchemaBuilder.users() {
 
             resolver {
                 mongoDb.getCollection<FriendRequest>().find(FriendRequest::from eq it.uid).toList()
+            }
+        }
+
+        property<List<GamingProfile>>("gamingProfiles") {
+            resolver {
+                gamingProfilesCollection.find(GamingProfile::user eq it.uid).toList()
             }
         }
     }

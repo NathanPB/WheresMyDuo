@@ -18,19 +18,28 @@
  */
 
 import React from 'react';
-import { Dialog } from 'primereact/dialog';
-import GamePicker from '../../selectors/GamePicker';
-import { Button } from 'primereact/button';
+import {Dialog} from 'primereact/dialog';
+import GamePicker from "../selectors/GamePicker";
+import {gql, useMutation} from "@apollo/client";
+import {Button} from "primereact/button";
 
-export default function GamingProfileAddDialog({ visible, setVisible, onPicked }) {
+const CREATE_GAMING_PROFILE = gql`
+  mutation CreateGamingProfile($game: Int!) {
+    createGamingProfile(game: $game) { id }
+  }
+`
 
+export default function GamingProfileCreateDialog({ visible, setVisible, notify }) {
   const [game, setGame] = React.useState()
+  const [createGamingProfile] = useMutation(CREATE_GAMING_PROFILE, { variables: { game: game?.id } })
 
   function handleAdd() {
-    if (game && onPicked) {
-      onPicked(game)
-      setGame(undefined)
-      setVisible(false)
+    if (game) {
+      createGamingProfile().then(() => {
+        setGame(undefined)
+        setVisible(false)
+        notify && notify()
+      })
     }
   }
 
@@ -51,8 +60,10 @@ export default function GamingProfileAddDialog({ visible, setVisible, onPicked }
       footer={footer()}
       header="Add Gaming Profile"
     >
-      <label htmlFor="gamePicker">Game:</label>
-      <GamePicker id="gamePicker" value={game} setValue={setGame}/>
+      <div>
+        <label htmlFor="gamePicker">Game:</label>
+        <GamePicker id="gamePicker" value={game} setValue={setGame}/>
+      </div>
     </Dialog>
   )
 }

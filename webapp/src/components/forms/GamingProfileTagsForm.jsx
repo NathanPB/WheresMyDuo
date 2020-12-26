@@ -17,21 +17,25 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { ApiContext } from '../providers/ApiProvider';
+import React from "react";
+import TagAddButton from "../misc/TagAddButton";
+import Tag from "../misc/Tag";
 
-export default function useTags(id) {
-  const api = React.useContext(ApiContext)
-  const [data, setData] = React.useState(id ? undefined : [])
+export default function GamingProfileTagsForm({ value, setValue, readOnly = false }) {
 
-  React.useEffect(() => {
-    if (api) {
-      (id ? api.getTag(id) : api.getTags())
-        .then(response => setData(response.data))
-    } else {
-      setData(id ? undefined : [])
-    }
-  }, [api, id])
+  function removeTag(tagId) {
+    setValue(value.filter(it => it.id !== tagId))
+  }
 
-  return data;
+  function addTag(tag) {
+    setValue([ ...value, tag ])
+  }
+
+
+  return (
+    <>
+      { value?.map(it => <Tag displayName={it.displayName} description={it.description} onRemoved={!readOnly ? () => removeTag(it.id) : undefined}/>) }
+      { !readOnly && <TagAddButton exclude={value?.tags?.map(it => it.id) || []} onAdded={addTag}/> }
+    </>
+  )
 }

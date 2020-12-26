@@ -23,25 +23,19 @@ import Styles from './index.module.scss';
 import GamingProfileCard from '../GamingProfileCard';
 
 import GamingProfileCardStyles from '../GamingProfileCard/index.module.scss';
-import {ApiContext} from '../../../providers/ApiProvider';
-import GamingProfileAddDialog from '../../dialogs/GamingProfileAddDialog';
+import GamingProfileCreateDialog from '../../dialogs/GamingProfileCreateDialog';
 import GamingProfileEditDialog from '../../dialogs/GamingProfileEditDialog';
 import SelfProfileInfoCard from "../../misc/SelfProfileInfoEditCard";
 import GamingProfileCardContainer from "../GamingProfileCard/GamingProfileCardContainer";
 import {TabPanel, TabView} from "primereact/tabview";
 import UserProfileCard from "../UserProfileCard";
 import {gql, useQuery} from "@apollo/client";
-import {UserContext} from "../../../providers/UserProvider";
 import {FriendRequestAnswerButtons} from "../../misc/FriendRequestPanel";
 import LoadingWrapper from "../../misc/LoadingWrapper";
-import {Dialog} from "primereact/dialog";
-import TagPicker from "../../selectors/TagPicker";
 
 export default function SelfProfileScreen({ history }) {
-  const api = React.useContext(ApiContext)
-  const currentUser = React.useContext(UserContext)
 
-  const { data, loading, error } = useQuery(gql`
+  const { data, loading } = useQuery(gql`
     {
       me {
         nickname
@@ -55,47 +49,32 @@ export default function SelfProfileScreen({ history }) {
             uid
           }
         }
+        gamingProfiles {
+          id
+          game
+        }
       }
     }
   `)
 
-  const [gamingProfiles, setGamingProfiles] = React.useState([])
-
   const [addingProfile, setAddingProfile] = React.useState(false)
   const [gameProfileEdit, setGameProfileEdit] = React.useState()
 
-  function reloadGamingProfiles() {
-    if (api) {
-      api.getGamingProfiles(currentUser?.uid)
-        .then(response => setGamingProfiles(response.data))
-    }
-  }
-
-  React.useEffect(reloadGamingProfiles, [api])
-
-  function handleAddGamingProfile(data) {
-    if (!gamingProfiles.some(it => it.game === data.id)) {
-      api.createGamingProfile(data.id)
-        .then(reloadGamingProfiles)
-    }
-  }
-
-  const [a, setA] = React.useState()
   return (
     <>
-      <Dialog visible modal>
-        <TagPicker value={a} setValue={setA}/>
-      </Dialog>
-      <GamingProfileEditDialog
-        id={gameProfileEdit}
-        visible={!!gameProfileEdit}
-        setVisible={flag => setGameProfileEdit(!flag ? undefined : gameProfileEdit)}
-        notify={reloadGamingProfiles}
-      />
-      <GamingProfileAddDialog
+      { !!gameProfileEdit && (
+        <GamingProfileEditDialog
+          id={gameProfileEdit}
+          visible={!!gameProfileEdit}
+          setVisible={flag => setGameProfileEdit(!flag ? undefined : gameProfileEdit)}
+          notify={() => window.location.reload()}
+        />
+      ) }
+
+      <GamingProfileCreateDialog
         visible={addingProfile}
         setVisible={setAddingProfile}
-        onPicked={handleAddGamingProfile}
+        notify={() => window.location.reload()}
       />
       <div className={Styles.ProfilePageWrapper}>
         <div className={Styles.ProfileHalfScreenCard}>
@@ -119,28 +98,29 @@ export default function SelfProfileScreen({ history }) {
         <div>
           <TabView>
             <TabPanel header="Gaming Profiles">
-              <div style={{ padding: 8 }}>
-                <GamingProfileCardContainer>
-                  {
-                    gamingProfiles.map(profile => (
-                      <GamingProfileCard
-                        key={profile._id}
-                        gameId={profile.game}
-                        onClick={() => setGameProfileEdit(profile._id)}
-                      />
+              <LoadingWrapper isLoading={loading} render={() => (
+                <div style={{ padding: 8 }}>
+                  <GamingProfileCardContainer>
+                    {
+                      data.me.gamingProfiles.map(profile => (
+                        <GamingProfileCard
+                          key={profile.id}
+                          gameId={profile.game}
+                          onClick={() => setGameProfileEdit(profile.id)}
+                        />
+                      ))
+                    }
 
-                    ))
-                  }
-
-                  <div
-                    className={`${GamingProfileCardStyles.Card} ${Styles.NewCard}`}
-                    onClick={() => setAddingProfile(true)}
-                    title="New Game"
-                  >
-                    <i className="pi pi-plus"/>
-                  </div>
-                </GamingProfileCardContainer>
-              </div>
+                    <div
+                      className={`${GamingProfileCardStyles.Card} ${Styles.NewCard}`}
+                      onClick={() => setAddingProfile(true)}
+                      title="New Game"
+                    >
+                      <i className="pi pi-plus"/>
+                    </div>
+                  </GamingProfileCardContainer>
+                </div>
+              )}/>
             </TabPanel>
             <TabPanel header="Friends">
               <LoadingWrapper isLoading={loading} render={() => (

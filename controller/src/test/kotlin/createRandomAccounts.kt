@@ -1,10 +1,7 @@
 import dev.nathanpb.wmd.data.GamingProfile
-import dev.nathanpb.wmd.data.Tag
 import dev.nathanpb.wmd.data.UserProfile
 import kotlinx.coroutines.runBlocking
-import org.bson.types.ObjectId
 import org.litote.kmongo.coroutine.coroutine
-import org.litote.kmongo.id.toId
 import org.litote.kmongo.reactivestreams.KMongo
 import kotlin.random.Random
 
@@ -37,13 +34,11 @@ fun main() {
     val profilesPerUser = 1..3
     val tagsPerProfile = 0..3
     val tags = listOf(
-        "5f8c478a13d7882d86317992",
-        "5f8c479013d7882d86317997",
-        "5f8c479c13d7882d8631799d",
-        "5f8c47ae13d7882d863179a4",
-        "5f8c47b313d7882d863179ac",
-        "5f8c47cc13d7882d863179c5"
-    ).map(::ObjectId)
+        "7adcf68b-3ee0-47cf-9af4-448bcca35059",
+        "312fc4a9-8ad5-4e1c-99fc-84893de87a7c",
+        "951ee168-d777-4c1f-81b9-5acab05b5050",
+        "4d43084a-3b43-45af-87d4-4ae6b92c6655",
+    )
 
     runBlocking {
         mongoDb.getCollection<UserProfile>().find().toList().forEach { user ->
@@ -51,11 +46,11 @@ fun main() {
                 val game = games.random()
                 val calendar = (0..167).filter { Random.nextBoolean() }
                 val tags = tagsPerProfile
-                    .map { tags.random().toId<Tag>() }
+                    .map { tags.random() }
                     .take(tagsPerProfile.random())
 
                 GamingProfile(
-                    user = user.uid.orEmpty(),
+                    user = user.uid,
                     game = game,
                     calendar = calendar,
                     tags = tags

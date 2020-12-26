@@ -18,21 +18,14 @@
  */
 
 import React from 'react';
-import useTags from '../../hooks/useTags';
 
 import Styles from './Tag.module.scss';
 
-export default function Tag({ id, onRemoved }) {
-  const tag = useTags(id)
-
-  function handleRemove(e) {
-    onRemoved && onRemoved(e)
-  }
-
-  return !tag ? null : (
-    <span className={`p-tag ${Styles.Tag}`} title={tag.description}>
-      { onRemoved && <i className="pi pi-times pointer" onClick={handleRemove} title="Remove"/> }
-      <span>{ tag.displayName }</span>
+export default function Tag({ displayName, description, onRemoved }) {
+  return (
+    <span className={`p-tag ${Styles.Tag}`} title={description}>
+        { !onRemoved && <i className="pi pi-times pointer" onClick={onRemoved} title="Remove"/> }
+      <span>{displayName}</span>
     </span>
   )
 }
