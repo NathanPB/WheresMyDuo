@@ -49,7 +49,7 @@ mutation UpdateGamingProfile($id: String!, $tags: [String!], $calendar: [Int!]) 
 
 const DELETE_GAMING_PROFILE = gql`
 mutation DeleteGamingProfile($id: String!) {
-  deleteGamingProfile(id: $id)
+  deleteGamingProfile(id: $id) { id }
 }
 `
 
