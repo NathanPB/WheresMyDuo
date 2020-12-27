@@ -18,50 +18,83 @@
  */
 
 import React from 'react';
-import { ApiContext } from '../../providers/ApiProvider';
-import { AutoComplete } from 'primereact/autocomplete';
+import {ApiContext} from '../../providers/ApiProvider';
+import Carousel from "react-spring-3d-carousel";
+import {InputText} from "primereact/inputtext";
+import Styles from './GamePicker.module.scss'
+import useDeepCompareMemoized from "../../hooks/useDeepCompareMemoized";
 
-export default function GamePicker({ id, value, setValue }) {
+export default function GamePicker({ onChange }) {
   const api = React.useContext(ApiContext)
+  const [query, setQuery] = React.useState('')
+  const [games, setGames] = React.useState([])
+  const [currentSlide, setCurrentSlide] = React.useState(0)
 
-  const [queriedGames, setQueriedGames] = React.useState([])
-
-  React.useEffect(() => onSearch({ query: '' }), [])
-
-  function onSearch(event) {
-    const query = event.query.trim()
+  function queryGames() {
     if (api) {
       if (query) {
         api.igdb
-          .fields(['name'])
+          .fields(['id', 'name', 'cover.url'])
           .limit(10)
           .search(query)
           .request('/games')
-          .then(response => setQueriedGames(response.data))
+          .then(response => setGames(response.data))
+          .catch(console.error)
       } else {
         api.igdb
-          .fields(['name'])
+          .fields(['id', 'name', 'cover.url'])
           .sort('total_rating asc')
-          .limit(20)
+          .limit(10)
           .request('/games')
-          .then(response => setQueriedGames(response.data))
+          .then(response => setGames(response.data))
+          .catch(console.error)
       }
     }
   }
 
-  return (
-    <AutoComplete
-      id={id}
-      field="name"
-      value={value}
-      suggestions={queriedGames}
-      completeMethod={onSearch}
-      onChange={e => setValue(e.value)}
-      itemTemplate={data => data.name}
-      appendTo={document.body}
-      style={{ width: '100%' }}
-      dropdown
+  React.useEffect(queryGames, [api, query])
+  React.useEffect(queryGames, [api])
+
+  React.useEffect(() => {
+    if (onChange) {
+      onChange(games[currentSlide])
+    }
+  }, [currentSlide, useDeepCompareMemoized(games)])
+
+  const slides = games.filter(it => it?.cover?.url).map((it, index) => ({
+    key: it.id,
+    content: <img
+      style={{ maxWidth: 172 }}
+      src={`https:${it.cover.url.replace('t_thumb', 't_cover_big')}`}
+      alt={it.name}
+      onClick={() => setCurrentSlide(index)}
     />
+  }))
+
+  return (
+    <div className={Styles.GamePicker}>
+      <span className={Styles.GameTitle}>{games[currentSlide]?.name}</span>
+      {
+        games.length > 0 && (
+          <div className={Styles.CarouselWrapper}>
+            <Carousel slides={slides} goToSlide={currentSlide}/>
+          </div>
+        )
+      }
+
+      {
+        (games.length === 0 && query) && (
+          <span>Well, we couldn't find anything about <code>{query}</code></span>
+        )
+      }
+
+      <div className="p-inputgroup">
+        <div className="p-inputgroup-addon">
+          <i className="pi pi-search"/>
+        </div>
+        <InputText placeholder="Search..." value={query} onChange={e => setQuery(e.target.value)}/>
+      </div>
+    </div>
   )
 
 }

@@ -60,10 +60,7 @@ export default function GamingProfileCreateDialog({ visible, setVisible, notify 
       footer={footer()}
       header="Add Gaming Profile"
     >
-      <div>
-        <label htmlFor="gamePicker">Game:</label>
-        <GamePicker id="gamePicker" value={game} setValue={setGame}/>
-      </div>
+      <GamePicker onChange={setGame}/>
     </Dialog>
   )
 }
