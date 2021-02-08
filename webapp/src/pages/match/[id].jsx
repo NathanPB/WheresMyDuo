@@ -24,6 +24,7 @@ import GamingProfileCardContainer from "../../components/screen/GamingProfileCar
 import UserProfileCard from "../../components/screen/UserProfileCard";
 import {gql, useQuery} from "@apollo/client";
 import {useRouter} from "next/router";
+import UserDashboard from "../../components/dashboards/UserDashboard";
 
 const MATCH = gql`
 query Match($profileId: String!) {
@@ -115,17 +116,19 @@ export default function MatchId() {
 
 
   return (
-    <div style={{ padding: '1em' }}>
-      <GamingProfileCardContainer>
-        {
-          data.match.map(match =>
-            <UserProfileCard
-              onClick={() => router.push(`/u/${match.user.uid}`)}
-              uid={match.user.uid}
-              header={makeHeader(match)}
-            />)
-        }
-      </GamingProfileCardContainer>
-    </div>
+    <UserDashboard>
+      <div style={{ padding: '1em' }}>
+        <GamingProfileCardContainer>
+          {
+            data.match.map(match =>
+              <UserProfileCard
+                onClick={() => router.push(`/u/${match.user.uid}`)}
+                uid={match.user.uid}
+                header={makeHeader(match)}
+              />)
+          }
+        </GamingProfileCardContainer>
+      </div>
+    </UserDashboard>
   )
 }

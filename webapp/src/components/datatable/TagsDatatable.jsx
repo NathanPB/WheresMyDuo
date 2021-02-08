@@ -19,7 +19,7 @@
 
 import React from "react";
 import {gql, useMutation, useQuery} from "@apollo/client";
-import Styles from "../screen/AdminDashboard/maintenance/TagsMaintenance.module.scss";
+import Styles from "./TagsDatatable.module.scss";
 import {Button} from "primereact/button";
 import {Checkbox} from "primereact/checkbox";
 import {DataTable} from "primereact/datatable";

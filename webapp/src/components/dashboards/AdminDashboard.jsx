@@ -19,17 +19,21 @@
 
 import React from 'react';
 
-import Styles from './index.module.scss';
+import Styles from './AdminDashboard.module.scss';
 
 import {Menubar} from 'primereact/menubar';
 import {Button} from 'primereact/button';
-import {Route, Switch} from 'react-router-dom';
-import TagsMaintenance from './maintenance/TagsMaintenance';
 import {TieredMenu} from 'primereact/tieredmenu';
-import {auth} from '../../../services/firebase/firebase';
-import AnalyticsScreen from "./analytics";
+import {auth} from '../../services/firebase';
+import {gql, useQuery} from "@apollo/client";
+import LoadingWrapper from "../../components/misc/LoadingWrapper";
 
-export default function AdminDashboard({ history, match }) {
+export default function AdminDashboard({ children }) {
+  const { loading, data } = useQuery(gql`{ me { isAdmin }}`)
+
+  if (!loading && !data) {
+    return null
+  }
 
   const topMenu = [
     {
@@ -55,35 +59,37 @@ export default function AdminDashboard({ history, match }) {
     {
       label: 'Tags',
       icon: 'pi pi-tag',
-      command: () => history.push(`${match.path}/tags`)
+      url: '/admin/tags',
     },
     {
       label: 'Analytics',
       icon: 'pi pi-chart-bar',
-      command: () => history.push(`${match.path}/analytics`)
+      url: '/admin/analytics'
     }
   ]
 
   return (
-    <div className={Styles.AdminDashboard}>
-      <header>
-        <Menubar
-          start={topMenuStart}
-          end={topMenuEnd}
-          model={topMenu}
-        />
-      </header>
-      <div>
-        <aside>
-            <TieredMenu model={asideMenu}/>
-        </aside>
-        <main>
-          <Switch>
-            <Route path={`${match.path}/tags`} component={TagsMaintenance} exact/>
-            <Route path={`${match.path}/analytics`} component={AnalyticsScreen} exact/>
-          </Switch>
-        </main>
-      </div>
-    </div>
+    <LoadingWrapper
+      isLoading={loading || !data?.me?.isAdmin}
+      render={() => (
+        <div className={Styles.AdminDashboard}>
+          <header>
+            <Menubar
+              start={topMenuStart}
+              end={topMenuEnd}
+              model={topMenu}
+            />
+          </header>
+          <div>
+            <aside>
+              <TieredMenu model={asideMenu}/>
+            </aside>
+            <main>
+              { children }
+            </main>
+          </div>
+        </div>
+      )}
+    />
   )
 }

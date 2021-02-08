@@ -19,10 +19,11 @@
 
 import React from 'react';
 import {Dialog} from 'primereact/dialog';
-import TagsDatatable from "../../../datatable/TagsDatatable";
-import {TagCreateController, TagEditController} from '../../../controller/tag'
+import TagsDatatable from "../../components/datatable/TagsDatatable";
+import {TagCreateController, TagEditController} from "../../components/controller/tag";
+import AdminDashboard from "../../components/dashboards/AdminDashboard";
 
-export default function TagsMaintenance() {
+export default function Tags() {
   const [selectedItem, setSelectedItem] = React.useState()
 
   function reload() {
@@ -34,7 +35,7 @@ export default function TagsMaintenance() {
   }
 
   return (
-    <>
+    <AdminDashboard>
       <Dialog header="Creating Tag" onHide={unselect} visible={selectedItem === 0} modal>
         <TagCreateController close={unselect} notify={reload}/>
       </Dialog>
@@ -48,6 +49,6 @@ export default function TagsMaintenance() {
       }
 
       <TagsDatatable selectItem={setSelectedItem}/>
-    </>
+    </AdminDashboard>
   )
 }

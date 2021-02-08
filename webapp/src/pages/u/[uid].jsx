@@ -32,6 +32,7 @@ import {FriendRequestPanel} from "../../components/misc/FriendRequestPanel";
 import LoadingWrapper from "../../components/misc/LoadingWrapper";
 import {useRouter} from "next/router";
 import Link from "next/link";
+import UserDashboard from "../../components/dashboards/UserDashboard";
 
 
 const QUERY = gql`
@@ -71,88 +72,90 @@ export default function UserProfileScreen() {
   }
 
   return (
-    <div className={Styles.ProfilePageWrapper}>
-      <div className={Styles.ProfileHalfScreenCard}>
-        <LoadingWrapper isLoading={loading} render={() => (
-          <>
-            <div>
-              <img
-                alt={`${data.user.nickname}'s Avatar`}
-                className={Styles.ProfilePic}
-                src={data.user.photoURL}
-              />
-              <span className={Styles.UserName}>
+    <UserDashboard>
+      <div className={Styles.ProfilePageWrapper}>
+        <div className={Styles.ProfileHalfScreenCard}>
+          <LoadingWrapper isLoading={loading} render={() => (
+            <>
+              <div>
+                <img
+                  alt={`${data.user.nickname}'s Avatar`}
+                  className={Styles.ProfilePic}
+                  src={data.user.photoURL}
+                />
+                <span className={Styles.UserName}>
                   {data.user.nickname}
               </span>
-            </div>
+              </div>
 
-            <hr/>
+              <hr/>
 
-            {
-              data.user.contactInfo && (
-                <>
-                  <div style={{ marginBottom: '1em' }}>
-                    <h3 style={{ textAlign: 'center' }}>Contact Information</h3>
-                    <InputTextarea
-                      style={{ display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
-                      value={data.user.contactInfo}
-                      readOnly
-                    />
-                  </div>
-                  <hr/>
-                </>
-              )
-            }
+              {
+                data.user.contactInfo && (
+                  <>
+                    <div style={{ marginBottom: '1em' }}>
+                      <h3 style={{ textAlign: 'center' }}>Contact Information</h3>
+                      <InputTextarea
+                        style={{ display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
+                        value={data.user.contactInfo}
+                        readOnly
+                      />
+                    </div>
+                    <hr/>
+                  </>
+                )
+              }
 
-            <div>
-              <FriendRequestPanel
-                friendRequest={data.friendRequest}
-                uid={uid}
-                nickname={data.user.nickname}
-                areFriends={data.user.friends.some(it => it.uid === currentUser.uid)}
-                onAnswer={() => window.location.reload()}
-                onDelete={() => window.location.reload()}
-              />
-            </div>
-          </>
-        )}/>
+              <div>
+                <FriendRequestPanel
+                  friendRequest={data.friendRequest}
+                  uid={uid}
+                  nickname={data.user.nickname}
+                  areFriends={data.user.friends.some(it => it.uid === currentUser.uid)}
+                  onAnswer={() => window.location.reload()}
+                  onDelete={() => window.location.reload()}
+                />
+              </div>
+            </>
+          )}/>
 
-      </div>
-      <div>
-        <LoadingWrapper isLoading={loading} render={() => (
-          <TabView>
-            <TabPanel header="Gaming Profiles">
-              <div style={{ padding: 8 }}>
+        </div>
+        <div>
+          <LoadingWrapper isLoading={loading} render={() => (
+            <TabView>
+              <TabPanel header="Gaming Profiles">
+                <div style={{ padding: 8 }}>
+                  <GamingProfileCardContainer>
+                    {
+                      data.user.gamingProfiles.map(profile => (
+                        <GamingProfileCard
+                          key={profile.id}
+                          gameId={profile.game}
+                        />
+                      ))
+                    }
+                  </GamingProfileCardContainer>
+                </div>
+              </TabPanel>
+
+              <TabPanel header="Friends">
+                <h1>Friends</h1>
                 <GamingProfileCardContainer>
                   {
-                    data.user.gamingProfiles.map(profile => (
-                      <GamingProfileCard
-                        key={profile.id}
-                        gameId={profile.game}
-                      />
-                    ))
+                    data.user.friends.map(friend => {
+                      return (
+                        <Link href={`/u/${friend.uid}`}>
+                          <UserProfileCard uid={friend.uid}/>
+                        </Link>
+                      )
+                    })
                   }
                 </GamingProfileCardContainer>
-              </div>
-            </TabPanel>
-
-            <TabPanel header="Friends">
-              <h1>Friends</h1>
-              <GamingProfileCardContainer>
-                {
-                  data.user.friends.map(friend => {
-                    return (
-                      <Link href={`/u/${friend.uid}`}>
-                        <UserProfileCard uid={friend.uid}/>
-                      </Link>
-                    )
-                  })
-                }
-              </GamingProfileCardContainer>
-            </TabPanel>
-          </TabView>
-        )}/>
+              </TabPanel>
+            </TabView>
+          )}/>
+        </div>
       </div>
-    </div>
+    </UserDashboard>
   )
 }

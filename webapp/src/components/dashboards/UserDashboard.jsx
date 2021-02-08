@@ -18,25 +18,22 @@
  */
 
 import React from 'react';
-import {Route, Switch} from 'react-router';
-import logo from '../../../logo.svg';
-import {auth} from '../../../services/firebase';
-import SelfProfileScreen from '../SelfProfileScreen';
+import {auth} from '../../services/firebase';
 
-import Styles from './index.module.scss';
+import Styles from './UserDashboard.module.scss';
 import {Menubar} from 'primereact/menubar';
 import {TieredMenu} from 'primereact/tieredmenu';
-import {UserContext} from '../../../providers/UserProvider';
+import {UserContext} from '../../providers/UserProvider';
 import {Button} from 'primereact/button';
 import {OverlayPanel} from 'primereact/overlaypanel';
-import MatchScreen from "../MatchScreen";
-import MatchListScreen from "../MatchScreen/MatchListScreen";
-import UserProfileScreen from "../UserProfileScreen";
 import {AutoComplete} from "primereact/autocomplete";
 import {gql, useQuery} from "@apollo/client";
+import {useRouter} from "next/router";
+import document from "../../document";
 
-export default function UserDashboard({ history }) {
+export default function UserDashboard({ children }) {
   const user = React.useContext(UserContext)
+  const router = useRouter()
 
   const tieredMenu = React.useRef()
   const searchMenu = React.useRef()
@@ -59,9 +56,12 @@ export default function UserDashboard({ history }) {
     }
   }, [userQuery])
 
+  if (!user) {
+    return null
+  }
 
   function onUserSelected(user) {
-    history.push(`/u/${user.uid}`)
+    router.push(`/u/${user.uid}`)
     setUserQuery('')
   }
 
@@ -70,7 +70,7 @@ export default function UserDashboard({ history }) {
       icon="pi pi-users"
       label="Match my profile!"
       className={Styles.Match}
-      onClick={() => history.push('/match')}
+      onClick={() => router.push('/match')}
     />
     <div style={{ display: 'inline-block' }} className={Styles.Search}>
       <div className="p-inputgroup">
@@ -78,6 +78,7 @@ export default function UserDashboard({ history }) {
           <i className="pi pi-search"/>
         </span>
         <AutoComplete
+          appendTo={document.body}
           ref={desktopSearch}
           panelClassName={Styles.AutoCompleteUserQuery}
           field="nickname"
@@ -87,13 +88,13 @@ export default function UserDashboard({ history }) {
           onFocus={() => desktopSearch.current?.showOverlay()}
           onChange={e => setUserQuery(e.value)}
           onSelect={e => onUserSelected(e.value)}
-          appendTo={document.body}
           dropdown
         />
       </div>
     </div>
     <OverlayPanel ref={searchMenu} className={Styles.SearchPopup}>
       <AutoComplete
+        appendTo={document.body}
         ref={mobileSearch}
         field="nickname"
         value={userQuery}
@@ -102,7 +103,6 @@ export default function UserDashboard({ history }) {
         onChange={e => setUserQuery(e.value)}
         onSelect={e => onUserSelected(e.value)}
         onFocus={() => mobileSearch.current?.showOverlay()}
-        appendTo={document.body}
         panelClassName={Styles.AutoCompleteUserQuery}
         dropdown
       />
@@ -144,22 +144,7 @@ export default function UserDashboard({ history }) {
         model={menu}
       />
       <main className={Styles.Main}>
-        <Switch>
-          <Route path="/" exact>
-            <div className="App">
-              <header className="App-header">
-                <img src={logo} className="App-logo" alt="logo" />
-                <span onClick={() => auth.signOut()}>
-                  Logout
-                </span>
-              </header>
-            </div>
-          </Route>
-          <Route path="/match/:id" component={MatchScreen}/>
-          <Route path="/match" component={MatchListScreen}/>
-          <Route path="/me" component={SelfProfileScreen} />
-          <Route path="/u/:id" component={({ match, history }) => <UserProfileScreen uid={match.params.id} history={history}/>}/>
-        </Switch>
+        { children }
       </main>
     </>
   )

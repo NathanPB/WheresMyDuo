@@ -1,5 +1,5 @@
-/*!
- * Copyright (c) 2020 - Nathan P. Bombana
+/*
+ * Copyright (c) 2021 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
  *
@@ -17,47 +17,6 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-.AdminDashboard {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  position: fixed;
+import AdminDashboard from "../../components/dashboards/AdminDashboard";
 
-  & > header {
-    flex-shrink: 0;
-    border-bottom: solid 1px rgba(255, 255, 255, 0.12);
-
-    & > * {
-      border-radius: 0;
-      border: none;
-    }
-  }
-
-  & > div {
-    flex-grow: 100;
-    display: flex;
-    flex-direction: row;
-  }
-
-  & > div > aside {
-    width: 128px;
-    max-width: 70vw;
-    flex-grow: 1;
-    flex-shrink: 0;
-
-    border-right: solid 1px grey;
-
-    & > * {
-      border-radius: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-  }
-
-  & > div > main {
-    flex-grow: 100;
-    height: 100%;
-    padding: 1em;
-  }
-}
+export default AdminDashboard

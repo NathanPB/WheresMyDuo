@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - Nathan P. Bombana
+ * Copyright (c) 2021 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
  *
@@ -20,8 +20,8 @@
 import React from "react";
 import {Chart} from "primereact/chart";
 import stc from 'string-to-color';
-import {ApiContext} from "../../../../providers/ApiProvider";
-import LoadingSpinner from "../../../misc/LoadingSpinner";
+import {ApiContext} from "../../providers/ApiProvider";
+import LoadingSpinner from "../misc/LoadingSpinner";
 
 
 export default function GameDistribution() {

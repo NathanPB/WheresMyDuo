@@ -32,6 +32,7 @@ import UserProfileCard from "../components/screen/UserProfileCard";
 import {FriendRequestAnswerButtons} from "../components/misc/FriendRequestPanel";
 import {useRouter} from "next/router";
 import Link from "next/link";
+import UserDashboard from "../dashboards/UserDashboard";
 
 const QUERY = gql`
     {
@@ -68,7 +69,7 @@ export default function Me() {
   }
 
   return (
-    <>
+    <UserDashboard>
       { !!gameProfileEdit && (
         <GamingProfileEditDialog
           id={gameProfileEdit}
@@ -186,6 +187,6 @@ export default function Me() {
         </div>
 
       </div>
-    </>
+    </UserDashboard>
   )
 }
