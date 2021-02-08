@@ -33,6 +33,7 @@ import {FriendRequestAnswerButtons} from "../components/misc/FriendRequestPanel"
 import {useRouter} from "next/router";
 import Link from "next/link";
 import UserDashboard from "../components/dashboards/UserDashboard";
+import Head from "next/head";
 
 const QUERY = gql`
     {
@@ -70,6 +71,9 @@ export default function Me() {
 
   return (
     <UserDashboard>
+      <Head>
+        <title>My Profile - WheresMyDuo</title>
+      </Head>
       { !!gameProfileEdit && (
         <GamingProfileEditDialog
           id={gameProfileEdit}

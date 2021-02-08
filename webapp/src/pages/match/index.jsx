@@ -27,6 +27,7 @@ import GamingProfileCard from "../../components/screen/GamingProfileCard";
 import Link from "next/link";
 import {useRouter} from "next/router";
 import UserDashboard from "../../components/dashboards/UserDashboard";
+import Head from "next/head";
 
 const QUERY_GAMING_PROFILES = gql`{
   me {
@@ -48,6 +49,9 @@ export default function Match() {
 
   return (
     <UserDashboard>
+      <Head>
+        <title>Matching - WheresMyDuo</title>
+      </Head>
       <LoadingWrapper isLoading={loading} render={() => {
         if (data.me.gamingProfiles.length === 0) {
           return (

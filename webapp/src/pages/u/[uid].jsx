@@ -33,6 +33,7 @@ import LoadingWrapper from "../../components/misc/LoadingWrapper";
 import {useRouter} from "next/router";
 import Link from "next/link";
 import UserDashboard from "../../components/dashboards/UserDashboard";
+import Head from "next/head";
 
 
 const QUERY = gql`
@@ -77,6 +78,9 @@ export default function UserProfileScreen() {
         <div className={Styles.ProfileHalfScreenCard}>
           <LoadingWrapper isLoading={loading} render={() => (
             <>
+              <Head>
+                <title>{data.user.nickname} on WheresMyDuo</title>
+              </Head>
               <div>
                 <img
                   alt={`${data.user.nickname}'s Avatar`}

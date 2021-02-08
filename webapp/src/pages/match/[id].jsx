@@ -25,6 +25,7 @@ import UserProfileCard from "../../components/screen/UserProfileCard";
 import {gql, useQuery} from "@apollo/client";
 import {useRouter} from "next/router";
 import UserDashboard from "../../components/dashboards/UserDashboard";
+import Head from "next/head";
 
 const MATCH = gql`
 query Match($profileId: String!) {
@@ -54,11 +55,16 @@ export default function MatchId() {
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center' }}>
-        <h1>We are matching your profile!</h1>
-        <span>It may take some time</span>
-        <LoadingSpinner/>
-      </div>
+      <UserDashboard>
+        <div style={{ textAlign: 'center' }}>
+          <Head>
+            <title>Matching - WheresMyDuo</title>
+          </Head>
+          <h1>We are matching your profile!</h1>
+          <span>It may take some time</span>
+          <LoadingSpinner/>
+        </div>
+      </UserDashboard>
     )
   }
 
@@ -68,12 +74,15 @@ export default function MatchId() {
 
   if (data.match.length === 0) {
     return (
-      <>
+      <UserDashboard>
+        <Head>
+          <title>Matching - WheresMyDuo</title>
+        </Head>
         <div style={{ textAlign: 'center' }}>
           <h1>It looks like there aren't great results for you yet :(</h1>
           <span>Why don't you come back in a few hours</span>
         </div>
-      </>
+      </UserDashboard>
     )
   }
 
@@ -117,6 +126,9 @@ export default function MatchId() {
 
   return (
     <UserDashboard>
+      <Head>
+        <title>Matching - WheresMyDuo</title>
+      </Head>
       <div style={{ padding: '1em' }}>
         <GamingProfileCardContainer>
           {
