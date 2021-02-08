@@ -32,7 +32,7 @@ import UserProfileCard from "../components/screen/UserProfileCard";
 import {FriendRequestAnswerButtons} from "../components/misc/FriendRequestPanel";
 import {useRouter} from "next/router";
 import Link from "next/link";
-import UserDashboard from "../dashboards/UserDashboard";
+import UserDashboard from "../components/dashboards/UserDashboard";
 
 const QUERY = gql`
     {
