@@ -26,7 +26,7 @@ import {Button} from 'primereact/button';
 import {Route, Switch} from 'react-router-dom';
 import TagsMaintenance from './maintenance/TagsMaintenance';
 import {TieredMenu} from 'primereact/tieredmenu';
-import {auth} from '../../../services/firebase';
+import {auth} from '../../../services/firebase/firebase';
 import AnalyticsScreen from "./analytics";
 
 export default function AdminDashboard({ history, match }) {

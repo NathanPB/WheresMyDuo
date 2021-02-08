@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - Nathan P. Bombana
+ * Copyright (c) 2021 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
  *
@@ -17,12 +17,15 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+
 import React from "react";
 import {Button} from "primereact/button";
-import GamingProfileCard from "../GamingProfileCard";
-import GamingProfileCardContainer from "../GamingProfileCard/GamingProfileCardContainer";
 import {gql, useQuery} from "@apollo/client";
-import LoadingWrapper from "../../misc/LoadingWrapper";
+import LoadingWrapper from "../../components/misc/LoadingWrapper";
+import GamingProfileCardContainer from "../../components/screen/GamingProfileCard/GamingProfileCardContainer";
+import GamingProfileCard from "../../components/screen/GamingProfileCard";
+import Link from "next/link";
+import {useRouter} from "next/router";
 
 const QUERY_GAMING_PROFILES = gql`{
   me {
@@ -33,8 +36,14 @@ const QUERY_GAMING_PROFILES = gql`{
   }
 }`
 
-export default function MatchListScreen({ history }) {
+export default function Match() {
+  const router = useRouter()
+
   const { loading, data } = useQuery(QUERY_GAMING_PROFILES)
+
+  if (!loading && !data) {
+    return null
+  }
 
   return <LoadingWrapper isLoading={loading} render={() => {
     if (data.me.gamingProfiles.length === 0) {
@@ -44,11 +53,13 @@ export default function MatchListScreen({ history }) {
           <h2>It seems that you have not entered any games yet</h2>
           <span>You can go to your profile page and add your favorite games, so we will know what to suggest you.</span>
           <br/>
-          <Button
-            label="Go to Profile"
-            onClick={() => history.push('/me')}
-            style={{ marginTop: 8 }}
-          />
+          <Link href={"/me"}>
+            <Button
+              label="Go to Profile"
+              onClick={() => router.push('/me')}
+              style={{ marginTop: 8 }}
+            />
+          </Link>
         </div>
       )
     }
@@ -58,10 +69,14 @@ export default function MatchListScreen({ history }) {
         <h1>Pick a game to match</h1>
         <GamingProfileCardContainer>
           {
-            data.me.gamingProfiles.map(profile => <GamingProfileCard
-              gameId={profile.game}
-              onClick={() => history.push(`match/${profile.id}`)}
-            />)
+            data.me.gamingProfiles.map(profile => (
+              <Link href={`match/${profile.id}`}>
+                <GamingProfileCard
+                  gameId={profile.game}
+                  onClick={() => router.push(`match/${profile.id}`)}
+                />
+              </Link>
+            ))
           }
         </GamingProfileCardContainer>
       </div>
@@ -70,4 +85,3 @@ export default function MatchListScreen({ history }) {
   }}/>
 
 }
-

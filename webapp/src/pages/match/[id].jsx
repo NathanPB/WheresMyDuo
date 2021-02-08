@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - Nathan P. Bombana
+ * Copyright (c) 2021 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
  *
@@ -17,11 +17,13 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+
 import React from "react";
-import LoadingSpinner from "../../misc/LoadingSpinner";
-import GamingProfileCardContainer from "../GamingProfileCard/GamingProfileCardContainer";
-import UserProfileCard from "../UserProfileCard";
+import LoadingSpinner from "../../components/misc/LoadingSpinner";
+import GamingProfileCardContainer from "../../components/screen/GamingProfileCard/GamingProfileCardContainer";
+import UserProfileCard from "../../components/screen/UserProfileCard";
 import {gql, useQuery} from "@apollo/client";
+import {useRouter} from "next/router";
 
 const MATCH = gql`
 query Match($profileId: String!) {
@@ -42,8 +44,12 @@ query Match($profileId: String!) {
   }
 }`
 
-export default function MatchScreen({ history, match }) {
-  const { data, loading } = useQuery(MATCH, { variables: { profileId: match.params.id } })
+export default function MatchId() {
+
+  const router = useRouter()
+  const { id } = router.query
+
+  const { data, loading } = useQuery(MATCH, { variables: { profileId: id } })
 
   if (loading) {
     return (
@@ -53,6 +59,10 @@ export default function MatchScreen({ history, match }) {
         <LoadingSpinner/>
       </div>
     )
+  }
+
+  if (!loading && !data) {
+    return null
   }
 
   if (data.match.length === 0) {
@@ -110,7 +120,7 @@ export default function MatchScreen({ history, match }) {
         {
           data.match.map(match =>
             <UserProfileCard
-              onClick={() => history.push(`/u/${match.user.uid}`)}
+              onClick={() => router.push(`/u/${match.user.uid}`)}
               uid={match.user.uid}
               header={makeHeader(match)}
             />)

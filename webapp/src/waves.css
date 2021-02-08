@@ -15,7 +15,7 @@ body {
 }
 
 .wave {
-    background: url(wave.png) repeat-x;
+    background: url("/wave.png") repeat-x;
     position: absolute;
     top: -198px;
     width: 6400px;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - Nathan P. Bombana
+ * Copyright (c) 2021 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
  *
@@ -17,25 +17,23 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-
-import Styles from './index.module.scss';
-import GamingProfileCard from '../GamingProfileCard';
-
-import GamingProfileCardStyles from '../GamingProfileCard/index.module.scss';
-import GamingProfileCreateDialog from '../../dialogs/GamingProfileCreateDialog';
-import GamingProfileEditDialog from '../../dialogs/GamingProfileEditDialog';
-import SelfProfileInfoCard from "../../misc/SelfProfileInfoEditCard";
-import GamingProfileCardContainer from "../GamingProfileCard/GamingProfileCardContainer";
-import {TabPanel, TabView} from "primereact/tabview";
-import UserProfileCard from "../UserProfileCard";
+import React from "react";
 import {gql, useQuery} from "@apollo/client";
-import {FriendRequestAnswerButtons} from "../../misc/FriendRequestPanel";
-import LoadingWrapper from "../../misc/LoadingWrapper";
+import GamingProfileEditDialog from "../components/dialogs/GamingProfileEditDialog";
+import GamingProfileCreateDialog from "../components/dialogs/GamingProfileCreateDialog";
+import Styles from "./me.module.scss";
+import LoadingWrapper from "../components/misc/LoadingWrapper";
+import SelfProfileInfoCard from "../components/misc/SelfProfileInfoEditCard";
+import {TabPanel, TabView} from "primereact/tabview";
+import GamingProfileCardContainer from "../components/screen/GamingProfileCard/GamingProfileCardContainer";
+import GamingProfileCard from "../components/screen/GamingProfileCard";
+import GamingProfileCardStyles from "../components/screen/GamingProfileCard/index.module.scss";
+import UserProfileCard from "../components/screen/UserProfileCard";
+import {FriendRequestAnswerButtons} from "../components/misc/FriendRequestPanel";
+import {useRouter} from "next/router";
+import Link from "next/link";
 
-export default function SelfProfileScreen({ history }) {
-
-  const { data, loading } = useQuery(gql`
+const QUERY = gql`
     {
       me {
         nickname
@@ -55,10 +53,19 @@ export default function SelfProfileScreen({ history }) {
         }
       }
     }
-  `)
+  `
+
+export default function Me() {
+
+  const { data, loading } = useQuery(QUERY)
+  const router = useRouter()
 
   const [addingProfile, setAddingProfile] = React.useState(false)
   const [gameProfileEdit, setGameProfileEdit] = React.useState()
+
+  if (!loading && !data) {
+    return null
+  }
 
   return (
     <>
@@ -67,14 +74,14 @@ export default function SelfProfileScreen({ history }) {
           id={gameProfileEdit}
           visible={!!gameProfileEdit}
           setVisible={flag => setGameProfileEdit(!flag ? undefined : gameProfileEdit)}
-          notify={() => window.location.reload()}
+          notify={router.reload}
         />
       ) }
 
       <GamingProfileCreateDialog
         visible={addingProfile}
         setVisible={setAddingProfile}
-        notify={() => window.location.reload()}
+        notify={router.reload}
       />
       <div className={Styles.ProfilePageWrapper}>
         <div className={Styles.ProfileHalfScreenCard}>
@@ -133,16 +140,18 @@ export default function SelfProfileScreen({ history }) {
                           {
                             data.me.incomingFriendRequests.map(request => {
                               return (
-                                <UserProfileCard
-                                  onClick={() => history.push(`/u/${request.from.uid}`)}
-                                  uid={request.from.uid}
-                                  header={
-                                    <FriendRequestAnswerButtons
-                                      friendRequestId={request.id}
-                                      onAnswer={() => window.location.reload()}
-                                    />
-                                  }
-                                />
+                                <Link href={`/u/${request.from.uid}`}>
+                                  <UserProfileCard
+                                    uid={request.from.uid}
+                                    onClick={() => router.push(`/u/${request.from.uid}`)}
+                                    header={
+                                      <FriendRequestAnswerButtons
+                                        friendRequestId={request.id}
+                                        onAnswer={router.reload}
+                                      />
+                                    }
+                                  />
+                                </Link>
                               )
                             })
                           }
@@ -158,10 +167,12 @@ export default function SelfProfileScreen({ history }) {
                         {
                           data.me.friends.map(friend => {
                             return (
-                              <UserProfileCard
-                                onClick={() => history.push(`/u/${friend.uid}`)}
-                                uid={friend.uid}
-                              />
+                              <Link href={`/u/${friend.uid}`}>
+                                <UserProfileCard
+                                  onClick={() => router.push(`/u/${friend.uid}`)}
+                                  uid={friend.uid}
+                                />
+                              </Link>
                             )
                           })
                         }
@@ -169,7 +180,7 @@ export default function SelfProfileScreen({ history }) {
                     ) : <span>It seems like you have to meet someone, why don't you see <a href="/match">our recomendations?</a></span>
                   }
                 </>
-                )}/>
+              )}/>
             </TabPanel>
           </TabView>
         </div>

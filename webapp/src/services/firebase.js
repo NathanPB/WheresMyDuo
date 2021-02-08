@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - Nathan P. Bombana
+ * Copyright (c) 2021 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
  *
@@ -21,9 +21,11 @@ import firebase from 'firebase/app';
 import 'firebase/auth'
 import 'firebase/analytics'
 
-const config = require(`../../firebase-config.json`)
-firebase.initializeApp(config)
-firebase.analytics()
+try {
+  const config = require(`../firebase-config.json`)
+  firebase.initializeApp(config)
+  firebase.analytics()
+} catch (e) {}
 
 export const auth = firebase.auth()
 export const googleAuthProvider = new firebase.auth.GoogleAuthProvider()
