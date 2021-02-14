@@ -21,7 +21,7 @@ import {ApolloClient, InMemoryCache} from "@apollo/client";
 
 export function createClient(apiKey) {
   return new ApolloClient({
-    uri: `${process.env.REACT_APP_API_BASE_URL}/graphql`,
+    uri: `${process.env.NEXT_PUBLIC_API_BASE_URL}/graphql`,
     cache: new InMemoryCache(),
     connectToDevTools: process.env.NODE_ENV === 'development',
     queryDeduplication: true,

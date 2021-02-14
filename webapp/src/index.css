@@ -17,12 +17,12 @@ html {
     color: white;
 }
 
-#root {
+#__next {
     position: relative;
     z-index: 1;
 }
 
-html, body, #root {
+html, body, #__next {
     height: 100%;
     width: 100%;
 }

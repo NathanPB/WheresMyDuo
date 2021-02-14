@@ -22,7 +22,7 @@ import Apicalypse from 'apicalypse';
 
 export default function create(token) {
   const axios = Axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL,
+    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
     headers: {
       Authorization: token
     }
@@ -32,7 +32,7 @@ export default function create(token) {
 
   const igdb = Apicalypse({
     method: 'POST',
-    baseURL: `${process.env.REACT_APP_API_BASE_URL}/igdb`,
+    baseURL: `${process.env.NEXT_PUBLIC_API_BASE_URL}/igdb`,
     headers: {
       Authorization: token
     },

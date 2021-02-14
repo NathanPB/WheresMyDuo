@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright (c) 2020 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
@@ -17,31 +17,48 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
+.AdminDashboard {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
 
-import {auth} from 'firebase';
+  & > header {
+    flex-shrink: 0;
+    border-bottom: solid 1px rgba(255, 255, 255, 0.12);
 
-import * as Styles from './index.module.scss';
-
-export default function LogInScreen() {
-
-  function handleLogin() {
-      auth().signInWithRedirect(new auth.GoogleAuthProvider())
+    & > * {
+      border-radius: 0;
+      border: none;
+    }
   }
 
-  return (
-    <main className={Styles.LoginScreen}>
-      <article className={Styles.LoginCard}>
-        <span className={Styles.Subtitle}>Welcome to</span><br/>
-        <span className={Styles.WMD}>WheresMy<span>Duo</span></span>
-        <hr/>
+  & > div {
+    flex-grow: 100;
+    display: flex;
+    flex-direction: row;
+  }
 
-        <div className={Styles.LoginText}>
-          <span onClick={handleLogin}>Login with Google</span>
-          <br/>
-          <i onClick={handleLogin} className="pi pi-google"/>
-        </div>
-      </article>
-    </main>
-  )
+  & > div > aside {
+    width: 128px;
+    max-width: 70vw;
+    flex-grow: 1;
+    flex-shrink: 0;
+
+    border-right: solid 1px grey;
+
+    & > * {
+      border-radius: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  }
+
+  & > div > main {
+    flex-grow: 100;
+    height: 100%;
+    padding: 1em;
+  }
 }

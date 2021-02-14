@@ -22,6 +22,7 @@ package dev.nathanpb.wmd.server.graphql
 import com.apurebase.kgraphql.Context
 import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
 import com.google.firebase.auth.FirebaseAuth
+import dev.nathanpb.wmd.ADMIN_EMAILS
 import dev.nathanpb.wmd.data.FriendRequest
 import dev.nathanpb.wmd.data.GamingProfile
 import dev.nathanpb.wmd.data.UserProfile
@@ -123,6 +124,13 @@ fun SchemaBuilder.users() {
         property<List<GamingProfile>>("gamingProfiles") {
             resolver {
                 gamingProfilesCollection.find(GamingProfile::user eq it.uid).toList()
+            }
+        }
+
+        property<Boolean>("isAdmin") {
+            resolver {
+                val token = FirebaseAuth.getInstance().getUser(it.uid)
+                token.email.toLowerCase() in ADMIN_EMAILS
             }
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - Nathan P. Bombana
+ * Copyright (c) 2021 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
  *
@@ -17,31 +17,29 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
+import React from "react";
+import Document, {Head, Html, Main, NextScript} from 'next/document'
 
-import {auth} from 'firebase';
+export default class MyDocument extends Document {
 
-import * as Styles from './index.module.scss';
-
-export default function LogInScreen() {
-
-  function handleLogin() {
-      auth().signInWithRedirect(new auth.GoogleAuthProvider())
+  static async getInitialProps(ctx) {
+    const initialProps = await Document.getInitialProps(ctx)
+    return { ...initialProps }
   }
 
-  return (
-    <main className={Styles.LoginScreen}>
-      <article className={Styles.LoginCard}>
-        <span className={Styles.Subtitle}>Welcome to</span><br/>
-        <span className={Styles.WMD}>WheresMy<span>Duo</span></span>
-        <hr/>
-
-        <div className={Styles.LoginText}>
-          <span onClick={handleLogin}>Login with Google</span>
-          <br/>
-          <i onClick={handleLogin} className="pi pi-google"/>
+  render() {
+    return (
+      <Html>
+        <Head/>
+        <body>
+        <div className="ocean">
+          <div className="wave"/>
+          <div className="wave"/>
         </div>
-      </article>
-    </main>
-  )
+        <Main />
+        <NextScript />
+        </body>
+      </Html>
+    )
+  }
 }

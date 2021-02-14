@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - Nathan P. Bombana
+ * Copyright (c) 2021 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
  *
@@ -17,29 +17,8 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import create from '../services/api';
-import {auth} from 'firebase';
-
-export const ApiContext = React.createContext({ api: null })
-
-export function ApiProvider({ children }) {
-  const [api, setApi] = React.useState(undefined)
-
-  async function onUserUpdated(newUser) {
-    if (newUser) {
-      const tokenInfo = await newUser.getIdToken()
-      setApi(create(tokenInfo))
-    } else {
-      setApi(null)
-    }
-  }
-
-  React.useEffect(() => void auth().onAuthStateChanged(onUserUpdated), [])
-
-  return (
-    <ApiContext.Provider value={api}>
-      { children }
-    </ApiContext.Provider>
-  );
-}
+export default (() => {
+  try {
+    return window.document
+  } catch (e) { }
+})()

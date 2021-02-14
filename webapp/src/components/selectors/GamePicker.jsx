@@ -19,10 +19,12 @@
 
 import React from 'react';
 import {ApiContext} from '../../providers/ApiProvider';
-import Carousel from "react-spring-3d-carousel";
 import {InputText} from "primereact/inputtext";
 import Styles from './GamePicker.module.scss'
 import useDeepCompareMemoized from "../../hooks/useDeepCompareMemoized";
+import dynamic from "next/dynamic";
+
+const Carousel = dynamic(() => import("react-spring-3d-carousel"), { ssr: false })
 
 export default function GamePicker({ onChange }) {
   const api = React.useContext(ApiContext)
