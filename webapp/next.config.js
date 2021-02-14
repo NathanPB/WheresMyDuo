@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - Nathan P. Bombana
+ * Copyright (c) 2021 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
  *
@@ -17,24 +17,10 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-
-import { auth } from '../services/firebase';
-
-export const UserContext = React.createContext({ user: null })
-
-export function UserProvider({ children }) {
-  const [user, setUser] = React.useState()
-
-  React.useEffect(() => void auth.onAuthStateChanged(user => {
-    setUser(user)
-    user.getIdToken().then(console.log)
-  }), [])
-
-  return (
-    <UserContext.Provider value={user}>
-      { children }
-    </UserContext.Provider>
-  );
+module.exports = {
+  async redirects() {
+    return [
+      { source: '/', destination: '/me', permanent: true }
+    ]
+  }
 }
-
