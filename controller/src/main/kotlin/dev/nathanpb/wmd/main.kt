@@ -25,6 +25,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import dev.nathanpb.wmd.boot.BootManager
 import dev.nathanpb.wmd.controller.igdbToken
+import dev.nathanpb.wmd.migration.MigrationConfig
 import dev.nathanpb.wmd.server.startServer
 import kotlinx.coroutines.runBlocking
 import org.litote.kmongo.coroutine.CoroutineClient
@@ -97,6 +98,16 @@ fun main() {
             subphase("Performing configurations") {
                 subphase("Configuring KMongo ID generator") {
                     IdGenerator.defaultGenerator = ObjectIdGenerator
+                }
+
+                execute {
+                    if (!MigrationConfig.ENABLE_TRANSACTION) {
+                        println("[WARN] Transactions on migrations are disabled!")
+                    }
+
+                    if (!MigrationConfig.ENABLE_SNAPSHOT) {
+                        println("[WARN] Snapshots on migrations are disabled!")
+                    }
                 }
             }
             subphase("Starting HTTP api") {

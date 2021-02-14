@@ -65,6 +65,11 @@ export default function AdminDashboard({ children }) {
       label: 'Analytics',
       icon: 'pi pi-chart-bar',
       url: '/admin/analytics'
+    },
+    {
+      label: 'Migrations',
+      icon: 'pi pi-database',
+      url: '/admin/migrations',
     }
   ]
 

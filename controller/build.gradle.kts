@@ -28,6 +28,7 @@ dependencies {
     implementation("com.github.husnjak:IGDB-API-JVM:1.0.1")
     implementation("com.apurebase:kgraphql:0.16.0")
     implementation("com.apurebase:kgraphql-ktor:0.16.0")
+    implementation("org.reflections:reflections:0.9.12")
 }
 
 tasks.withType<Jar> {
