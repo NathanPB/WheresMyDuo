@@ -31,8 +31,6 @@ import kotlinx.coroutines.runBlocking
 import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.coroutine.coroutine
-import org.litote.kmongo.id.IdGenerator
-import org.litote.kmongo.id.ObjectIdGenerator
 import org.litote.kmongo.reactivestreams.KMongo
 
 /*
@@ -96,10 +94,6 @@ fun main() {
                 }
             }
             subphase("Performing configurations") {
-                subphase("Configuring KMongo ID generator") {
-                    IdGenerator.defaultGenerator = ObjectIdGenerator
-                }
-
                 execute {
                     if (!MigrationConfig.ENABLE_TRANSACTION) {
                         println("[WARN] Transactions on migrations are disabled!")

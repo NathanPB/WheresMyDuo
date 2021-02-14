@@ -28,7 +28,6 @@ data class UserProfile (
     @SerialName("_id") @MongoId val uid: String,
     val nickname: String,
     val photoURL: String,
-    val favs: List<String> = emptyList(),
     val friends: List<String> = emptyList(),
     val contactInfo: String = ""
 )
