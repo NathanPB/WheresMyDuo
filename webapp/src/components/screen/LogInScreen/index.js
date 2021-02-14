@@ -19,14 +19,14 @@
 
 import React from 'react';
 
-import {auth, googleAuthProvider} from '../../../services/firebase';
+import {auth} from 'firebase';
 
 import * as Styles from './index.module.scss';
 
 export default function LogInScreen() {
 
   function handleLogin() {
-    auth.signInWithRedirect(googleAuthProvider)
+      auth().signInWithRedirect(new auth.GoogleAuthProvider())
   }
 
   return (

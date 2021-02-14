@@ -24,7 +24,7 @@ import Styles from './AdminDashboard.module.scss';
 import {Menubar} from 'primereact/menubar';
 import {Button} from 'primereact/button';
 import {TieredMenu} from 'primereact/tieredmenu';
-import {auth} from '../../services/firebase';
+import {auth} from 'firebase';
 import {gql, useQuery} from "@apollo/client";
 import LoadingWrapper from "../../components/misc/LoadingWrapper";
 
@@ -52,7 +52,7 @@ export default function AdminDashboard({ children }) {
   </>
 
   const topMenuEnd = <>
-    <Button label="Logout" icon="pi pi-power-off" onClick={() => auth.signOut()}/>
+    <Button label="Logout" icon="pi pi-power-off" onClick={() => auth().signOut()}/>
   </>
 
   const asideMenu = [

@@ -26,6 +26,3 @@ try {
   firebase.initializeApp(config)
   firebase.analytics()
 } catch (e) {}
-
-export const auth = firebase.auth()
-export const googleAuthProvider = new firebase.auth.GoogleAuthProvider()

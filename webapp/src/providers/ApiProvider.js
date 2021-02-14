@@ -19,7 +19,7 @@
 
 import React from 'react';
 import create from '../services/api';
-import { auth } from '../services/firebase';
+import {auth} from 'firebase';
 
 export const ApiContext = React.createContext({ api: null })
 
@@ -35,7 +35,7 @@ export function ApiProvider({ children }) {
     }
   }
 
-  React.useEffect(() => void auth.onAuthStateChanged(onUserUpdated), [])
+  React.useEffect(() => void auth().onAuthStateChanged(onUserUpdated), [])
 
   return (
     <ApiContext.Provider value={api}>

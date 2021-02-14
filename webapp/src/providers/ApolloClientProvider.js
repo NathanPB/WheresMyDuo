@@ -18,7 +18,7 @@
  */
 
 import React from "react";
-import {auth} from "../services/firebase";
+import {auth} from "firebase";
 import {createClient} from '../services/apollo';
 
 
@@ -36,7 +36,7 @@ export function ApolloClientProvider({ children }) {
     }
   }
 
-  React.useEffect(() => void auth.onAuthStateChanged(onUserUpdated), [])
+  React.useEffect(() => void auth().onAuthStateChanged(onUserUpdated), [])
 
   return (
     <ApolloClientContext.Provider value={client}>

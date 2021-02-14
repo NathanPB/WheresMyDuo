@@ -20,7 +20,6 @@
 import React from 'react';
 
 import Styles from './[uid].module.scss';
-import {UserContext} from '../../providers/UserProvider';
 import GamingProfileCard from '../../components/screen/GamingProfileCard';
 
 import GamingProfileCardContainer from "../../components/screen/GamingProfileCard/GamingProfileCardContainer";
@@ -34,6 +33,7 @@ import {useRouter} from "next/router";
 import Link from "next/link";
 import UserDashboard from "../../components/dashboards/UserDashboard";
 import Head from "next/head";
+import {auth} from "firebase";
 
 
 const QUERY = gql`
@@ -53,7 +53,7 @@ const QUERY = gql`
 `
 
 export default function UserProfileScreen() {
-  const currentUser = React.useContext(UserContext)
+  const currentUser = auth().currentUser
 
   const router = useRouter()
   const { uid } = router.query

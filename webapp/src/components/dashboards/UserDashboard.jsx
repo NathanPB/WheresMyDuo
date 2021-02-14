@@ -18,12 +18,11 @@
  */
 
 import React from 'react';
-import {auth} from '../../services/firebase';
+import {auth} from 'firebase';
 
 import Styles from './UserDashboard.module.scss';
 import {Menubar} from 'primereact/menubar';
 import {TieredMenu} from 'primereact/tieredmenu';
-import {UserContext} from '../../providers/UserProvider';
 import {Button} from 'primereact/button';
 import {OverlayPanel} from 'primereact/overlaypanel';
 import {AutoComplete} from "primereact/autocomplete";
@@ -32,7 +31,7 @@ import {useRouter} from "next/router";
 import document from "../../document";
 
 export default function UserDashboard({ children }) {
-  const user = React.useContext(UserContext)
+  const user = auth().currentUser
   const router = useRouter()
 
   const tieredMenu = React.useRef()
@@ -118,7 +117,7 @@ export default function UserDashboard({ children }) {
     {
       label: 'Logout',
       icon: 'pi pi-power-off',
-      command: () => auth.signOut()
+      command: () => auth().signOut()
     }
   ]
 
