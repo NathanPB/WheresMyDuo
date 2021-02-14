@@ -6,7 +6,8 @@ RUN npm install
 RUN npm run build
 
 # Stage 2 - Production Server
-FROM nginx:alpine
-COPY --from=build /app/build /usr/share/nginx/html
-ADD ./nginx-config.conf /etc/nginx/conf.d/default.conf
-CMD ["nginx", "-g", "daemon off;"]
+FROM node:lts-alpine3.12
+WORKDIR /app
+COPY --from=build /app/.next .next
+COPY --from=build /app/node_modules node_modules
+CMD ["npx", "next", "start", "-p", "80"]
