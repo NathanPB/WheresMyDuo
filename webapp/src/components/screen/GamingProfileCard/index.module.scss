@@ -20,7 +20,6 @@
 .Card {
   overflow: hidden;
   min-width: 128px;
-  background-color: #2d2d2d;
   cursor: pointer;
 }
 
@@ -31,16 +30,4 @@
   min-width: 128px;
   height: auto;
   min-height: 100%;
-}
-
-.GameTitle {
-  display: block;
-  position: absolute;
-  width: 128px;
-
-  background-color: #181818;
-  text-align: center;
-  font-size: 1.25rem;
-
-  transform: translateY(-2rem);
 }

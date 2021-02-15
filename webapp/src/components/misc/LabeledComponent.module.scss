@@ -1,5 +1,5 @@
 /*!
- * Copyright (c) 2020 - Nathan P. Bombana
+ * Copyright (c) 2021 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
  *
@@ -17,54 +17,20 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-.ProfilePic {
-  border-radius: 8px;
-  width: 256px;
-  height: auto;
-  max-width: 256px;
-  flex-grow: 1;
-  flex-shrink: 0;
+.Wrapper {
+  width: -moz-fit-content;
+  width: fit-content;
+}
 
+.Label {
   display: block;
   margin: 0 auto 0 auto;
-}
 
-.ProfilePageWrapper {
-  display: flex;
-  height: 100%;
-  margin-top: 0;
-  overflow: hidden;
-
-  @media (max-width: 769px) {
-    flex-direction: column;
-  }
-
-  @media (min-width: 769px) {
-    & > *:last-child {
-      padding-left: 404px;
-    }
-  }
-}
-
-.ProfileHalfScreenCard {
   width: 100%;
-  padding-top: 1em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 
-  @media (min-width: 769px) {
-    position: fixed;
-    overflow-y: auto;
-    width: 400px;
-    min-width: 400px;
-    background-color: black;
-    border-right: solid 4px #440473;
-    height: 100%;
-
-    & > * {
-      width: 400px;
-    }
-  }
-}
-
-.ProfileHalfScreenCard + div {
-  flex-grow: 100;
+  background-color: #181818;
+  text-align: center;
 }

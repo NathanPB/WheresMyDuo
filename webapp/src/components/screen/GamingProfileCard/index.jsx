@@ -21,6 +21,7 @@ import React from 'react';
 
 import Styles from './index.module.scss';
 import {ApiContext} from '../../../providers/ApiProvider';
+import LabeledComponent from "../../misc/LabeledComponent";
 
 export default function GamingProfileCard({ gameId, onClick }) {
 
@@ -39,22 +40,23 @@ export default function GamingProfileCard({ gameId, onClick }) {
 
   return (
     <div className={Styles.Card} title={gameData?.name} onClick={onClick}>
-      <img
-        alt={gameData?.name}
-        className={Styles.Cover}
-        src={`https:${gameData?.cover?.url?.replace('t_thumb', 't_cover_big')}`}
-        onErrorCapture={e => {
-          if (gameData?.cover?.url && e.target.src !== gameData?.cover?.url) {
-            e.target.src = `https:${gameData?.cover?.url}`
-          }
-        }}
-      />
-      <span
-        style={gameData?.name?.length > 15 ? { fontSize: '.7rem' } : undefined}
-        className={Styles.GameTitle}
+      <LabeledComponent
+        label={gameData?.name}
+        fontSize={gameData?.name?.length > 15 ? '.75rem' : '1rem'}
+        labelHeight="-1.75rem"
+        maxWidth={128}
       >
-        {gameData?.name}
-      </span>
+        <img
+          alt={gameData?.name}
+          className={Styles.Cover}
+          src={`https:${gameData?.cover?.url?.replace('t_thumb', 't_cover_big')}`}
+          onErrorCapture={e => {
+            if (gameData?.cover?.url && e.target.src !== gameData?.cover?.url) {
+              e.target.src = `https:${gameData?.cover?.url}`
+            }
+          }}
+        />
+      </LabeledComponent>
     </div>
 
   )

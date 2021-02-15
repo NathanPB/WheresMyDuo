@@ -34,6 +34,7 @@ import Link from "next/link";
 import UserDashboard from "../../components/dashboards/UserDashboard";
 import Head from "next/head";
 import {auth} from "firebase";
+import LabeledComponent from "../../components/misc/LabeledComponent";
 
 
 const QUERY = gql`
@@ -82,14 +83,19 @@ export default function UserProfileScreen() {
                 <title>{data.user.nickname} on WheresMyDuo</title>
               </Head>
               <div>
-                <img
-                  alt={`${data.user.nickname}'s Avatar`}
-                  className={Styles.ProfilePic}
-                  src={data.user.photoURL}
-                />
-                <span className={Styles.UserName}>
-                  {data.user.nickname}
-              </span>
+                <LabeledComponent
+                  label={data.user.nickname}
+                  labelHeight="-3rem"
+                  fontSize="2rem"
+                  style={{ margin: 'auto' }}
+                  autofixYCenter
+                >
+                  <img
+                    alt={`${data.user.nickname}'s Avatar`}
+                    className={Styles.ProfilePic}
+                    src={data.user.photoURL}
+                  />
+                </LabeledComponent>
               </div>
 
               <hr/>

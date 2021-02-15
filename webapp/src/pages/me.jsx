@@ -34,6 +34,7 @@ import {useRouter} from "next/router";
 import Link from "next/link";
 import UserDashboard from "../components/dashboards/UserDashboard";
 import Head from "next/head";
+import LabeledComponent from "../components/misc/LabeledComponent";
 
 const QUERY = gql`
     {
@@ -92,14 +93,19 @@ export default function Me() {
         <div className={Styles.ProfileHalfScreenCard}>
           <LoadingWrapper isLoading={loading} render={() => (
             <>
-              <div>
+              <LabeledComponent
+                label={data.me.nickname}
+                labelHeight="-3rem"
+                fontSize="2rem"
+                style={{ margin: 'auto' }}
+                autofixYCenter
+              >
                 <img
                   alt="Your Avatar"
                   className={Styles.ProfilePic}
                   src={data.me.photoURL}
                 />
-                <span className={Styles.UserName}>{data.me.nickname}</span>
-              </div>
+              </LabeledComponent>
 
               <div>
                 <SelfProfileInfoCard style={{ margin: '1em' }} allowEdit/>

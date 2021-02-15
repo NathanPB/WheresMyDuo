@@ -25,28 +25,16 @@
   flex-grow: 1;
   flex-shrink: 0;
 
-  display: block;
-  margin: 0 auto 0 auto;
-
   min-height: 256px;
 }
 
-.UserName {
-  display: block;
-  margin: 0 auto 0 auto;
-  width: 256px;
-
-  background-color: #181818;
-  text-align: center;
-  font-size: 2rem;
-
-  transform: translateY(-3rem);
-}
-
 .NewCard {
+  // Please be careful touching this
   position: relative;
-  min-height: 164px;
+  min-height: 170.666px;
   border: solid 1px #181818;
+  transform: translateY(calc(-1.25rem - 2px));
+  background-color: var(--surface-f);
 
   & > * {
     font-size: 3rem;
@@ -85,10 +73,6 @@
     min-width: 400px;
     background-color: black;
     border-right: solid 4px #440473;
-
-    & > * {
-      width: 400px;
-    }
   }
 }
 
