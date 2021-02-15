@@ -34,3 +34,14 @@ textarea {
 .pointer {
     cursor: pointer;
 }
+
+::-webkit-scrollbar {
+    width: 3px;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(84,84,84, 0.4);
+    border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(84,84,84, 0.8);
+}
