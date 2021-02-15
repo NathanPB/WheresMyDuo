@@ -23,89 +23,21 @@ import {auth} from 'firebase';
 import Styles from './UserDashboard.module.scss';
 import {Menubar} from 'primereact/menubar';
 import {TieredMenu} from 'primereact/tieredmenu';
-import {Button} from 'primereact/button';
-import {OverlayPanel} from 'primereact/overlaypanel';
-import {AutoComplete} from "primereact/autocomplete";
-import {gql, useQuery} from "@apollo/client";
-import {useRouter} from "next/router";
 import document from "../../document";
+import AppName from "../misc/AppName";
+import UserDiscover from "../selectors/UserDiscover";
 
 export default function UserDashboard({ children }) {
   const user = auth().currentUser
-  const router = useRouter()
 
   const tieredMenu = React.useRef()
-  const searchMenu = React.useRef()
-
-  const [userQuery, setUserQuery] = React.useState('')
-
-  const { data } = useQuery(gql`
-    query GetUser($query: String!) { 
-      users(query: $query) { uid, nickname }
-    }
-  `, { variables: { query: userQuery } })
-
-  const desktopSearch = React.useRef()
-  const mobileSearch = React.useRef()
-
-  React.useEffect(() => {
-    if (userQuery) {
-      if (desktopSearch.current) desktopSearch.current.showOverlay()
-      if (mobileSearch.current) mobileSearch.current.showOverlay()
-    }
-  }, [userQuery])
 
   if (!user) {
     return null
   }
 
-  function onUserSelected(user) {
-    router.push(`/u/${user.uid}`)
-    setUserQuery('')
-  }
-
   const menuStart = <>
-    <Button
-      icon="pi pi-users"
-      label="Match my profile!"
-      className={Styles.Match}
-      onClick={() => router.push('/match')}
-    />
-    <div style={{ display: 'inline-block' }} className={Styles.Search}>
-      <div className="p-inputgroup">
-        <span className="p-inputgroup-addon" onClick={(e) => searchMenu.current.toggle(e)}>
-          <i className="pi pi-search"/>
-        </span>
-        <AutoComplete
-          appendTo={document.body}
-          ref={desktopSearch}
-          panelClassName={Styles.AutoCompleteUserQuery}
-          field="nickname"
-          value={userQuery}
-          completeMethod={() => {}}
-          suggestions={data?.users || []}
-          onFocus={() => desktopSearch.current?.showOverlay()}
-          onChange={e => setUserQuery(e.value)}
-          onSelect={e => onUserSelected(e.value)}
-          dropdown
-        />
-      </div>
-    </div>
-    <OverlayPanel ref={searchMenu} className={Styles.SearchPopup}>
-      <AutoComplete
-        appendTo={document.body}
-        ref={mobileSearch}
-        field="nickname"
-        value={userQuery}
-        completeMethod={() => {}}
-        suggestions={data?.users || []}
-        onChange={e => setUserQuery(e.value)}
-        onSelect={e => onUserSelected(e.value)}
-        onFocus={() => mobileSearch.current?.showOverlay()}
-        panelClassName={Styles.AutoCompleteUserQuery}
-        dropdown
-      />
-    </OverlayPanel>
+    <AppName dark/>
   </>
 
   const userMenu = [
@@ -131,7 +63,26 @@ export default function UserDashboard({ children }) {
   </>
 
   const menu = [
-
+    {
+      label: 'Home',
+      icon: 'pi pi-home',
+      url: '/me'
+    },
+    {
+      label: 'Match My Profile',
+      icon: 'pi pi-users',
+      url: '/match'
+    },
+    {
+      template: () => (
+        <li className="p-menuitem" role="none">
+          <a href="#" className="p-menuitem-link" role="menuitem" aria-haspopup="false">
+            <span className="p-menuicon pi pi-search"/>
+            <UserDiscover/>
+          </a>
+        </li>
+      )
+    }
   ]
 
   return (
