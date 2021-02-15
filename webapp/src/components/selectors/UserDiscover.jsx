@@ -65,8 +65,6 @@ export default function UserDiscover() {
       suggestions={suggestions?.users || []}
       onFocus={() => ref.current?.showOverlay()}
       onChange={e => setUserQuery(e.value)}
-
-      showClear
     />
   );
 }
