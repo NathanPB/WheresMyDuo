@@ -23,12 +23,11 @@ import com.apurebase.kgraphql.Context
 import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
 import com.google.firebase.auth.FirebaseAuth
 import dev.nathanpb.wmd.ADMIN_EMAILS
-import dev.nathanpb.wmd.data.FriendRequest
-import dev.nathanpb.wmd.data.GamingProfile
-import dev.nathanpb.wmd.data.UserProfile
+import dev.nathanpb.wmd.data.*
 import dev.nathanpb.wmd.mongoDb
 import org.litote.kmongo.*
 import org.litote.kmongo.coroutine.CoroutineCollection
+import kotlin.reflect.KProperty
 
 
 suspend fun getUserProfile(
@@ -67,34 +66,56 @@ fun SchemaBuilder.users() {
     val collection by lazy { mongoDb.getCollection<UserProfile>() }
     val gamingProfilesCollection by lazy { mongoDb.getCollection<GamingProfile>() }
 
+    enum<ContactVisibility>()
+    type<ContactField>()
+    type<UserContact> {
+        fun contactField(key: String, prop: KProperty<ContactField?>) {
+            property<ContactField?>(key) {
+                resolver { contact, ctx: Context ->
+                    // Viva reflection
+                    // The context at this point has an object UserProfile
+                    //   that was stored in there in the previous nodes,
+                    //   but to access that we need to do a little hacky move
+                    //   with reflection
+                    val field = Context::class.java.getDeclaredField("map")
+                    val map = field.also { it.isAccessible = true }.get(ctx) as LinkedHashMap<Any, Any>
+                    val requester = ctx.get<UserProfile>()
+                    val requested = map["requested"] as UserProfile
+                    val contactField = prop.call(contact)
+
+                    contactField?.takeIf {
+                        it.visibility.canView(requested, requester?.uid)
+                    }
+                }
+            }
+        }
+
+        contactField("discord", UserContact::discord)
+        contactField("skype", UserContact::skype)
+        contactField("telegram", UserContact::telegram)
+        contactField("facebook", UserContact::facebook)
+    }
+
     type<UserProfile> {
         property(UserProfile::uid) {}
         property(UserProfile::nickname) {}
         property(UserProfile::photoURL) {}
+        property<UserContact>("contact") {
+            resolver { userProfile, ctx: Context ->
+                // Só vamo caraio
+                // This is meant to store the requested user in the context
+                //   so it can be used in upper layers of the node
+                val field = Context::class.java.getDeclaredField("map")
+                val map = field.also { it.isAccessible = true }.get(ctx) as LinkedHashMap<Any, Any>
+                map["requested"] = userProfile
+
+                userProfile.contact
+            }
+        }
         property<List<UserProfile>>("friends") {
             resolver {
                 collection.find(UserProfile::uid.`in`(it.friends)).toList()
             }
-        }
-        property<String?>("contactInfo") {
-            resolver { profile: UserProfile, ctx: Context ->
-                val user = ctx.get<UserProfile>() ?: error("Not Authenticated")
-                return@resolver profile.contactInfo.takeIf {
-                    user.uid == profile.uid || user.uid in profile.friends
-                }
-            }
-
-            /*
-            TODO make this access rule work properly
-            accessRule { profile, ctx ->
-                val user = ctx.get<UserProfile>() ?: return@accessRule IllegalStateException("Not Authenticated")
-                if (user.uid != profile.uid && user.uid !in profile.friends) {
-                    return@accessRule IllegalStateException("This user is not friends with you")
-                }
-
-                return@accessRule null
-            }
-            */
         }
 
         property<List<FriendRequest>>("incomingFriendRequests") {
@@ -170,6 +191,16 @@ fun SchemaBuilder.users() {
 
             collection.save(toBeRemovedProfile.copy(friends = toBeRemovedProfile.friends - user.uid))
             collection.save(user.copy(friends = user.friends - toBeRemovedProfile.uid))
+            return@resolver getUserProfile(user.uid)
+        }
+    }
+
+    mutation("setContact") {
+        resolver { contact: UserContact, ctx: Context ->
+            val user = ctx.get<UserProfile>() ?: error("Not Authenticated")
+            contact.validate()
+
+            collection.save(user.copy(contact = contact))
             return@resolver getUserProfile(user.uid)
         }
     }

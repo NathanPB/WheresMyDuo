@@ -29,5 +29,5 @@ data class UserProfile (
     val nickname: String,
     val photoURL: String,
     val friends: List<String> = emptyList(),
-    val contactInfo: String = ""
+    val contact: UserContact = UserContact()
 )
