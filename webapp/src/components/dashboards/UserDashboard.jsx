@@ -26,6 +26,8 @@ import {TieredMenu} from 'primereact/tieredmenu';
 import document from "../../document";
 import AppName from "../misc/AppName";
 import UserDiscover from "../selectors/UserDiscover";
+import {faSearch} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 
 export default function UserDashboard({ children }) {
   const user = auth().currentUser
@@ -82,7 +84,7 @@ export default function UserDashboard({ children }) {
       template: () => (
         <li className="p-menuitem" role="none">
           <a href="#" className="p-menuitem-link" role="menuitem" aria-haspopup="false">
-            <span className="p-menuicon pi pi-search"/>
+            <FontAwesomeIcon icon={faSearch} className="p-menuicon"/>
             <UserDiscover/>
           </a>
         </li>

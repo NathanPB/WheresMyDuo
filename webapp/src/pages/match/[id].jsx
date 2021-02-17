@@ -26,6 +26,9 @@ import {gql, useQuery} from "@apollo/client";
 import {useRouter} from "next/router";
 import UserDashboard from "../../components/dashboards/UserDashboard";
 import Head from "next/head";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faClock} from "@fortawesome/free-regular-svg-icons";
+import {faTags} from "@fortawesome/free-solid-svg-icons";
 
 const MATCH = gql`
 query Match($profileId: String!) {
@@ -109,13 +112,13 @@ export default function MatchId() {
       <div style={{ width: '100%', display: 'flex' }}>
         { !!commonTags && (
           <div style={{ textAlign: 'center', flexGrow: 1 }} title={`Common Tags: ${commonTags}`}>
-            <i className="pi pi-tags"/><br/>
+            <FontAwesomeIcon icon={faTags}/><br/>
             <span>{commonTags}</span>
           </div>
         ) }
         { !!commonCalendar && (
           <div style={{ textAlign: 'center', flexGrow: 1 }} title={`Common Weekly Hours: ${commonCalendar}h`}>
-            <i className="pi pi-clock"/><br/>
+            <FontAwesomeIcon icon={faClock}/><br/>
             <span>{commonCalendar}h</span>
           </div>
         ) }

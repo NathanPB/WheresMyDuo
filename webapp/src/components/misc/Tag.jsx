@@ -20,11 +20,13 @@
 import React from 'react';
 
 import Styles from './Tag.module.scss';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faTimes} from "@fortawesome/free-solid-svg-icons";
 
 export default function Tag({ displayName, description, onRemoved }) {
   return (
     <span className={`p-tag ${Styles.Tag}`} title={description}>
-        { !onRemoved && <i className="pi pi-times pointer" onClick={onRemoved} title="Remove"/> }
+        { !onRemoved && <FontAwesomeIcon icon={faTimes} className="pointer" onClick={onRemoved} title="Remove"/>}
       <span>{displayName}</span>
     </span>
   )

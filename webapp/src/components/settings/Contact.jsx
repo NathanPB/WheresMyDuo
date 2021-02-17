@@ -26,6 +26,8 @@ import {Skeleton} from "primereact/skeleton";
 import DiscordInput, {REGEX_CORRECT as REGEX_DISCORD_CORRECT} from "../input/DiscordInput";
 import {Button} from "primereact/button";
 import LoadingWrapper from "../misc/LoadingWrapper";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faInfoCircle} from "@fortawesome/free-solid-svg-icons";
 
 const QUERY = gql`
 {
@@ -107,7 +109,7 @@ export default function Contact() {
       <div className="p-col-12 p-md-6" style={fieldStyles}>
         <OrSkeleton loading={loading} skeleton={skeleton}>
           <span className="p-float-label">
-            <DiscordInput id="discord" value={discord} onChange={e => setDiscord(e.target.value)} infoIcon={<i className="pi pi-info-circle"/>}/>
+            <DiscordInput id="discord" value={discord} onChange={e => setDiscord(e.target.value)} infoIcon={<FontAwesomeIcon icon={faInfoCircle}/>}/>
             <label htmlFor="discord">Discord</label>
           </span>
         </OrSkeleton>

@@ -22,7 +22,9 @@ import {ApiContext} from '../../providers/ApiProvider';
 import {InputText} from "primereact/inputtext";
 import Styles from './GamePicker.module.scss'
 import useDeepCompareMemoized from "../../hooks/useDeepCompareMemoized";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import dynamic from "next/dynamic";
+import {faSearch} from "@fortawesome/free-solid-svg-icons";
 
 const Carousel = dynamic(() => import("react-spring-3d-carousel"), { ssr: false })
 
@@ -92,7 +94,7 @@ export default function GamePicker({ onChange }) {
 
       <div className="p-inputgroup">
         <div className="p-inputgroup-addon">
-          <i className="pi pi-search"/>
+          <FontAwesomeIcon icon={faSearch}/>
         </div>
         <InputText placeholder="Search..." value={query} onChange={e => setQuery(e.target.value)}/>
       </div>

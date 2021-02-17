@@ -76,7 +76,7 @@ export default function TagsDatatable({ selectItem }) {
     <div className={Styles.Wrapper}>
       <div className={Styles.Buttons}>
         <Button
-          icon="pi pi-plus"
+          icon="fa fa-plus"
           label="New"
           className="p-button-success"
           onClick={() => selectItem(0)}

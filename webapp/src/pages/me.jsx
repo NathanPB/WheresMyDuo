@@ -34,6 +34,8 @@ import LabeledComponent from "../components/misc/LabeledComponent";
 import UserFollow from "../components/misc/UserFollow";
 import BigAvatar from "../components/misc/BigAvatar";
 import {FullFollowersList, FullFollowingList} from "../components/screen/FullFollowList";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faPlus} from "@fortawesome/free-solid-svg-icons";
 
 const QUERY = gql`
     {
@@ -145,7 +147,7 @@ export default function Me() {
                       onClick={() => setAddingProfile(true)}
                       title="New Game"
                     >
-                      <i className="pi pi-plus"/>
+                      <FontAwesomeIcon icon={faPlus}/>
                     </div>
                   </GamingProfileCardContainer>
                 </div>

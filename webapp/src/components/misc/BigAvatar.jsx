@@ -20,8 +20,10 @@
 import React from 'react';
 import Styles from './BigAvatar.module.scss';
 import {Tooltip} from "primereact/tooltip";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faHeart as faHeartSolid} from "@fortawesome/free-solid-svg-icons";
+import {faHeart} from "@fortawesome/free-regular-svg-icons";
 
-// TODO change the icon to a full heart when the user is being followed
 export default function BigAvatar({ photoURL, nickname, onFollowClick, isSelf, isFollowing }) {
 
   return (
@@ -33,10 +35,10 @@ export default function BigAvatar({ photoURL, nickname, onFollowClick, isSelf, i
             className={`p-badge p-component p-badge-xl BigAvatar_Badge__WGWdh ${Styles.Badge}`}
             onClick={onFollowClick}
           >
-            <i
-              className="pi pi-heart"
-              style={{ transform: `translateY(.25rem)`, fontSize: '1.75rem' }}
-              data-pr-tooltip={isFollowing ? 'Unfollow' : 'Follow'}
+            <FontAwesomeIcon
+             icon={isFollowing ? faHeartSolid : faHeart}
+             style={{ transform: `translateY(.25rem)`, fontSize: '1.75rem' }}
+             data-pr-tooltip={isFollowing ? 'Unfollow' : 'Follow'}
             />
           </span>
         )

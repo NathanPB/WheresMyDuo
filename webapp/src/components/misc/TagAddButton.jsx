@@ -20,9 +20,11 @@
 import React from 'react';
 
 import Styles from './Tag.module.scss';
-import { OverlayPanel } from 'primereact/overlaypanel';
+import {OverlayPanel} from 'primereact/overlaypanel';
 import TagPicker from '../selectors/TagPicker';
-import { Button } from 'primereact/button';
+import {Button} from 'primereact/button';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faPlus} from "@fortawesome/free-solid-svg-icons";
 
 export default function TagAddButton({ onAdded, exclude }) {
 
@@ -64,7 +66,7 @@ export default function TagAddButton({ onAdded, exclude }) {
 
       </OverlayPanel>
       <span className={`p-tag pointer ${Styles.Tag}`} title="Add Tag" onClick={handleClick}>
-        <i className="pi pi-plus"/>
+        <FontAwesomeIcon icon={faPlus}/>
       </span>
     </>
   )

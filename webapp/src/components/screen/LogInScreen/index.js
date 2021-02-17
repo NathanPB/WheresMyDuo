@@ -23,6 +23,8 @@ import {auth} from 'firebase';
 
 import * as Styles from './index.module.scss';
 import AppName from "../../misc/AppName";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faGoogle} from "@fortawesome/free-brands-svg-icons";
 
 export default function LogInScreen() {
 
@@ -40,7 +42,7 @@ export default function LogInScreen() {
         <div className={Styles.LoginText}>
           <span onClick={handleLogin}>Login with Google</span>
           <br/>
-          <i onClick={handleLogin} className="pi pi-google"/>
+          <FontAwesomeIcon onClick={handleLogin} icon={faGoogle} size="6x"/>
         </div>
       </article>
     </main>
