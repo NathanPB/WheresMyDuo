@@ -33,10 +33,12 @@ import Head from "next/head";
 import LabeledComponent from "../components/misc/LabeledComponent";
 import UserFollow from "../components/misc/UserFollow";
 import BigAvatar from "../components/misc/BigAvatar";
+import {FullFollowersList, FullFollowingList} from "../components/screen/FullFollowList";
 
 const QUERY = gql`
     {
       me {
+        uid
         nickname
         photoURL
         followers(limit: 15) { uid, nickname, photoURL }
@@ -58,6 +60,15 @@ export default function Me() {
 
   const [addingProfile, setAddingProfile] = React.useState(false)
   const [gameProfileEdit, setGameProfileEdit] = React.useState()
+  const [activeIndex, setActiveIndex] = React.useState(0)
+
+  React.useEffect(() => {
+    const hash = router.asPath.split("#")[1]
+    switch (hash) {
+      case "followers": setActiveIndex(1)
+      case "following": setActiveIndex(2)
+    }
+  }, [router])
 
   if (!loading && !data) {
     return null
@@ -114,7 +125,7 @@ export default function Me() {
           )}/>
         </div>
         <div>
-          <TabView>
+          <TabView activeIndex={activeIndex} onTabChange={e => setActiveIndex(e.index)}>
             <TabPanel header="Gaming Profiles">
               <LoadingWrapper isLoading={loading} render={() => (
                 <div style={{ padding: 8 }}>
@@ -139,6 +150,12 @@ export default function Me() {
                   </GamingProfileCardContainer>
                 </div>
               )}/>
+            </TabPanel>
+            <TabPanel header="Followers">
+              { !loading&& <FullFollowersList uid={data?.me?.uid}/> }
+            </TabPanel>
+            <TabPanel header="Following">
+              { !loading && <FullFollowingList uid={data?.me?.uid}/> }
             </TabPanel>
           </TabView>
         </div>

@@ -33,6 +33,7 @@ import {auth} from "firebase";
 import LabeledComponent from "../../components/misc/LabeledComponent";
 import UserFollow from "../../components/misc/UserFollow";
 import BigAvatar from "../../components/misc/BigAvatar";
+import {FullFollowersList, FullFollowingList} from "../../components/screen/FullFollowList";
 
 
 const QUERY = gql`
@@ -73,6 +74,16 @@ export default function UserProfileScreen() {
   const { data, loading, refetch } = useQuery(QUERY, { variables: { uid } })
   const [follow] = useMutation(FOLLOW, { variables: { uid } })
   const [unfollow] = useMutation(UNFOLLOW, { variables: { uid } })
+  const [activeIndex, setActiveIndex] = React.useState(0)
+
+
+  React.useEffect(() => {
+    const hash = router.asPath.split("#")[1]
+    switch (hash) {
+      case "followers": setActiveIndex(1)
+      case "following": setActiveIndex(2)
+    }
+  }, [router])
 
   React.useEffect(() => {
     if (uid && uid === currentUser?.uid) {
@@ -131,7 +142,7 @@ export default function UserProfileScreen() {
         </div>
         <div>
           <LoadingWrapper isLoading={loading} render={() => (
-            <TabView>
+            <TabView activeIndex={activeIndex} onTabChange={e => setActiveIndex(e.index)}>
               <TabPanel header="Gaming Profiles">
                 <div style={{ padding: 8 }}>
                   <GamingProfileCardContainer>
@@ -145,6 +156,12 @@ export default function UserProfileScreen() {
                     }
                   </GamingProfileCardContainer>
                 </div>
+              </TabPanel>
+              <TabPanel header="Followers">
+                <FullFollowersList uid={uid}/>
+              </TabPanel>
+              <TabPanel header="Following">
+                <FullFollowingList uid={uid}/>
               </TabPanel>
             </TabView>
           )}/>

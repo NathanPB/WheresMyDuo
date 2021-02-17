@@ -18,11 +18,24 @@
  */
 
 import {ApolloClient, InMemoryCache} from "@apollo/client";
+import {offsetLimitPagination} from "@apollo/client/utilities";
+
+// https://www.apollographql.com/docs/react/pagination/core-api/#defining-a-field-policy
+const cache = new InMemoryCache({
+  typePolicies: {
+    UserProfile: {
+      fields: {
+        following: offsetLimitPagination([]),
+        followers: offsetLimitPagination([]),
+      }
+    }
+  }
+});
 
 export function createClient(apiKey) {
   return new ApolloClient({
     uri: `${process.env.NEXT_PUBLIC_API_BASE_URL}/graphql`,
-    cache: new InMemoryCache(),
+    cache,
     connectToDevTools: process.env.NODE_ENV === 'development',
     queryDeduplication: true,
     headers: {

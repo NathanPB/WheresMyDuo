@@ -115,34 +115,34 @@ fun SchemaBuilder.users() {
         }
 
         property<List<UserProfile>>("following") {
-            resolver { it, limit: Int, index: Int ->
+            resolver { it, limit: Int, offset: Int ->
                 if (limit > 250) {
                     error("You cannot retrieve more than 250 follows at a time")
                 }
                 collection.aggregate<UserProfile>(
                     match(UserProfile::uid.`in`(it.following)),
+                    skip(offset),
                     limit(limit),
-                    skip(index * limit)
                 ).toList()
             }.withArgs {
                 arg<Int> { name = "limit"; defaultValue = 250  }
-                arg<Int> { name = "index"; defaultValue = 0 }
+                arg<Int> { name = "offset"; defaultValue = 0 }
             }
         }
 
         property<List<UserProfile>>("followers") {
-            resolver { it, limit: Int, index: Int ->
+            resolver { it, offset: Int, limit: Int ->
                 if (limit > 250) {
                     error("You cannot retrieve more than 250 followers at a time")
                 }
                 collection.aggregate<UserProfile>(
                     match(UserProfile::following.`in`(it.uid)),
+                    skip(offset),
                     limit(limit),
-                    skip(index * limit)
                 ).toList()
             }.withArgs {
                 arg<Int> { name = "limit"; defaultValue = 250  }
-                arg<Int> { name = "index"; defaultValue = 0 }
+                arg<Int> { name = "offset"; defaultValue = 0 }
             }
         }
 
@@ -194,7 +194,7 @@ fun SchemaBuilder.users() {
     }
 
     query("users") {
-        resolver { index: Int, query: String? ->
+        resolver { offset: Int, query: String? ->
             collection.aggregate<UserProfile>(
                 listOf(
                     match(
@@ -205,11 +205,11 @@ fun SchemaBuilder.users() {
                         ).toTypedArray()
                     ),
                     limit(20),
-                    skip(index * 20)
+                    skip(offset * 20)
                 )
             ).toList()
         }.withArgs {
-            arg<Int> { name = "index"; defaultValue = 0 }
+            arg<Int> { name = "offset"; defaultValue = 0 }
         }
     }
 
