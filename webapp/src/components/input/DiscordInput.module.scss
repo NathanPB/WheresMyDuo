@@ -64,6 +64,6 @@
   }
 }
 
-.DiscordInput:not(:focus) + .HideWhenNotNeeded {
+.DiscordInput:not(:focus)[value=""] + .HideWhenNotNeeded {
   display: none;
 }
