@@ -23,7 +23,6 @@ import GamingProfileEditDialog from "../components/dialogs/GamingProfileEditDial
 import GamingProfileCreateDialog from "../components/dialogs/GamingProfileCreateDialog";
 import Styles from "./me.module.scss";
 import LoadingWrapper from "../components/misc/LoadingWrapper";
-import SelfProfileInfoCard from "../components/misc/SelfProfileInfoEditCard";
 import {TabPanel, TabView} from "primereact/tabview";
 import GamingProfileCardContainer from "../components/screen/GamingProfileCard/GamingProfileCardContainer";
 import GamingProfileCard from "../components/screen/GamingProfileCard";
@@ -110,7 +109,6 @@ export default function Me() {
                     followingCount={data.me.followingCount}
                   />
                 </div>
-                <SelfProfileInfoCard style={{ margin: '1em' }} allowEdit/>
               </div>
             </>
           )}/>
