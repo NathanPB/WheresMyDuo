@@ -28,6 +28,7 @@ import {Button} from "primereact/button";
 import LoadingWrapper from "../misc/LoadingWrapper";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faInfoCircle} from "@fortawesome/free-solid-svg-icons";
+import {faDiscord, faFacebook, faSkype, faTelegram} from "@fortawesome/free-brands-svg-icons";
 
 const QUERY = gql`
 {
@@ -108,34 +109,54 @@ export default function Contact() {
       </div>
       <div className="p-col-12 p-md-6" style={fieldStyles}>
         <OrSkeleton loading={loading} skeleton={skeleton}>
-          <span className="p-float-label">
-            <DiscordInput id="discord" value={discord} onChange={e => setDiscord(e.target.value)} infoIcon={<FontAwesomeIcon icon={faInfoCircle}/>}/>
-            <label htmlFor="discord">Discord</label>
-          </span>
+          <div className="p-inputgroup">
+            <span className="p-inputgroup-addon">
+              <FontAwesomeIcon icon={faDiscord}/>
+            </span>
+            <span className="p-float-label">
+              <DiscordInput id="discord" value={discord} onChange={e => setDiscord(e.target.value)} infoIcon={<FontAwesomeIcon icon={faInfoCircle}/>}/>
+              <label htmlFor="discord">Discord</label>
+            </span>
+          </div>
         </OrSkeleton>
       </div>
       <div className="p-col-12 p-md-6" style={fieldStyles}>
         <OrSkeleton loading={loading} skeleton={skeleton}>
-          <span className="p-float-label">
-            <InputText id="skype" value={skype} onChange={e => setSkype(e.target.value)}/>
-            <label htmlFor="skype">Skype</label>
-          </span>
+          <div className="p-inputgroup">
+            <span className="p-inputgroup-addon">
+              <FontAwesomeIcon icon={faSkype}/>
+            </span>
+            <span className="p-float-label">
+              <InputText id="skype" value={skype} onChange={e => setSkype(e.target.value)}/>
+              <label htmlFor="skype">Skype</label>
+            </span>
+          </div>
         </OrSkeleton>
       </div>
       <div className="p-col-12 p-md-6" style={fieldStyles}>
         <OrSkeleton loading={loading} skeleton={skeleton}>
-          <span className="p-float-label">
-            <InputText id="facebook" value={facebook} onChange={e => setFacebook(e.target.value)}/>
-            <label htmlFor="facebook">Facebook</label>
-          </span>
+          <div className="p-inputgroup">
+            <span className="p-inputgroup-addon">
+              <FontAwesomeIcon icon={faFacebook}/>
+            </span>
+            <span className="p-float-label">
+              <InputText id="facebook" value={facebook} onChange={e => setFacebook(e.target.value)}/>
+              <label htmlFor="facebook">Facebook</label>
+            </span>
+          </div>
         </OrSkeleton>
       </div>
       <div className="p-col-12 p-md-6" style={fieldStyles}>
         <OrSkeleton loading={loading} skeleton={skeleton}>
-          <span className="p-float-label">
-            <InputText id="telegram" value={telegram} onChange={e => setTelegram(e.target.value)}/>
-            <label htmlFor="telegram">Telegram</label>
-          </span>
+          <div className="p-inputgroup">
+            <span className="p-inputgroup-addon">
+              <FontAwesomeIcon icon={faTelegram}/>
+            </span>
+            <span className="p-float-label">
+              <InputText id="telegram" value={telegram} onChange={e => setTelegram(e.target.value)}/>
+              <label htmlFor="telegram">Telegram</label>
+            </span>
+          </div>
         </OrSkeleton>
       </div>
       <div className="p-col-12" style={{ display: 'flex', flexDirection: 'row-reverse' }}>
