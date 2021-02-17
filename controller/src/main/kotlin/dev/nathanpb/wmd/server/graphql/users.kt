@@ -27,6 +27,7 @@ import dev.nathanpb.wmd.data.*
 import dev.nathanpb.wmd.mongoDb
 import org.litote.kmongo.*
 import org.litote.kmongo.coroutine.CoroutineCollection
+import org.litote.kmongo.coroutine.aggregate
 import kotlin.reflect.KProperty
 
 
@@ -84,7 +85,7 @@ fun SchemaBuilder.users() {
                     val contactField = prop.call(contact)
 
                     contactField?.takeIf {
-                        it.visibility.canView(requested, requester?.uid)
+                        it.visibility.canView(requested, requester)
                     }
                 }
             }
@@ -112,33 +113,47 @@ fun SchemaBuilder.users() {
                 userProfile.contact
             }
         }
-        property<List<UserProfile>>("friends") {
-            resolver {
-                collection.find(UserProfile::uid.`in`(it.friends)).toList()
+
+        property<List<UserProfile>>("following") {
+            resolver { it, limit: Int, index: Int ->
+                if (limit > 250) {
+                    error("You cannot retrieve more than 250 follows at a time")
+                }
+                collection.aggregate<UserProfile>(
+                    match(UserProfile::uid.`in`(it.following)),
+                    limit(limit),
+                    skip(index * limit)
+                ).toList()
+            }.withArgs {
+                arg<Int> { name = "limit"; defaultValue = 250  }
+                arg<Int> { name = "index"; defaultValue = 0 }
             }
         }
 
-        property<List<FriendRequest>>("incomingFriendRequests") {
-            accessRule { userProfile, context ->
-                IllegalStateException().takeIf {
-                    userProfile.uid != context.get<UserProfile>()?.uid
+        property<List<UserProfile>>("followers") {
+            resolver { it, limit: Int, index: Int ->
+                if (limit > 250) {
+                    error("You cannot retrieve more than 250 followers at a time")
                 }
-            }
-
-            resolver {
-                mongoDb.getCollection<FriendRequest>().find(FriendRequest::to eq it.uid).toList()
+                collection.aggregate<UserProfile>(
+                    match(UserProfile::following.`in`(it.uid)),
+                    limit(limit),
+                    skip(index * limit)
+                ).toList()
+            }.withArgs {
+                arg<Int> { name = "limit"; defaultValue = 250  }
+                arg<Int> { name = "index"; defaultValue = 0 }
             }
         }
 
-        property<List<FriendRequest>>("ongoingFriendRequests") {
-            accessRule { userProfile, context ->
-                IllegalStateException().takeIf {
-                    userProfile.uid != context.get<UserProfile>()?.uid
-                }
-            }
-
+        property<Long>("followingCount") {
             resolver {
-                mongoDb.getCollection<FriendRequest>().find(FriendRequest::from eq it.uid).toList()
+                collection.countDocuments(UserProfile::uid.`in`(it.following))
+            }
+        }
+        property<Long>("followersCount") {
+            resolver {
+                collection.countDocuments(UserProfile::following.`in`(it.uid))
             }
         }
 
@@ -152,6 +167,20 @@ fun SchemaBuilder.users() {
             resolver {
                 val token = FirebaseAuth.getInstance().getUser(it.uid)
                 token.email.toLowerCase() in ADMIN_EMAILS
+            }
+        }
+
+        property<Boolean>("doesFollowMe") {
+            resolver { it, ctx: Context ->
+                val me = ctx.get<UserProfile>() ?: error("Not Authenticated")
+                me.uid in it.following
+            }
+        }
+
+        property<Boolean>("isFollowedByMe") {
+            resolver { it, ctx: Context ->
+                val me = ctx.get<UserProfile>() ?: error("Not Authenticated")
+                it.uid in me.following
             }
         }
     }
@@ -184,13 +213,25 @@ fun SchemaBuilder.users() {
         }
     }
 
-    mutation("removeFriend") {
+    mutation("follow") {
         resolver { uid: String, ctx: Context ->
             val user = ctx.get<UserProfile>() ?: error("Not Authenticated")
-            val toBeRemovedProfile = getUserProfile(uid) ?: error("$uid does not exists")
+            getUserProfile(uid) ?: error("$uid does not exists")
+            if (uid == user.uid) {
+                error("You cannot follow yourself")
+            }
 
-            collection.save(toBeRemovedProfile.copy(friends = toBeRemovedProfile.friends - user.uid))
-            collection.save(user.copy(friends = user.friends - toBeRemovedProfile.uid))
+            collection.save(user.copy(following = user.following + uid))
+            return@resolver getUserProfile(user.uid)
+        }
+    }
+
+    mutation("unfollow") {
+        resolver { uid: String, ctx: Context ->
+            val user = ctx.get<UserProfile>() ?: error("Not Authenticated")
+            getUserProfile(uid) ?: error("$uid does not exists")
+
+            collection.save(user.copy(following = user.following - uid))
             return@resolver getUserProfile(user.uid)
         }
     }

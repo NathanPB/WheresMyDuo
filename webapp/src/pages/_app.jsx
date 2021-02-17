@@ -29,6 +29,7 @@ import 'primereact/resources/primereact.css';
 import 'primereact/resources/themes/mdc-dark-deeppurple/theme.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
+import '../primereact-hack.scss';
 import '../services/firebase';
 import '../index.css'
 import '../waves.css'

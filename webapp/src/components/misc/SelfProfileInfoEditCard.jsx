@@ -22,31 +22,25 @@ import {Card} from "primereact/card";
 import {InputText} from "primereact/inputtext";
 import {ApiContext} from "../../providers/ApiProvider";
 import {Button} from "primereact/button";
-import {InputTextarea} from "primereact/inputtextarea";
 import {gql, useQuery} from "@apollo/client";
 
 export default function SelfProfileInfoCard({ allowEdit, style }) {
   const api = React.useContext(ApiContext)
 
   const [edit, setEdit] = React.useState(false)
-  const { data, loading } = useQuery(gql`{ me { nickname, photoURL, contactInfo } }`)
+  const { data, loading } = useQuery(gql`{ me { nickname } }`)
 
   const [nickname, setNickname] = React.useState()
-  const [photoURL, setPhotoURL] = React.useState()
-  const [contactInfo, setContactInfo] = React.useState("")
 
   function refresh() {
     if (!loading && !edit) {
       setNickname(data.me.nickname)
-      setPhotoURL(data.me.photoURL)
-      setContactInfo(data.me.contactInfo)
     }
   }
 
   function handleSave() {
     if (nickname) {
-      api.saveSelfProfile({ nickname, photoURL, contactInfo })
-        .then(() => setEdit(false))
+      // TODO
     }
   }
 
@@ -63,16 +57,6 @@ export default function SelfProfileInfoCard({ allowEdit, style }) {
         <div className="p-field">
           <label>Nickname:</label>
           <InputText value={nickname} onChange={e => setNickname(e.target.value)} readOnly={!edit}/>
-        </div>
-
-        <div className="p-field">
-          <label>Contact Information:</label>
-          <InputTextarea
-            value={contactInfo}
-            onChange={e => setContactInfo(e.target.value)}
-            placeholder="Describe where your friends can find you"
-            readOnly={!edit}
-          />
         </div>
 
         { edit && (

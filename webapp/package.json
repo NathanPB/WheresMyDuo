@@ -18,6 +18,7 @@
     "firebase": "^7.19.1",
     "graphql": "^15.4.0",
     "next": "^10.0.6",
+    "number-abbreviate": "^2.0.0",
     "primeflex": "^2.0.0",
     "primeicons": "^4.0.0",
     "primereact": "^6.0.2",

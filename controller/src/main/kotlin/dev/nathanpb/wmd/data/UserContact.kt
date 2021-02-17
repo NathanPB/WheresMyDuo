@@ -24,12 +24,28 @@ import kotlinx.serialization.Serializable
 private val DISCORD_DISCRIMINATOR_REGEX = """.+#[0-9]{4}$""".toRegex()
 
 enum class ContactVisibility {
-    PRIVATE, FRIENDS, PUBLIC;
+    PRIVATE, FOLLOWED, FOLLOW_BACK, PUBLIC;
 
-    fun canView(user: UserProfile, otherUserId: String?) = when (this) {
-        PRIVATE -> otherUserId != null && user.uid == otherUserId
-        FRIENDS -> otherUserId != null && (user.uid == otherUserId || otherUserId in user.friends)
-        PUBLIC -> true
+    fun canView(user: UserProfile, otherUser: UserProfile?): Boolean {
+        // User viewing its own information
+        if (user.uid == otherUser?.uid) {
+            return true
+        }
+
+        // Information is not public but the requester is anonymous
+        if (this != PUBLIC && otherUser == null) {
+            return false
+        }
+
+        // Otherwise, compute the visibility
+        // Not-null assertions on FOLLOWED and FOLLOW_BACK are
+        //   because this is checked in the if statement above
+        return when (this) {
+            PRIVATE -> user.uid == otherUser?.uid
+            FOLLOWED -> otherUser!!.uid in user.following
+            FOLLOW_BACK -> otherUser!!.uid in user.following && user.uid in otherUser.following
+            PUBLIC -> true
+        }
     }
 }
 

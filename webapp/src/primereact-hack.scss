@@ -1,0 +1,65 @@
+/*
+ * Copyright (c) 2021 - Nathan P. Bombana
+ *
+ * This file is part of Wheres My Duo.
+ *
+ * Wheres My Duo is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Wheres My Duo is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// Bunch of hacks for the PrimeReact CSS
+// Includes errors that I didn't reported yet or that have not been shipped
+//   and common stylish to the project
+
+
+// Circle avatar not working
+.p-avatar-circle {
+    border-radius: 50% !important;
+}
+
+// Avatars not clickable, I had to wrap with an <a> tag to perform redirections
+// Also made a little animation on hovers just to look cool
+// https://github.com/primefaces/primereact/issues/1819
+.p-avatar-group {
+  height: 2.5rem;
+
+  & > a + a {
+    margin-left: -.5rem;
+  }
+
+  & > a:not(:hover) + a {
+    margin-left: -1rem;
+  }
+
+  & a:not(:hover) + .p-avatar {
+    margin-left: -1rem;
+  }
+
+  & a:hover > .p-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  & .p-avatar {
+    background-color: #1e1e1e;
+  }
+
+  & > * {
+    transition: all ease-in-out .2s;
+  }
+
+  & * {
+    text-decoration: none;
+    color: inherit;
+  }
+}

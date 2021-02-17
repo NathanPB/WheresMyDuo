@@ -76,7 +76,6 @@ fun startServer() {
 
             schema {
                 users()
-                friendRequests()
                 tags()
                 gamingProfiles()
                 migrations()

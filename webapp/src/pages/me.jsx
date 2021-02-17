@@ -28,28 +28,22 @@ import {TabPanel, TabView} from "primereact/tabview";
 import GamingProfileCardContainer from "../components/screen/GamingProfileCard/GamingProfileCardContainer";
 import GamingProfileCard from "../components/screen/GamingProfileCard";
 import GamingProfileCardStyles from "../components/screen/GamingProfileCard/index.module.scss";
-import UserProfileCard from "../components/screen/UserProfileCard";
-import {FriendRequestAnswerButtons} from "../components/misc/FriendRequestPanel";
 import {useRouter} from "next/router";
-import Link from "next/link";
 import UserDashboard from "../components/dashboards/UserDashboard";
 import Head from "next/head";
 import LabeledComponent from "../components/misc/LabeledComponent";
+import UserFollow from "../components/misc/UserFollow";
+import BigAvatar from "../components/misc/BigAvatar";
 
 const QUERY = gql`
     {
       me {
         nickname
         photoURL
-        friends {
-          uid
-        }
-        incomingFriendRequests {
-          id
-          from {
-            uid
-          }
-        }
+        followers(limit: 15) { uid, nickname, photoURL }
+        following(limit: 15) { uid, nickname, photoURL }
+        followingCount
+        followersCount
         gamingProfiles {
           id
           game
@@ -100,14 +94,22 @@ export default function Me() {
                 style={{ margin: 'auto' }}
                 autofixYCenter
               >
-                <img
-                  alt="Your Avatar"
-                  className={Styles.ProfilePic}
-                  src={data.me.photoURL}
+                <BigAvatar
+                  photoURL={data.me.photoURL}
+                  nickname={data.me.nickname}
+                  isSelf
                 />
               </LabeledComponent>
 
               <div>
+                <div style={{ padding: '0 2em' }}>
+                  <UserFollow
+                    followers={data.me.followers}
+                    following={data.me.following}
+                    followersCount={data.me.followersCount}
+                    followingCount={data.me.followingCount}
+                  />
+                </div>
                 <SelfProfileInfoCard style={{ margin: '1em' }} allowEdit/>
               </div>
             </>
@@ -138,59 +140,6 @@ export default function Me() {
                     </div>
                   </GamingProfileCardContainer>
                 </div>
-              )}/>
-            </TabPanel>
-            <TabPanel header="Friends">
-              <LoadingWrapper isLoading={loading} render={() => (
-                <>
-                  {
-                    data.me.incomingFriendRequests.length > 0 && (
-                      <>
-                        <h1>Friend Requests</h1>
-                        <GamingProfileCardContainer>
-                          {
-                            data.me.incomingFriendRequests.map(request => {
-                              return (
-                                <Link href={`/u/${request.from.uid}`}>
-                                  <UserProfileCard
-                                    uid={request.from.uid}
-                                    onClick={() => router.push(`/u/${request.from.uid}`)}
-                                    header={
-                                      <FriendRequestAnswerButtons
-                                        friendRequestId={request.id}
-                                        onAnswer={router.reload}
-                                      />
-                                    }
-                                  />
-                                </Link>
-                              )
-                            })
-                          }
-                        </GamingProfileCardContainer>
-                      </>
-                    )
-                  }
-
-                  <h1>Friends</h1>
-                  {
-                    (data.me.friends.length > 0) ? (
-                      <GamingProfileCardContainer>
-                        {
-                          data.me.friends.map(friend => {
-                            return (
-                              <Link href={`/u/${friend.uid}`}>
-                                <UserProfileCard
-                                  onClick={() => router.push(`/u/${friend.uid}`)}
-                                  uid={friend.uid}
-                                />
-                              </Link>
-                            )
-                          })
-                        }
-                      </GamingProfileCardContainer>
-                    ) : <span>It seems like you have to meet someone, why don't you see <a href="/match">our recomendations?</a></span>
-                  }
-                </>
               )}/>
             </TabPanel>
           </TabView>

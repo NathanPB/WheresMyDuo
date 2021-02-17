@@ -24,17 +24,15 @@ import GamingProfileCard from '../../components/screen/GamingProfileCard';
 
 import GamingProfileCardContainer from "../../components/screen/GamingProfileCard/GamingProfileCardContainer";
 import {TabPanel, TabView} from "primereact/tabview";
-import UserProfileCard from "../../components/screen/UserProfileCard";
-import {InputTextarea} from "primereact/inputtextarea";
-import {gql, useQuery} from "@apollo/client";
-import {FriendRequestPanel} from "../../components/misc/FriendRequestPanel";
+import {gql, useMutation, useQuery} from "@apollo/client";
 import LoadingWrapper from "../../components/misc/LoadingWrapper";
 import {useRouter} from "next/router";
-import Link from "next/link";
 import UserDashboard from "../../components/dashboards/UserDashboard";
 import Head from "next/head";
 import {auth} from "firebase";
 import LabeledComponent from "../../components/misc/LabeledComponent";
+import UserFollow from "../../components/misc/UserFollow";
+import BigAvatar from "../../components/misc/BigAvatar";
 
 
 const QUERY = gql`
@@ -42,16 +40,28 @@ const QUERY = gql`
     user(uid: $uid) {
      nickname
      photoURL
-     contactInfo
-     friends { uid }
+     following(limit: 15) { uid, nickname, photoURL }
+     followers(limit: 15) { uid, nickname, photoURL }
+     followingCount
+     followersCount
+     isFollowedByMe
      gamingProfiles {
        id
        game
      }
     }
-    friendRequest: friendRequestBetweenMeAnd(other: $uid) { id, to { uid }, from { uid } }
   } 
 `
+
+const FOLLOW = gql`
+mutation Follow($uid: String!) {
+  follow(uid: $uid) { uid }
+}`
+
+const UNFOLLOW = gql`
+mutation Unfollow($uid: String!) {
+  unfollow(uid: $uid) { uid }
+}`
 
 export default function UserProfileScreen() {
   const currentUser = auth().currentUser
@@ -60,8 +70,9 @@ export default function UserProfileScreen() {
   const { uid } = router.query
 
 
-  const { data, loading } = useQuery(QUERY, { variables: { uid } })
-
+  const { data, loading, refetch } = useQuery(QUERY, { variables: { uid } })
+  const [follow] = useMutation(FOLLOW, { variables: { uid } })
+  const [unfollow] = useMutation(UNFOLLOW, { variables: { uid } })
 
   React.useEffect(() => {
     if (uid && uid === currentUser?.uid) {
@@ -71,6 +82,11 @@ export default function UserProfileScreen() {
 
   if (!loading && !data) {
     return null
+  }
+
+  async function onFollowButtonHit() {
+    await (data.user.isFollowedByMe ? unfollow() : follow())
+    refetch()
   }
 
   return (
@@ -90,40 +106,23 @@ export default function UserProfileScreen() {
                   style={{ margin: 'auto' }}
                   autofixYCenter
                 >
-                  <img
-                    alt={`${data.user.nickname}'s Avatar`}
-                    className={Styles.ProfilePic}
-                    src={data.user.photoURL}
+                  <BigAvatar
+                    nickname={data.user.nickname}
+                    isFollowing={data.user.isFollowedByMe}
+                    photoURL={data.user.photoURL}
+                    onFollowClick={onFollowButtonHit}
                   />
                 </LabeledComponent>
               </div>
 
               <hr/>
 
-              {
-                data.user.contactInfo && (
-                  <>
-                    <div style={{ marginBottom: '1em' }}>
-                      <h3 style={{ textAlign: 'center' }}>Contact Information</h3>
-                      <InputTextarea
-                        style={{ display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
-                        value={data.user.contactInfo}
-                        readOnly
-                      />
-                    </div>
-                    <hr/>
-                  </>
-                )
-              }
-
-              <div>
-                <FriendRequestPanel
-                  friendRequest={data.friendRequest}
-                  uid={uid}
-                  nickname={data.user.nickname}
-                  areFriends={data.user.friends.some(it => it.uid === currentUser.uid)}
-                  onAnswer={() => window.location.reload()}
-                  onDelete={() => window.location.reload()}
+              <div style={{ padding: '0 2em' }}>
+                <UserFollow
+                  following={data.user.following}
+                  followers={data.user.followers}
+                  followingCount={data.user.followingCount}
+                  followersCount={data.user.followersCount}
                 />
               </div>
             </>
@@ -146,21 +145,6 @@ export default function UserProfileScreen() {
                     }
                   </GamingProfileCardContainer>
                 </div>
-              </TabPanel>
-
-              <TabPanel header="Friends">
-                <h1>Friends</h1>
-                <GamingProfileCardContainer>
-                  {
-                    data.user.friends.map(friend => {
-                      return (
-                        <Link href={`/u/${friend.uid}`}>
-                          <UserProfileCard uid={friend.uid}/>
-                        </Link>
-                      )
-                    })
-                  }
-                </GamingProfileCardContainer>
               </TabPanel>
             </TabView>
           )}/>

@@ -17,18 +17,6 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-.ProfilePic {
-  border-radius: 8px;
-  width: 256px;
-  height: auto;
-  max-width: 256px;
-  flex-grow: 1;
-  flex-shrink: 0;
-
-  display: block;
-  margin: 0 auto 0 auto;
-}
-
 .ProfilePageWrapper {
   display: flex;
   height: 100%;
