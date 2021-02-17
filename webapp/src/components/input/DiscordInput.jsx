@@ -29,10 +29,6 @@ export default function DiscordInput(props) {
   const { value, infoIcon } = props;
   const input = React.useRef()
 
-  // https://stackoverflow.com/a/53215514/9893963
-  const [, updateState] = React.useState();
-  const forceUpdate = React.useCallback(() => updateState({}), []);
-
   const discriminator = (!value ? "" : value.split('#')[1] || "").substring(0, 4)
 
   const discriminatorTemplate = "0000"
@@ -60,11 +56,6 @@ export default function DiscordInput(props) {
     props.onChange && props.onChange(e)
   }
 
-  function onFocus(e) {
-    forceUpdate()
-    props.onFocus && onFocus(e)
-  }
-
   return (
     <>
       <Tooltip target={`.${Styles.Info}`}/>
@@ -79,7 +70,7 @@ export default function DiscordInput(props) {
         {...props}
         ref={input}
         onChange={onChange}
-        onFocus={onFocus}
+        onFocus={props.onFocus}
         className={`p-inputtext p-component ${value ? "p-filled" : ""} ${value?.length > 0 && !isCorrect ? "p-invalid" : ""} ${Styles.DiscordInput} ${props.className}`}
       />
 
