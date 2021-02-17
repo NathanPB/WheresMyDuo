@@ -22,6 +22,7 @@ import React from 'react';
 import {auth} from 'firebase';
 
 import * as Styles from './index.module.scss';
+import AppName from "../../misc/AppName";
 
 export default function LogInScreen() {
 
@@ -33,7 +34,7 @@ export default function LogInScreen() {
     <main className={Styles.LoginScreen}>
       <article className={Styles.LoginCard}>
         <span className={Styles.Subtitle}>Welcome to</span><br/>
-        <span className={Styles.WMD}>WheresMy<span>Duo</span></span>
+        <AppName dark/>
         <hr/>
 
         <div className={Styles.LoginText}>
