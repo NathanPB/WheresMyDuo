@@ -47,6 +47,11 @@ export default function UserDashboard({ children }) {
       url: '/me'
     },
     {
+      label: 'Account Settings',
+      icon: 'pi pi-cog',
+      url: '/settings'
+    },
+    {
       label: 'Logout',
       icon: 'pi pi-power-off',
       command: () => auth().signOut()
