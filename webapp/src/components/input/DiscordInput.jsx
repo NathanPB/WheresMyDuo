@@ -21,7 +21,7 @@ import React from "react";
 import Styles from "./DiscordInput.module.scss";
 import {Tooltip} from "primereact/tooltip";
 
-const REGEX_CORRECT = /.+#[0-9]{4}$/g
+export const REGEX_CORRECT = /.+#[0-9]{4}$/g
 
 // I can't imagine the time I'm wasting on this shit
 // TODO make this a library
@@ -80,7 +80,7 @@ export default function DiscordInput(props) {
         ref={input}
         onChange={onChange}
         onFocus={onFocus}
-        className={`p-inputtext p-component ${value ? "p-filled" : ""} ${Styles.DiscordInput} ${props.className}`}
+        className={`p-inputtext p-component ${value ? "p-filled" : ""} ${value?.length > 0 && !isCorrect ? "p-invalid" : ""} ${Styles.DiscordInput} ${props.className}`}
       />
 
       <span
