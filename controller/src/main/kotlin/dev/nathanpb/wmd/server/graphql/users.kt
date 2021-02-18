@@ -277,8 +277,10 @@ fun SchemaBuilder.users() {
                 error("Slug is not valid")
             }
 
-            if (getUserProfile(slugValidated)?.uid != requester.uid) {
-                error("Slug already in use")
+            getUserProfile(slugValidated)?.let {
+                if (it.uid != requester.uid) {
+                    error("Slug already in use")
+                }
             }
 
             requester.copy(slug = slugValidated, nickname = nickname.take(32)).also {
