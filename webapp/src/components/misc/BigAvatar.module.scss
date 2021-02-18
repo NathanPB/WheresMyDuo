@@ -21,7 +21,7 @@
   border-radius: 8px;
   width: 256px;
   height: auto;
-  max-width: 256px;
+  max-width: min(256px, 100%);
   flex-grow: 1;
   flex-shrink: 0;
 

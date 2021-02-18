@@ -18,7 +18,7 @@
  */
 
 import React from "react";
-import Styles from './Contact.module.scss';
+import Styles from './index.module.scss';
 import {gql, useMutation, useQuery} from "@apollo/client";
 import {InputText} from "primereact/inputtext";
 import OrSkeleton from "../misc/OrSkeleton";

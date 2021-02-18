@@ -18,7 +18,24 @@
  */
 
 .Save {
-  @media (min-width: 340px) {
+  width: 100%;
+  @media (min-width: 480px) {
     width: 128px !important;
+  }
+}
+
+
+.ResponsiveFlex {
+  display: flex;
+  @media (max-width: 880px) {
+    flex-direction: column;
+
+    & > * {
+      padding: 0 !important;
+    }
+
+    & > *:not(:first-child) {
+      margin-top: 1em;
+    }
   }
 }

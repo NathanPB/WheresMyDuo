@@ -23,6 +23,7 @@ import {Panel} from "primereact/panel";
 import Contact from "../components/settings/Contact";
 import UserDashboard from "../components/dashboards/UserDashboard";
 import Head from "next/head";
+import Info from "../components/settings/Info";
 
 export default function SettingsPage() {
   return (
@@ -32,6 +33,9 @@ export default function SettingsPage() {
       </Head>
       <UserDashboard>
         <section className={Styles.Wrapper}>
+          <Panel header="Basic">
+            <Info/>
+          </Panel>
           <Panel header="Contact">
             <div>
               <b>Disclaimer:</b> Information put here will temporarily be PUBLIC! Visibility customization is work in progress.
