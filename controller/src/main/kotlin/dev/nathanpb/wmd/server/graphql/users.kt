@@ -24,18 +24,28 @@ import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
 import com.google.firebase.auth.FirebaseAuth
 import dev.nathanpb.wmd.ADMIN_EMAILS
 import dev.nathanpb.wmd.data.*
+import dev.nathanpb.wmd.data.input.UserProfileInput
 import dev.nathanpb.wmd.mongoDb
+import dev.nathanpb.wmd.utils.getSlugSuggestions
+import dev.nathanpb.wmd.utils.slugify
 import org.litote.kmongo.*
 import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.aggregate
 import kotlin.reflect.KProperty
 
 
+suspend fun hasUserProfile(
+    uidOrSlug: String,
+    collection: CoroutineCollection<UserProfile> = mongoDb.getCollection()
+): Boolean {
+    return collection.countDocuments(or(UserProfile::uid eq uidOrSlug, UserProfile::slug eq uidOrSlug)) > 0
+}
+
 suspend fun getUserProfile(
-    uid: String,
+    uidOrSlug: String,
     collection: CoroutineCollection<UserProfile> = mongoDb.getCollection()
 ): UserProfile? {
-    return collection.findOne(UserProfile::uid eq uid)
+    return collection.findOne(or(UserProfile::uid eq uidOrSlug, UserProfile::slug eq uidOrSlug))
 }
 
 suspend fun getUserProfileOrCreate(
@@ -55,12 +65,12 @@ suspend fun getUserProfileOrCreate(
                 photoURL = user.photoUrl
             }
 
-            profile = UserProfile(uid, nickname, photoURL)
+            profile = UserProfile(uid, uid, nickname, photoURL)
             collection.insertOne(profile)
         } catch (e: Exception) {  }
 
     }
-    return profile ?: UserProfile(uid, "Unknown", "")
+    return profile ?: UserProfile(uid, uid, "Unknown", "")
 }
 
 fun SchemaBuilder.users() {
@@ -69,6 +79,7 @@ fun SchemaBuilder.users() {
 
     enum<ContactVisibility>()
     type<ContactField>()
+    type<UserProfileInput>()
     type<UserContact> {
         fun contactField(key: String, prop: KProperty<ContactField?>) {
             property<ContactField?>(key) {
@@ -99,8 +110,21 @@ fun SchemaBuilder.users() {
 
     type<UserProfile> {
         property(UserProfile::uid) {}
+        property(UserProfile::slug) {}
         property(UserProfile::nickname) {}
         property(UserProfile::photoURL) {}
+
+        property<List<String>>("slugSuggestions") {
+            resolver { userProfile, ctx: Context ->
+                val requester = ctx.get<UserProfile>()
+                val privacy = ContactVisibility.values().first {
+                    it.canView(userProfile, requester)
+                }
+
+                userProfile.getSlugSuggestions(privacy)
+            }
+        }
+
         property<UserContact>("contact") {
             resolver { userProfile, ctx: Context ->
                 // Só vamo caraio
@@ -190,7 +214,9 @@ fun SchemaBuilder.users() {
     }
 
     query("user") {
-        resolver { uid: String -> collection.findOne(UserProfile::uid eq uid) }
+        resolver { uid: String -> getUserProfile(uid)}.withArgs {
+            arg<String> { name = "uid"; description = "User uid or slug" }
+        }
     }
 
     query("users") {
@@ -233,6 +259,26 @@ fun SchemaBuilder.users() {
 
             collection.save(user.copy(following = user.following - uid))
             return@resolver getUserProfile(user.uid)
+        }
+    }
+
+    mutation("setProfileInfo") {
+        resolver { profile: UserProfileInput, ctx: Context ->
+            val requester = ctx.get<UserProfile>() ?: error("Not Authenticated")
+            val (slug, nickname) = profile
+
+            val slugValidated = slug.take(32).slugify()
+            if (slugValidated.isEmpty()) {
+                error("Slug is not valid")
+            }
+
+            if (getUserProfile(slugValidated)?.uid != requester.uid) {
+                error("Slug already in use")
+            }
+
+            requester.copy(slug = slugValidated, nickname = nickname.take(32)).also {
+                collection.save(it)
+            }
         }
     }
 

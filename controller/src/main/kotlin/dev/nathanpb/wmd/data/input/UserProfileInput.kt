@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - Nathan P. Bombana
+ * Copyright (c) 2021 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
  *
@@ -17,18 +17,12 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.nathanpb.wmd.data
+package dev.nathanpb.wmd.data.input
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.litote.kmongo.id.MongoId
 
 @Serializable
-data class UserProfile (
-    @SerialName("_id") @MongoId val uid: String,
+data class UserProfileInput(
     val slug: String,
-    val nickname: String,
-    val photoURL: String,
-    val following: List<String> = emptyList(),
-    val contact: UserContact = UserContact()
+    val nickname: String
 )

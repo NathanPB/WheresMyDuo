@@ -42,6 +42,7 @@ query Match($profileId: String!) {
     calendar
     user {
       uid
+      slug
     }
     tags {
       id
@@ -137,7 +138,7 @@ export default function MatchId() {
           {
             data.match.map(match =>
               <UserProfileCard
-                onClick={() => router.push(`/u/${match.user.uid}`)}
+                onClick={() => router.push(`/u/${match.user.slug}`)}
                 uid={match.user.uid}
                 header={makeHeader(match)}
               />)

@@ -28,7 +28,7 @@ import {Avatar} from "primereact/avatar";
 
 const QUERY = gql`
     query GetUser($query: String!) { 
-      users(query: $query) { uid, nickname, photoURL }
+      users(query: $query) { uid, slug, nickname, photoURL }
     }
   `
 
@@ -40,7 +40,7 @@ export default function UserDiscover() {
 
   function itemTemplate(user) {
     return (
-      <Link href={`/u/${user.uid}`}>
+      <Link href={`/u/${user.slug}`}>
         <a style={{ display: 'block' }}>
           <Avatar image={user.photoURL} shape="circle"/>
           <span className={Styles.UserName}>

@@ -31,7 +31,7 @@ query Following($uid: String!, $offset: Int!) {
   user(uid: $uid) {
     followingCount
     following(offset: $offset, limit: ${ROWS}) {
-      uid
+      slug
       nickname
       photoURL
     }
@@ -43,7 +43,7 @@ query Followers($uid: String!, $offset: Int!) {
   user(uid: $uid) {
     followersCount
     followers(offset: $offset, limit: ${ROWS}) {
-      uid
+      slug
       nickname
       photoURL
     }
@@ -96,7 +96,7 @@ function FullFollowList({ users, fetchMore, totalRecords, loading }) {
     if (layout === 'grid') {
       return (
         <div className="p-lg-2 p-md-4">
-          <Link href={`/u/${user.uid}`}>
+          <Link href={`/u/${user.slug}`}>
             <a>
               <LabeledComponent
                 label={user.nickname}
@@ -122,7 +122,7 @@ function FullFollowList({ users, fetchMore, totalRecords, loading }) {
     if (layout === 'list') {
       return (
         <div className="p-col-12" style={{ padding: '0 8px', marginTop: '1rem' }}>
-          <Link href={`/u/${user.uid}`}>
+          <Link href={`/u/${user.slug}`}>
             <a style={{ textDecoration: 'none' }}>
               <div className="p-grid">
                 <div className="p-col-fixed" style={{ width: '5rem' }}>

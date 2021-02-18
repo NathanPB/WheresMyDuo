@@ -46,8 +46,8 @@ const QUERY = gql`
         uid
         nickname
         photoURL
-        followers(limit: 15) { uid, nickname, photoURL }
-        following(limit: 15) { uid, nickname, photoURL }
+        followers(limit: 15) { uid, slug, nickname, photoURL }
+        following(limit: 15) { uid, slug, nickname, photoURL }
         followingCount
         followersCount
         gamingProfiles {

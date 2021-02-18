@@ -55,7 +55,7 @@ export default function UserFollow(props) {
           <AvatarGroup>
             {
               followers.map(follower => (
-                <Link href={`/u/${follower.uid}`}>
+                <Link href={`/u/${follower.slug}`}>
                   <a id={`u-${follower.uid}`}>
                     <Avatar image={follower.photoURL} shape="circle"/>
                   </a>
@@ -96,7 +96,7 @@ export default function UserFollow(props) {
           <AvatarGroup>
             {
               following.map(follower => (
-                <Link href={`/u/${follower.uid}`}>
+                <Link href={`/u/${follower.slug}`}>
                   <a id={`u-${follower.uid}`}>
                     <Avatar image={follower.photoURL} shape="circle"/>
                   </a>

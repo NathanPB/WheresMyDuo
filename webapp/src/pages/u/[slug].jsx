@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import Styles from './[uid].module.scss';
+import Styles from './[slug].module.scss';
 import GamingProfileCard from '../../components/screen/GamingProfileCard';
 
 import GamingProfileCardContainer from "../../components/screen/GamingProfileCard/GamingProfileCardContainer";
@@ -41,10 +41,11 @@ import ContactOutputForm from "../../components/forms/ContactOutputForm";
 const QUERY = gql`
   query PageData($uid: String!) {
     user(uid: $uid) {
+     uid
      nickname
      photoURL
-     following(limit: 15) { uid, nickname, photoURL }
-     followers(limit: 15) { uid, nickname, photoURL }
+     following(limit: 15) { uid, slug, nickname, photoURL }
+     followers(limit: 15) { uid, slug, nickname, photoURL }
      followingCount
      followersCount
      isFollowedByMe
@@ -76,12 +77,12 @@ export default function UserProfileScreen() {
   const currentUser = auth().currentUser
 
   const router = useRouter()
-  const { uid } = router.query
+  const { slug } = router.query
 
 
-  const { data, loading, refetch } = useQuery(QUERY, { variables: { uid } })
-  const [follow] = useMutation(FOLLOW, { variables: { uid } })
-  const [unfollow] = useMutation(UNFOLLOW, { variables: { uid } })
+  const { data, loading, refetch } = useQuery(QUERY, { variables: { uid: slug } })
+  const [follow] = useMutation(FOLLOW, { variables: { uid: data?.user?.uid } })
+  const [unfollow] = useMutation(UNFOLLOW, { variables: { uid: data?.user?.uid } })
   const [activeIndex, setActiveIndex] = React.useState(0)
 
 
@@ -94,10 +95,10 @@ export default function UserProfileScreen() {
   }, [router])
 
   React.useEffect(() => {
-    if (uid && uid === currentUser?.uid) {
+    if (data?.user?.uid && data?.user?.uid === currentUser?.uid) {
       router.push('../me')
     }
-  }, [currentUser?.uid, uid])
+  }, [currentUser?.uid, data?.user?.uid])
 
   if (!loading && !data) {
     return null
@@ -174,10 +175,10 @@ export default function UserProfileScreen() {
                 </div>
               </TabPanel>
               <TabPanel header="Followers">
-                <FullFollowersList uid={uid}/>
+                { !loading && <FullFollowersList uid={data?.user?.uid}/> }
               </TabPanel>
               <TabPanel header="Following">
-                <FullFollowingList uid={uid}/>
+                { !loading && <FullFollowingList uid={data?.user?.uid}/> }
               </TabPanel>
             </TabView>
           )}/>
