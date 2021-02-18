@@ -35,7 +35,10 @@ import UserFollow from "../components/misc/UserFollow";
 import BigAvatar from "../components/misc/BigAvatar";
 import {FullFollowersList, FullFollowingList} from "../components/screen/FullFollowList";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faPlus} from "@fortawesome/free-solid-svg-icons";
+import {faPencilAlt, faPlus} from "@fortawesome/free-solid-svg-icons";
+import ContactOutputForm from "../components/forms/ContactOutputForm";
+import {Card} from "primereact/card";
+import Link from "next/link";
 
 const QUERY = gql`
     {
@@ -50,6 +53,12 @@ const QUERY = gql`
         gamingProfiles {
           id
           game
+        }
+        contact {
+          discord { value }
+          skype { value }
+          telegram { value }
+          facebook { value }
         }
       }
     }
@@ -122,6 +131,20 @@ export default function Me() {
                     followingCount={data.me.followingCount}
                   />
                 </div>
+                { (loading || !Object.keys(data?.user?.contact || {}).length) && (
+                  <div style={{ padding: '1em 2em' }}>
+                    <div className="p-overlay-badge">
+                      <Link href={`/settings`}>
+                        <a className={`p-badge p-component`}>
+                          <FontAwesomeIcon icon={faPencilAlt}/>
+                        </a>
+                      </Link>
+                      <Card style={{ boxShadow: '10px 10px 5px 0 rgba(0,0,0,0.75)' }}>
+                        <ContactOutputForm loading={loading} data={data.me.contact} edit/>
+                      </Card>
+                    </div>
+                  </div>
+                ) }
               </div>
             </>
           )}/>

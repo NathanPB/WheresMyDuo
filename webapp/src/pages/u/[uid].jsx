@@ -34,6 +34,8 @@ import LabeledComponent from "../../components/misc/LabeledComponent";
 import UserFollow from "../../components/misc/UserFollow";
 import BigAvatar from "../../components/misc/BigAvatar";
 import {FullFollowersList, FullFollowingList} from "../../components/screen/FullFollowList";
+import {Card} from "primereact/card";
+import ContactOutputForm from "../../components/forms/ContactOutputForm";
 
 
 const QUERY = gql`
@@ -49,6 +51,12 @@ const QUERY = gql`
      gamingProfiles {
        id
        game
+     }
+     contact {
+       discord { value }
+       skype { value }
+       telegram { value }
+       facebook { value }
      }
     }
   } 
@@ -136,6 +144,14 @@ export default function UserProfileScreen() {
                   followersCount={data.user.followersCount}
                 />
               </div>
+
+              { (loading || !Object.keys(data?.user?.contact || {}).length) && (
+                <div style={{ padding: '1em 2em' }}>
+                  <Card style={{ boxShadow: '10px 10px 5px 0 rgba(0,0,0,0.75)' }}>
+                    <ContactOutputForm loading={loading} data={data.user.contact} edit/>
+                  </Card>
+                </div>
+              ) }
             </>
           )}/>
 
