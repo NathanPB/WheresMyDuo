@@ -29,6 +29,7 @@ import LoadingWrapper from "../misc/LoadingWrapper";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faInfoCircle} from "@fortawesome/free-solid-svg-icons";
 import {faDiscord, faFacebook, faSkype, faTelegram} from "@fortawesome/free-brands-svg-icons";
+import FacebookInput from "../input/FacebookInput";
 
 const QUERY = gql`
 {
@@ -140,7 +141,7 @@ export default function Contact() {
               <FontAwesomeIcon icon={faFacebook}/>
             </span>
             <span className="p-float-label">
-              <InputText id="facebook" value={facebook} onChange={e => setFacebook(e.target.value)}/>
+              <FacebookInput id="facebook" value={facebook} onChange={e => setFacebook(e.target.value)} infoIcon={<FontAwesomeIcon icon={faInfoCircle}/>}/>
               <label htmlFor="facebook">Facebook</label>
             </span>
           </div>
