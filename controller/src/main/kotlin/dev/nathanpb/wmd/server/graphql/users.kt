@@ -66,6 +66,7 @@ suspend fun getUserProfileOrCreate(
             }
 
             profile = UserProfile(uid, uid, nickname, photoURL)
+            profile = profile.copy(slug = profile.getSlugSuggestions(ContactVisibility.PUBLIC).first())
             collection.insertOne(profile)
         } catch (e: Exception) {  }
 
