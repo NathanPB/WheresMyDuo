@@ -224,11 +224,16 @@ fun SchemaBuilder.users() {
             collection.aggregate<UserProfile>(
                 listOf(
                     match(
-                        *listOfNotNull(
-                            query?.let {
-                                UserProfile::nickname regex ".*${it}.*".toRegex(RegexOption.IGNORE_CASE)
-                            }
-                        ).toTypedArray()
+                        or(
+                            *listOfNotNull(
+                                query?.let {
+                                    UserProfile::nickname regex ".*${it}.*".toRegex(RegexOption.IGNORE_CASE)
+                                },
+                                query?.let {
+                                    UserProfile::slug regex ".*${it}.*".toRegex(RegexOption.IGNORE_CASE)
+                                }
+                            ).toTypedArray()
+                        )
                     ),
                     limit(20),
                     skip(offset * 20)
