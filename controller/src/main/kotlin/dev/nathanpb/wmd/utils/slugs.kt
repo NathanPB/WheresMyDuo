@@ -27,7 +27,7 @@ import dev.nathanpb.wmd.server.graphql.hasUserProfile
 
 suspend fun UserProfile.getSlugSuggestions(privacy: ContactVisibility): List<String> {
     val contacts = listOfNotNull(
-        contact.discord?.run { copy(value = value.split("#")[1]) },
+        contact.discord?.run { copy(value = value.split("#")[0]) },
         contact.facebook,
         contact.skype,
     )
