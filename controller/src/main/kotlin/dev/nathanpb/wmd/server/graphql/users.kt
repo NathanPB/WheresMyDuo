@@ -116,6 +116,12 @@ fun SchemaBuilder.users() {
         property(UserProfile::nickname) {}
         property(UserProfile::photoURL) {}
 
+        property<Boolean>("isMe") {
+            resolver { it, ctx: Context ->
+                it.uid == ctx.get<UserProfile>()?.uid
+            }
+        }
+
         property<Long>("postsCount") {
             resolver {
                 postsCollection.countDocuments(Post::author eq it.uid)

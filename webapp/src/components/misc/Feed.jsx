@@ -31,7 +31,7 @@ const YOUTUBE_ID_REGEX = /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[
 
 const QUERY_FOLLOW_SUGGESTIONS = gql`
 {
-  users(query: "") { uid, slug, nickname, photoURL }
+  users(query: "") { uid, slug, nickname, photoURL, isMe, isFollowedByMe }
 }`
 
 const QUERY = gql`
@@ -119,7 +119,13 @@ export default function Feed({ setRefetcher }) {
         <h6 style={{ margin: '1em' }}>Why don't you follow more people?</h6>
         <div style={{ display: 'inline-block' }}>
 
-          <UserSmallAvatarGroup users={suggestedFollows?.users?.slice(0, 12) || []}/>
+          <UserSmallAvatarGroup
+            users={
+              suggestedFollows?.users
+                ?.filter(it => !it.isFollowedByMe && !it.isMe)
+                ?.slice(0, 12) || []
+            }
+          />
         </div>
       </section>
     )
