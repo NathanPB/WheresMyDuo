@@ -77,6 +77,7 @@ suspend fun getUserProfileOrCreate(
 fun SchemaBuilder.users() {
     val collection by lazy { mongoDb.getCollection<UserProfile>() }
     val gamingProfilesCollection by lazy { mongoDb.getCollection<GamingProfile>() }
+    val postsCollection by lazy { mongoDb.getCollection<Post>() }
 
     enum<ContactVisibility>()
     type<ContactField>()
@@ -114,6 +115,30 @@ fun SchemaBuilder.users() {
         property(UserProfile::slug) {}
         property(UserProfile::nickname) {}
         property(UserProfile::photoURL) {}
+
+        property<Long>("postsCount") {
+            resolver {
+                postsCollection.countDocuments(Post::author eq it.uid)
+            }
+        }
+
+        property<List<Post>>("posts") {
+            resolver { profile: UserProfile, offset: Int, limit: Int, ctx: Context ->
+                if (limit > 20) {
+                    error("Retrieving more than 20 posts is not allowed")
+                }
+
+                ctx.get<UserProfile>() ?: error("Not Authenticated")
+
+                postsCollection.aggregate<Post>(
+                    match(Post::author eq profile.uid),
+                    limit(limit),
+                    skip(offset)
+                ).toList()
+            }.withArgs {
+                arg<Int> { name = "offset"; defaultValue = 0 }
+            }
+        }
 
         property<List<String>>("slugSuggestions") {
             resolver { userProfile, ctx: Context ->

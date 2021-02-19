@@ -79,6 +79,7 @@ fun startServer() {
                 tags()
                 gamingProfiles()
                 migrations()
+                posts()
             }
         }
 
