@@ -26,9 +26,6 @@ import Styles from './Feed.module.scss';
 import {Card} from "primereact/card";
 import Link from "next/link";
 import {Avatar} from "primereact/avatar";
-import unified from 'unified';
-import parse from 'remark-parse';
-import remark2react from 'remark-react';
 
 const YOUTUBE_ID_REGEX = /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/gi
 
@@ -95,17 +92,9 @@ export default function Feed() {
       return null
     }
 
-    function markdown(content) {
-      return unified()
-        .use(parse)
-        .use(remark2react)
-        .processSync(content)
-        .result
-    }
-
     return (
       <Card header={header()} footer={footer()}>
-        { parseYoutubeEmbed(post.content) || markdown(post.content) }
+        { parseYoutubeEmbed(post.content) || post.content }
       </Card>
     )
   }
