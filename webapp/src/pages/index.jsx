@@ -23,6 +23,7 @@ import UserDashboard from "../components/dashboards/UserDashboard";
 import {gql, useQuery} from "@apollo/client";
 import PostWriter from "../components/input/PostWriter";
 import Styles from './index.module.scss';
+import Head from "next/head";
 
 const QUERY = gql`{
   me {
@@ -36,18 +37,22 @@ export default function HomePage() {
   const { data, loading } = useQuery(QUERY)
   const [refetcher, setRefetcher] = React.useState({})
 
-  console.log(refetcher)
   return (
-    <UserDashboard>
-      <section className={Styles.Feed}>
-        <PostWriter
-          nickname={data?.me?.nickname}
-          photoURL={data?.me?.photoURL}
-          loading={loading}
-          onPost={() => refetcher?.refetcher ? refetcher?.refetcher() : undefined}
-        />
-        <Feed setRefetcher={refetcher => setRefetcher({ refetcher })} />
-      </section>
-    </UserDashboard>
+    <>
+      <Head>
+        <title>Feed - WheresMyDuo</title>
+      </Head>
+      <UserDashboard>
+        <section className={Styles.Feed}>
+          <PostWriter
+            nickname={data?.me?.nickname}
+            photoURL={data?.me?.photoURL}
+            loading={loading}
+            onPost={() => refetcher?.refetcher ? refetcher?.refetcher() : undefined}
+          />
+          <Feed setRefetcher={refetcher => setRefetcher({ refetcher })} />
+        </section>
+      </UserDashboard>
+    </>
   )
 }
