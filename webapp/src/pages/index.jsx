@@ -34,7 +34,9 @@ const QUERY = gql`{
 export default function HomePage() {
 
   const { data, loading } = useQuery(QUERY)
+  const [refetcher, setRefetcher] = React.useState({})
 
+  console.log(refetcher)
   return (
     <UserDashboard>
       <section className={Styles.Feed}>
@@ -42,8 +44,9 @@ export default function HomePage() {
           nickname={data?.me?.nickname}
           photoURL={data?.me?.photoURL}
           loading={loading}
+          onPost={() => refetcher?.refetcher ? refetcher?.refetcher() : undefined}
         />
-        <Feed/>
+        <Feed setRefetcher={refetcher => setRefetcher({ refetcher })} />
       </section>
     </UserDashboard>
   )

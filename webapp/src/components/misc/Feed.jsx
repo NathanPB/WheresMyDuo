@@ -44,9 +44,14 @@ query QueryFeed($offset: Int!) {
   }
 }`
 
-export default function Feed() {
-  const { data, loading, fetchMore } = useQuery(QUERY, { variables: { offset: 0 } })
+export default function Feed({ setRefetcher }) {
+  const { data, loading, fetchMore, ...other } = useQuery(QUERY, { variables: { offset: 0 } })
   const { data: suggestedFollows } = useQuery(QUERY_FOLLOW_SUGGESTIONS)
+
+  React.useEffect(() => {
+    console.log(other.refetch)
+    setRefetcher(other.refetch)
+  }, [])
 
   function itemTemplate(post) {
     if (!post) {

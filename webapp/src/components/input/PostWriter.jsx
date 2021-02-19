@@ -42,6 +42,7 @@ export default function PostWriter({ nickname, photoURL, loading, onPost }) {
   function tryPost() {
     if (content) {
       post().then((...args) => onPost && onPost(...args))
+      setContent("")
     }
   }
 
