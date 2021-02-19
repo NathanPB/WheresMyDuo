@@ -35,8 +35,11 @@
     "react-scripts": "3.4.3",
     "react-spring-3d-carousel": "^1.2.0",
     "react-transition-group": "^4.4.1",
+    "remark-parse": "^9.0.0",
+    "remark-react": "^8.0.0",
     "sass": "^1.26.10",
-    "string-to-color": "^2.2.2"
+    "string-to-color": "^2.2.2",
+    "unified": "^9.2.0"
   },
   "scripts": {
     "dev": "next dev",

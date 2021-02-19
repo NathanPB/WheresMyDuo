@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright (c) 2021 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
@@ -17,10 +17,31 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-module.exports = {
-  async redirects() {
-    return [
-      { source: '/', destination: '/me', permanent: true }
-    ]
+.Feed {
+
+  & > :global(.p-datascroller-content) {
+    background: none !important;
+    padding: 0;
+
+    & > :global(.p-datascroller-list) > * {
+      margin: 1em 0;
+      box-shadow: 0 0 5px 2px rgba(0,0,0,0.75);
+    }
   }
+
+  & > :global(.p-datascroller-foot) {
+    margin-top: 1em;
+    background: none !important;
+    box-shadow: 0 0 5px 2px rgba(0,0,0,0.75);
+  }
+
+}
+
+.Post {
+  box-shadow: 0 0 5px 2px rgba(0,0,0,0.75);
+}
+
+.Date {
+  font-size: .7rem;
+  --text-color: var(--text-color-secondary);
 }

@@ -18,12 +18,12 @@
  */
 
 import React from 'react';
-import {AvatarGroup} from 'primereact/avatargroup'
 import {Avatar} from "primereact/avatar";
 import {Divider} from "primereact/divider";
 import abbreviate from "number-abbreviate"
 import Link from "next/link";
 import {Tooltip} from "primereact/tooltip";
+import UserSmallAvatarGroup from "./UserSmallAvatarGroup";
 
 const AVATAR_COUNT = 15
 
@@ -52,30 +52,20 @@ export default function UserFollow(props) {
       <>
         <h3 style={{ marginBottom: 4 }}>Followers</h3>
         <div style={{ marginLeft: 8 }}>
-          <AvatarGroup>
-            {
-              followers.map(follower => (
-                <Link href={`/u/${follower.slug}`}>
-                  <a id={`u-${follower.uid}`}>
-                    <Avatar image={follower.photoURL} shape="circle"/>
-                  </a>
-                </Link>
-              ))
-            }
-            {
-              (plus > 0) && (
-                <Link href={`#follow`}>
-                  <a>
-                    <Avatar
-                      style={{ fontSize: '1rem' }}
-                      shape="circle"
-                      label={`+${abbreviate(plus, 2)}`.toUpperCase()}
-                    />
-                  </a>
-                </Link>
-              )
-            }
-          </AvatarGroup>
+          <UserSmallAvatarGroup
+            users={followers}
+            lastAvatar={plus > 0 ? (
+              <Link href={`#follow`}>
+                <a>
+                  <Avatar
+                    style={{ fontSize: '1rem' }}
+                    shape="circle"
+                    label={`+${abbreviate(plus, 2)}`.toUpperCase()}
+                  />
+                </a>
+              </Link>
+            ) : undefined}
+          />
         </div>
       </>
     )
@@ -93,30 +83,20 @@ export default function UserFollow(props) {
       <>
         <h3 style={{ marginBottom: 4 }}>Following</h3>
         <div style={{ marginLeft: 8 }}>
-          <AvatarGroup>
-            {
-              following.map(follower => (
-                <Link href={`/u/${follower.slug}`}>
-                  <a id={`u-${follower.uid}`}>
-                    <Avatar image={follower.photoURL} shape="circle"/>
-                  </a>
-                </Link>
-              ))
-            }
-            {
-              (plus > 0) && (
-                <Link href={`#follow`}>
-                  <a>
-                    <Avatar
-                      style={{ fontSize: '1rem' }}
-                      shape="circle"
-                      label={`+${abbreviate(plus, 2)}`.toUpperCase()}
-                    />
-                  </a>
-                </Link>
-              )
-            }
-          </AvatarGroup>
+          <UserSmallAvatarGroup
+            users={following}
+            lastAvatar={plus > 0 ? (
+              <Link href={`#follow`}>
+                <a>
+                  <Avatar
+                    style={{ fontSize: '1rem' }}
+                    shape="circle"
+                    label={`+${abbreviate(plus, 2)}`.toUpperCase()}
+                  />
+                </a>
+              </Link>
+            ) : undefined}
+          />
         </div>
       </>
     )

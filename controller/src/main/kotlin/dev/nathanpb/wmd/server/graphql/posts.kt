@@ -26,10 +26,7 @@ import dev.nathanpb.wmd.data.PostEditHistory
 import dev.nathanpb.wmd.data.PostReply
 import dev.nathanpb.wmd.data.UserProfile
 import dev.nathanpb.wmd.mongoDb
-import org.litote.kmongo.eq
-import org.litote.kmongo.limit
-import org.litote.kmongo.match
-import org.litote.kmongo.skip
+import org.litote.kmongo.*
 
 fun SchemaBuilder.posts() {
 
@@ -174,6 +171,35 @@ fun SchemaBuilder.posts() {
                     editHistory = reply.editHistory + history
                 ).also { replies.save(it) }
             }
+        }
+    }
+
+    query("post") {
+        resolver { id: String -> posts.findOne(Post::id eq id) }
+    }
+
+    query("reply") {
+        resolver { id: String -> replies.findOne(PostReply::id eq id) }
+    }
+
+    query("feed") {
+        resolver { offset: Int, ctx: Context ->
+            val requester = ctx.get<UserProfile>() ?: error("Not Authenticated")
+            posts.aggregate<Post>(
+                listOf(
+                    match(
+                        or(
+                            Post::author.`in`(requester.following),
+                            Post::author eq requester.uid
+                        )
+                    ),
+                    sort(descending(Post::date)),
+                    limit(16),
+                    skip(offset)
+                )
+            ).toList()
+        }.withArgs {
+            arg<Int> { name = "offset"; defaultValue = 0 }
         }
     }
 }

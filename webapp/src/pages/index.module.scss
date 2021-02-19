@@ -1,0 +1,41 @@
+/*!
+ * Copyright (c) 2021 - Nathan P. Bombana
+ *
+ * This file is part of Wheres My Duo.
+ *
+ * Wheres My Duo is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Wheres My Duo is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+.Feed {
+  width: 50%;
+  position: absolute;
+  right: 50%;
+  transform: translateX(50%);
+  padding: 2em 0;
+
+  height: 100%;
+
+  @media (max-width: 680px) {
+    width: 90%;
+  }
+
+  @media (max-width: 480px) {
+    width: 100%;
+    margin-top: 0;
+  }
+
+  & > *:not(:first-child) {
+    margin-top: 1em;
+  }
+}

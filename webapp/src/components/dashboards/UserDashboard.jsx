@@ -73,7 +73,7 @@ export default function UserDashboard({ children }) {
     {
       label: 'Home',
       icon: 'pi pi-home',
-      url: '/me'
+      url: '/'
     },
     {
       label: 'Match My Profile',
