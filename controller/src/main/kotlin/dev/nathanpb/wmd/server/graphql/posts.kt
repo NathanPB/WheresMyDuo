@@ -107,7 +107,7 @@ fun SchemaBuilder.posts() {
 
             val requester = ctx.get<UserProfile>() ?: error("Not Authenticated")
 
-            Post(author = requester.uid, content = content).also {
+            Post(author = requester.uid, content = content.take(256)).also {
                 posts.save(it)
             }
         }
@@ -125,7 +125,7 @@ fun SchemaBuilder.posts() {
             PostReply(
                 author = requester.uid,
                 post = post.id,
-                content = content
+                content = content.take(256)
             ).also { replies.save(it) }
         }
     }
@@ -142,10 +142,10 @@ fun SchemaBuilder.posts() {
             PostEditHistory(
                 author = requester.uid,
                 oldContent = post.content,
-                newContent = content
+                newContent = content.take(256)
             ).also { history ->
                 post.copy(
-                    content = content,
+                    content = content.take(256),
                     editHistory = post.editHistory + history
                 ).also { posts.save(it) }
             }
@@ -164,10 +164,10 @@ fun SchemaBuilder.posts() {
             PostEditHistory(
                 author = requester.uid,
                 oldContent = reply.content,
-                newContent = content
+                newContent = content.take(256)
             ).also { history ->
                 reply.copy(
-                    content = content,
+                    content = content.take(256),
                     editHistory = reply.editHistory + history
                 ).also { replies.save(it) }
             }
