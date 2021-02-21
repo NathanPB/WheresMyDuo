@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Next Dev" type="NodeJSConfigurationType" path-to-js-file="node_modules/next/dist/bin/next" working-dir="$PROJECT_DIR$/webapp">
+    <method v="2" />
+  </configuration>
+</component>
