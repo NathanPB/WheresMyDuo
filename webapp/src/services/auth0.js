@@ -22,15 +22,17 @@ import {initAuth0} from '@auth0/nextjs-auth0';
 
 export const auth0 = initAuth0();
 
-export async function sessionOrUndefined(req, res) {
+export async function sessionOrNull(req, res) {
   if (typeof window === 'undefined') {
-    return auth0.getSession(req, res)?.user
+    return auth0.getSession(req, res)?.user || null
   }
+
+  return null
 }
 
 export async function sessionOrRedirect(req, res) {
   if (typeof window === 'undefined') {
-    const user = sessionOrUndefined(req, res)
+    const user = sessionOrNull(req, res)
     if (!user) {
       res.writeHead(302, { Location: '/api/auth/login' })
       res.end()
