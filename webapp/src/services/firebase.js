@@ -23,5 +23,7 @@ import 'firebase/analytics'
 try {
   const config = require(`../firebase-config.json`)
   firebase.initializeApp(config)
-  firebase.analytics()
+
+  firebase.analytics.isSupported()
+    .then(flag => flag ? firebase.analytics() : undefined)
 } catch (e) {}
