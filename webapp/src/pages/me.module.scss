@@ -17,17 +17,6 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-.ProfilePic {
-  border-radius: 8px;
-  width: 256px;
-  height: auto;
-  max-width: 256px;
-  flex-grow: 1;
-  flex-shrink: 0;
-
-  min-height: 256px;
-}
-
 .NewCard {
   // Please be careful touching this
   position: relative;

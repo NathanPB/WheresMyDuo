@@ -51,13 +51,6 @@
   }
 }
 
-.Close {
-  position: relative;
-  top: 0;
-  right: 0;
-  cursor: pointer;
-}
-
 .CalendarCard {
   & :global(.p-card-content) {
     padding: 0;
