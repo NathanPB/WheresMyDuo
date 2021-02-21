@@ -26,8 +26,7 @@ import {createProxyMiddleware} from 'http-proxy-middleware';
 
 export const config = { api: { externalResolver: true, bodyParser: false } }
 
-export default async (...params) => {
-  const [req, res] = params
+export default async (req, res) => {
   const session = await auth0.getSession(req, res)
 
   const proxy = createProxyMiddleware({
@@ -36,9 +35,9 @@ export default async (...params) => {
     pathRewrite: { ['^/api/proxy']: '' },
     secure: process.env.NEXT_PUBLIC_NODE_ENV !== 'development',
     headers: {
-      Authorization: session ? `${session.token_type} ${session.accessToken}` : undefined
+      Authorization: session ? `${session.token_type} ${session.accessToken}` : null
     }
   })
 
-  await proxy(...params)
+  await proxy(req, res, () => { /* the middleware expects a "next" function, which is that */ })
 }
