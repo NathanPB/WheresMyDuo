@@ -21,11 +21,10 @@ package dev.nathanpb.wmd.server.graphql
 
 import com.apurebase.kgraphql.Context
 import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
-import com.google.firebase.auth.FirebaseToken
-import dev.nathanpb.wmd.ADMIN_EMAILS
 import dev.nathanpb.wmd.data.GamingProfile
 import dev.nathanpb.wmd.data.Tag
 import dev.nathanpb.wmd.mongoDb
+import dev.nathanpb.wmd.server.checkIsAdmin
 import org.litote.kmongo.*
 
 fun SchemaBuilder.tags() {
@@ -68,10 +67,7 @@ fun SchemaBuilder.tags() {
 
     mutation("createTag") {
         resolver { displayName: String, description: String?, ctx: Context ->
-            val token = ctx.get<FirebaseToken>() ?: error("Unauthorized")
-            if (token.email.toLowerCase() !in ADMIN_EMAILS) {
-                error("Forbidden")
-            }
+            ctx.checkIsAdmin()
 
             return@resolver Tag(displayName = displayName, description = description).also {
                 collection.save(it)
@@ -81,10 +77,7 @@ fun SchemaBuilder.tags() {
 
     mutation("updateTag") {
         resolver { id: String, displayName: String, description: String?, ctx: Context ->
-            val token = ctx.get<FirebaseToken>() ?: error("Unauthorized")
-            if (token.email.toLowerCase() !in ADMIN_EMAILS) {
-                error("Forbidden")
-            }
+            ctx.checkIsAdmin()
 
             val tag = collection.findOneById(id) ?: error("Not Found")
 
@@ -96,10 +89,7 @@ fun SchemaBuilder.tags() {
 
     mutation("deleteTag") {
         resolver { id: String, force: Boolean, ctx: Context ->
-            val token = ctx.get<FirebaseToken>() ?: error("Unauthorized")
-            if (token.email.toLowerCase() !in ADMIN_EMAILS) {
-                error("Forbidden")
-            }
+            ctx.checkIsAdmin()
 
             if (!force) {
                 val count = mongoDb.getCollection<GamingProfile>().countDocuments(GamingProfile::tags contains id)

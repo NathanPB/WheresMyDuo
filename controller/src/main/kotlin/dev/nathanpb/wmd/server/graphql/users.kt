@@ -21,58 +21,17 @@ package dev.nathanpb.wmd.server.graphql
 
 import com.apurebase.kgraphql.Context
 import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
-import com.google.firebase.auth.FirebaseAuth
-import dev.nathanpb.wmd.ADMIN_EMAILS
+import dev.nathanpb.wmd.controller.UserController
 import dev.nathanpb.wmd.data.*
 import dev.nathanpb.wmd.data.input.UserProfileInput
 import dev.nathanpb.wmd.mongoDb
+import dev.nathanpb.wmd.server.userOrNull
+import dev.nathanpb.wmd.server.userOrThrow
 import dev.nathanpb.wmd.utils.getSlugSuggestions
 import dev.nathanpb.wmd.utils.slugify
 import org.litote.kmongo.*
-import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.aggregate
 import kotlin.reflect.KProperty
-
-
-suspend fun hasUserProfile(
-    uidOrSlug: String,
-    collection: CoroutineCollection<UserProfile> = mongoDb.getCollection()
-): Boolean {
-    return collection.countDocuments(or(UserProfile::uid eq uidOrSlug, UserProfile::slug eq uidOrSlug)) > 0
-}
-
-suspend fun getUserProfile(
-    uidOrSlug: String,
-    collection: CoroutineCollection<UserProfile> = mongoDb.getCollection()
-): UserProfile? {
-    return collection.findOne(or(UserProfile::uid eq uidOrSlug, UserProfile::slug eq uidOrSlug))
-}
-
-suspend fun getUserProfileOrCreate(
-    uid: String,
-    collection: CoroutineCollection<UserProfile> = mongoDb.getCollection()
-): UserProfile {
-    var profile = getUserProfile(uid, collection)
-    if (profile == null) {
-        var nickname = "Unknown"
-        var photoURL = ""
-
-        try {
-            val user = FirebaseAuth.getInstance().getUser(uid)
-
-            if (user?.isDisabled == false) {
-                nickname = user.displayName
-                photoURL = user.photoUrl
-            }
-
-            profile = UserProfile(uid, uid, nickname, photoURL)
-            profile = profile.copy(slug = profile.getSlugSuggestions(ContactVisibility.PUBLIC).first())
-            collection.insertOne(profile)
-        } catch (e: Exception) {  }
-
-    }
-    return profile ?: UserProfile(uid, uid, "Unknown", "")
-}
 
 fun SchemaBuilder.users() {
     val collection by lazy { mongoDb.getCollection<UserProfile>() }
@@ -93,7 +52,7 @@ fun SchemaBuilder.users() {
                     //   with reflection
                     val field = Context::class.java.getDeclaredField("map")
                     val map = field.also { it.isAccessible = true }.get(ctx) as LinkedHashMap<Any, Any>
-                    val requester = ctx.get<UserProfile>()
+                    val requester = ctx.userOrThrow()
                     val requested = map["requested"] as UserProfile
                     val contactField = prop.call(contact)
 
@@ -118,7 +77,7 @@ fun SchemaBuilder.users() {
 
         property<Boolean>("isMe") {
             resolver { it, ctx: Context ->
-                it.uid == ctx.get<UserProfile>()?.uid
+                it.uid == ctx.userOrNull()?.uid
             }
         }
 
@@ -134,7 +93,7 @@ fun SchemaBuilder.users() {
                     error("Retrieving more than 20 posts is not allowed")
                 }
 
-                ctx.get<UserProfile>() ?: error("Not Authenticated")
+                ctx.userOrThrow()
 
                 postsCollection.aggregate<Post>(
                     match(Post::author eq profile.uid),
@@ -148,7 +107,7 @@ fun SchemaBuilder.users() {
 
         property<List<String>>("slugSuggestions") {
             resolver { userProfile, ctx: Context ->
-                val requester = ctx.get<UserProfile>()
+                val requester = ctx.userOrThrow()
                 val privacy = ContactVisibility.values().first {
                     it.canView(userProfile, requester)
                 }
@@ -219,34 +178,26 @@ fun SchemaBuilder.users() {
             }
         }
 
-        property<Boolean>("isAdmin") {
-            resolver {
-                val token = FirebaseAuth.getInstance().getUser(it.uid)
-                token.email.toLowerCase() in ADMIN_EMAILS
-            }
-        }
-
         property<Boolean>("doesFollowMe") {
             resolver { it, ctx: Context ->
-                val me = ctx.get<UserProfile>() ?: error("Not Authenticated")
-                me.uid in it.following
+                ctx.userOrThrow().uid in it.following
             }
         }
 
         property<Boolean>("isFollowedByMe") {
             resolver { it, ctx: Context ->
-                val me = ctx.get<UserProfile>() ?: error("Not Authenticated")
-                it.uid in me.following
+                it.uid in ctx.userOrThrow().following
             }
         }
     }
 
     query("me") {
-        resolver { ctx: Context -> ctx.get<UserProfile>() ?: error("Not Authenticated")}
+        resolver { ctx: Context -> ctx.userOrThrow()}
     }
 
     query("user") {
-        resolver { uid: String -> getUserProfile(uid)}.withArgs {
+        resolver { uid: String -> UserController.getUserProfile(uid) }
+        .withArgs {
             arg<String> { name = "uid"; description = "User uid or slug" }
         }
     }
@@ -278,30 +229,32 @@ fun SchemaBuilder.users() {
 
     mutation("follow") {
         resolver { uid: String, ctx: Context ->
-            val user = ctx.get<UserProfile>() ?: error("Not Authenticated")
-            getUserProfile(uid) ?: error("$uid does not exists")
+            val user = ctx.userOrThrow()
+            UserController.getUserProfile(uid) ?: error("$uid does not exists")
             if (uid == user.uid) {
                 error("You cannot follow yourself")
             }
 
-            collection.save(user.copy(following = user.following + uid))
-            return@resolver getUserProfile(user.uid)
+            user.copy(following = user.following + uid).also {
+                collection.save(it)
+            }
         }
     }
 
     mutation("unfollow") {
         resolver { uid: String, ctx: Context ->
-            val user = ctx.get<UserProfile>() ?: error("Not Authenticated")
-            getUserProfile(uid) ?: error("$uid does not exists")
+            val user = ctx.userOrThrow()
+            UserController.getUserProfile(uid) ?: error("$uid does not exists")
 
-            collection.save(user.copy(following = user.following - uid))
-            return@resolver getUserProfile(user.uid)
+            user.copy(following = user.following - uid).also {
+                collection.save(it)
+            }
         }
     }
 
     mutation("setProfileInfo") {
         resolver { profile: UserProfileInput, ctx: Context ->
-            val requester = ctx.get<UserProfile>() ?: error("Not Authenticated")
+            val requester = ctx.userOrThrow()
             val (slug, nickname) = profile
 
             val slugValidated = slug.take(32).slugify()
@@ -309,7 +262,7 @@ fun SchemaBuilder.users() {
                 error("Slug is not valid")
             }
 
-            getUserProfile(slugValidated)?.let {
+            UserController.getUserProfile(slugValidated)?.let {
                 if (it.uid != requester.uid) {
                     error("Slug already in use")
                 }
@@ -323,11 +276,12 @@ fun SchemaBuilder.users() {
 
     mutation("setContact") {
         resolver { contact: UserContact, ctx: Context ->
-            val user = ctx.get<UserProfile>() ?: error("Not Authenticated")
+            val user = ctx.userOrThrow()
             contact.validate()
 
-            collection.save(user.copy(contact = contact))
-            return@resolver getUserProfile(user.uid)
+            user.copy(contact = contact).also {
+                collection.save(it)
+            }
         }
     }
 }

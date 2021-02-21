@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - Nathan P. Bombana
+ * Copyright (c) 2021 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
  *
@@ -17,17 +17,6 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.nathanpb.wmd.boot
+import {handleAuth} from "@auth0/nextjs-auth0";
 
-import dev.nathanpb.wmd.ADMIN_EMAILS
-
-class BootManager : io.github.nathanpb.bb.BootManager() {
-    override fun onStartupEnd(initTime: Long) {
-        if (ADMIN_EMAILS.isEmpty()) {
-            println("No administrative emails found")
-        } else {
-            println("Admin Emails: ${ADMIN_EMAILS.joinToString(", ")}")
-        }
-        super.onStartupEnd(initTime)
-    }
-}
+export default handleAuth()

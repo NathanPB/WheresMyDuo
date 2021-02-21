@@ -28,15 +28,19 @@ import AppName from "../misc/AppName";
 import UserDiscover from "../selectors/UserDiscover";
 import {faSearch} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {gql, useQuery} from "@apollo/client";
+
+const QUERY = gql`
+{
+  me {
+    photoURL
+  }
+}`
 
 export default function UserDashboard({ children }) {
-  const user = auth().currentUser
 
+  const { data } = useQuery(QUERY)
   const tieredMenu = React.useRef()
-
-  if (!user) {
-    return null
-  }
 
   const menuStart = <>
     <AppName dark/>
@@ -61,9 +65,9 @@ export default function UserDashboard({ children }) {
   ]
 
   const menuEnd = <>
-    <TieredMenu appendTo={document.body} ref={tieredMenu} model={userMenu} popup/>
+    <TieredMenu appendTo={document?.body} ref={tieredMenu} model={userMenu} popup/>
     <img
-      src={user.photoURL}
+      src={data?.me?.photoURL}
       className={Styles.Avatar}
       onClick={e => tieredMenu.current.toggle(e)}
     />

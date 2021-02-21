@@ -57,7 +57,7 @@ export default function UserDiscover() {
       className={Styles.UserDiscover}
 
       ref={ref}
-      appendTo={document.body}
+      appendTo={document?.body}
       field="nickname"
       itemTemplate={itemTemplate}
       value={userQuery}

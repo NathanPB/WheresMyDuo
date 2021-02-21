@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - Nathan P. Bombana
+ * Copyright (c) 2021 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
  *
@@ -17,26 +17,10 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {ApolloClient, InMemoryCache} from "@apollo/client";
-import {offsetLimitPagination} from "@apollo/client/utilities";
+package dev.nathanpb.wmd.utils
 
-// https://www.apollographql.com/docs/react/pagination/core-api/#defining-a-field-policy
-const cache = new InMemoryCache({
-  typePolicies: {
-    UserProfile: {
-      fields: {
-        following: offsetLimitPagination([]),
-        followers: offsetLimitPagination([]),
-      }
-    }
-  }
-});
+import io.ktor.http.*
 
-export function createClient() {
-  return new ApolloClient({
-    uri: 'api/proxy/graphql',
-    cache,
-    connectToDevTools: process.env.NEXT_PUBLIC_NODE_ENV === 'development',
-    queryDeduplication: true,
-  })
-}
+class HttpException(val code: HttpStatusCode, val description: String) : Exception("HTTP Exception $code $description")
+
+fun HttpStatusCode.exception() = HttpException(this, description)

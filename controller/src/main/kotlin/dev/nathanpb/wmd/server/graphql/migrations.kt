@@ -21,12 +21,11 @@ package dev.nathanpb.wmd.server.graphql
 
 import com.apurebase.kgraphql.Context
 import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
-import com.google.firebase.auth.FirebaseToken
-import dev.nathanpb.wmd.ADMIN_EMAILS
 import dev.nathanpb.wmd.migration.DataLossPotential
 import dev.nathanpb.wmd.migration.Migration
 import dev.nathanpb.wmd.migration.MigrationController
 import dev.nathanpb.wmd.migration.MigrationResult
+import dev.nathanpb.wmd.server.checkIsAdmin
 
 fun SchemaBuilder.migrations() {
     type<Migration>()
@@ -40,11 +39,7 @@ fun SchemaBuilder.migrations() {
 
     query("migrations") {
         resolver { query: String?, ctx: Context ->
-            val token = ctx.get<FirebaseToken>() ?: error("Not Authenticated")
-            if (token.email.toLowerCase() !in ADMIN_EMAILS) {
-                error("Forbidden")
-            }
-
+            ctx.checkIsAdmin()
             MigrationController.migrations.filter {
                 if (query != null) {
                     ".*${query}.*".toRegex(RegexOption.IGNORE_CASE).matches(it.name)
@@ -55,11 +50,7 @@ fun SchemaBuilder.migrations() {
 
     query("migration") {
         resolver { id: String, ctx: Context ->
-            val token = ctx.get<FirebaseToken>() ?: error("Not Authenticated")
-            if (token.email.toLowerCase() !in ADMIN_EMAILS) {
-                error("Forbidden")
-            }
-
+            ctx.checkIsAdmin()
             MigrationController.migrations.firstOrNull {
                 it.id === id
             }
@@ -68,11 +59,7 @@ fun SchemaBuilder.migrations() {
 
     mutation("runMigration") {
         resolver { id: String, ctx: Context ->
-            val token = ctx.get<FirebaseToken>() ?: error("Not Authenticated")
-            if (token.email.toLowerCase() !in ADMIN_EMAILS) {
-                error("Forbidden")
-            }
-
+            ctx.checkIsAdmin()
             val migration = MigrationController.migrations.firstOrNull { it.id == id } ?: error("Not Found")
             MigrationController.run(migration)
         }
@@ -80,11 +67,7 @@ fun SchemaBuilder.migrations() {
 
     mutation("rollbackMigration") {
         resolver { id: String, ctx: Context ->
-            val token = ctx.get<FirebaseToken>() ?: error("Not Authenticated")
-            if (token.email.toLowerCase() !in ADMIN_EMAILS) {
-                error("Forbidden")
-            }
-
+            ctx.checkIsAdmin()
             val migration = MigrationController.migrations.firstOrNull { it.id == id } ?: error("Not Found")
             MigrationController.rollback(migration)
         }

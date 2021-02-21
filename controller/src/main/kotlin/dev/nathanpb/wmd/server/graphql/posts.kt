@@ -21,11 +21,13 @@ package dev.nathanpb.wmd.server.graphql
 
 import com.apurebase.kgraphql.Context
 import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
+import dev.nathanpb.wmd.controller.UserController
 import dev.nathanpb.wmd.data.Post
 import dev.nathanpb.wmd.data.PostEditHistory
 import dev.nathanpb.wmd.data.PostReply
 import dev.nathanpb.wmd.data.UserProfile
 import dev.nathanpb.wmd.mongoDb
+import dev.nathanpb.wmd.server.userOrThrow
 import org.litote.kmongo.*
 
 fun SchemaBuilder.posts() {
@@ -45,7 +47,7 @@ fun SchemaBuilder.posts() {
         property(Post::editHistory) {}
 
         property<UserProfile>("author") {
-            resolver { getUserProfile(it.author)!! }
+            resolver { UserController.getUserProfile(it.author)!! }
         }
 
         property<Long>("repliesCount") {
@@ -80,7 +82,7 @@ fun SchemaBuilder.posts() {
         property(PostReply::editHistory) {}
 
         property<UserProfile>("author") {
-            resolver { getUserProfile(it.author)!! }
+            resolver { UserController.getUserProfile(it.author)!! }
         }
 
         property<Post>("post") {
@@ -95,7 +97,7 @@ fun SchemaBuilder.posts() {
         property(PostEditHistory::date) {}
 
         property<UserProfile>("author") {
-            resolver { getUserProfile(it.author)!! }
+            resolver { UserController.getUserProfile(it.author)!! }
         }
     }
 
@@ -105,7 +107,7 @@ fun SchemaBuilder.posts() {
                 error("Text cannot be empty")
             }
 
-            val requester = ctx.get<UserProfile>() ?: error("Not Authenticated")
+            val requester = ctx.userOrThrow()
 
             Post(author = requester.uid, content = content.take(256)).also {
                 posts.save(it)
@@ -119,7 +121,7 @@ fun SchemaBuilder.posts() {
                 error("Content is empty")
             }
 
-            val requester = ctx.get<UserProfile>() ?: error("Not Authenticated")
+            val requester = ctx.userOrThrow()
             val post = posts.findOne(Post::id eq postId) ?: error("Post not Found")
 
             PostReply(
@@ -132,7 +134,7 @@ fun SchemaBuilder.posts() {
 
     mutation("editPost") {
         resolver { content: String, postId: String, ctx: Context ->
-            val requester = ctx.get<UserProfile>() ?: error("Not Authenticated")
+            val requester = ctx.userOrThrow()
             val post = posts.findOne(Post::id eq postId) ?: error("Post Not Found")
 
             if (post.author != requester.uid) {
@@ -154,7 +156,7 @@ fun SchemaBuilder.posts() {
 
     mutation("editReply") {
         resolver { content: String,  replyId: String, ctx: Context ->
-            val requester = ctx.get<UserProfile>() ?: error("Not Authenticated")
+            val requester = ctx.userOrThrow()
             val reply = replies.findOne(PostReply::id eq  replyId) ?: error("Reply Not Found")
 
             if (reply.author != requester.uid) {
@@ -184,7 +186,7 @@ fun SchemaBuilder.posts() {
 
     query("feed") {
         resolver { offset: Int, ctx: Context ->
-            val requester = ctx.get<UserProfile>() ?: error("Not Authenticated")
+            val requester = ctx.userOrThrow()
             posts.aggregate<Post>(
                 listOf(
                     match(

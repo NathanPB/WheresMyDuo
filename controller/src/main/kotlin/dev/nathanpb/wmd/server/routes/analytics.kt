@@ -20,10 +20,13 @@
 package dev.nathanpb.wmd.server.routes
 
 import com.mongodb.BasicDBObject
+import dev.nathanpb.wmd.controller.Auth0Controller
 import dev.nathanpb.wmd.data.GamingProfile
 import dev.nathanpb.wmd.data.Tag
 import dev.nathanpb.wmd.mongoDb
 import dev.nathanpb.wmd.server.authenticate
+import dev.nathanpb.wmd.utils.exception
+import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.serialization.Contextual
@@ -32,6 +35,7 @@ import org.litote.kmongo.*
 import org.litote.kmongo.coroutine.toList
 
 
+// TODO move to graphql
 fun Route.analytics() {
 
     @Serializable
@@ -47,7 +51,11 @@ fun Route.analytics() {
     val tagsCollection = mongoDb.getCollection<Tag>()
 
     get("/tag_distribution") {
-        context.authenticate(true) ?: return@get
+        val user = context.authenticate(true) ?: return@get
+        if (!Auth0Controller.getUserPermissions(user.uid).contains("delete:users")) {
+            throw HttpStatusCode.Forbidden.exception()
+        }
+
         context.respond(
             tagsCollection.find().toList()
                 .map {
@@ -62,7 +70,10 @@ fun Route.analytics() {
     }
 
     get("/game_distribution") {
-        context.authenticate(true) ?: return@get
+        val user = context.authenticate(true) ?: return@get
+        if (!Auth0Controller.getUserPermissions(user.uid).contains("delete:users")) {
+            throw HttpStatusCode.Forbidden.exception()
+        }
 
         val col = mongoDb.database.getCollection("gamingProfile")
 
@@ -75,7 +86,10 @@ fun Route.analytics() {
     }
 
     get("/hour_distribution") {
-        context.authenticate(true) ?: return@get
+        val user = context.authenticate(true) ?: return@get
+        if (!Auth0Controller.getUserPermissions(user.uid).contains("delete:users")) {
+            throw HttpStatusCode.Forbidden.exception()
+        }
 
         val data = (0..23).map { h ->
             val hours = (0..6).map { it * 24 + h }
@@ -89,7 +103,10 @@ fun Route.analytics() {
     }
 
     get("day_distribution") {
-        context.authenticate(true) ?: return@get
+        val user = context.authenticate(true) ?: return@get
+        if (!Auth0Controller.getUserPermissions(user.uid).contains("delete:users")) {
+            throw HttpStatusCode.Forbidden.exception()
+        }
 
         val data = (0..6).map { h ->
             val hours = (0..23).map { it * 24 + h }

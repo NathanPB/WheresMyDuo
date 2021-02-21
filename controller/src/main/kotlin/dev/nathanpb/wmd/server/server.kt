@@ -20,9 +20,9 @@
 package dev.nathanpb.wmd.server
 
 import com.apurebase.kgraphql.GraphQL
+import dev.nathanpb.wmd.controller.UserController
 import dev.nathanpb.wmd.server.graphql.*
 import dev.nathanpb.wmd.server.routes.analytics
-import dev.nathanpb.wmd.server.routes.auth
 import dev.nathanpb.wmd.server.routes.igdbProxy
 import io.ktor.application.*
 import io.ktor.features.*
@@ -68,9 +68,13 @@ fun startServer() {
             useDefaultPrettyPrinter = true
 
             context { call ->
-                call.authenticate(requireAdmin = false)?.let {
-                    + runBlocking { getUserProfileOrCreate(it.uid) }
-                    + it
+                runBlocking {
+                    runCatching {
+                        call.authenticate(false)
+                    }.getOrNull()?.let {
+                        + UserController.getUserProfileOrCreate(it)
+                        + it
+                    }
                 }
             }
 
@@ -86,10 +90,6 @@ fun startServer() {
         routing {
             route("igdb/*") {
                 igdbProxy()
-            }
-
-            route("/auth") {
-                auth()
             }
 
             route("/analytics") {

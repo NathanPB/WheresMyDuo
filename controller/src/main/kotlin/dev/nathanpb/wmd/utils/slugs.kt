@@ -19,10 +19,10 @@
 
 package dev.nathanpb.wmd.utils
 
+import dev.nathanpb.wmd.controller.UserController
 import dev.nathanpb.wmd.data.ContactField
 import dev.nathanpb.wmd.data.ContactVisibility
 import dev.nathanpb.wmd.data.UserProfile
-import dev.nathanpb.wmd.server.graphql.hasUserProfile
 
 
 suspend fun UserProfile.getSlugSuggestions(privacy: ContactVisibility): List<String> {
@@ -39,7 +39,7 @@ suspend fun UserProfile.getSlugSuggestions(privacy: ContactVisibility): List<Str
         .map(String::slugify)
         .filter(String::isNotEmpty)
         .filter { it != slug }
-        .filterNot { hasUserProfile(it) }
+        .filterNot { UserController.hasUserProfile(it) }
         .let {
             listOf(uid.toLowerCase()).takeIf { _ -> it.isEmpty() } ?: it // If nothing is found, be content with your uid
         }

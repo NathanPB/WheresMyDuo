@@ -20,10 +20,9 @@
 import React from "react";
 
 import {ApiProvider} from "../providers/ApiProvider";
-import {ApolloClientContext, ApolloClientProvider} from "../providers/ApolloClientProvider";
 import {ApolloProvider} from "@apollo/client";
-import {auth} from "firebase";
-import LogInScreen from "../components/screen/LogInScreen";
+import {createClient} from "../services/apollo"
+import {UserProvider} from '@auth0/nextjs-auth0';
 
 import 'primereact/resources/primereact.css';
 import 'primereact/resources/themes/mdc-dark-deeppurple/theme.css';
@@ -31,29 +30,21 @@ import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import '../primereact-hack.scss';
 import '../services/firebase';
+import '../services/auth0';
 import '../index.css'
 import '../waves.css'
 
 
-function ApolloWrapper({ children }) {
-  const apolloClient = React.useContext(ApolloClientContext)
-  const user = auth().currentUser
-
-  return (
-    <ApolloProvider client={apolloClient}>
-      { user ? children : <LogInScreen/> }
-    </ApolloProvider>
-  );
-}
-
 export default function App({ Component, pageProps }) {
+  const apolloClient = React.useMemo(createClient, [])
+
   return (
     <ApiProvider>
-      <ApolloClientProvider>
-        <ApolloWrapper>
+      <ApolloProvider client={apolloClient}>
+        <UserProvider>
           <Component {...pageProps}/>
-        </ApolloWrapper>
-      </ApolloClientProvider>
+        </UserProvider>
+      </ApolloProvider>
     </ApiProvider>
   )
 }

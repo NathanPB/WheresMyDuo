@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - Nathan P. Bombana
+ * Copyright (c) 2021 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
  *
@@ -17,19 +17,25 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.nathanpb.wmd.server.routes
 
-import dev.nathanpb.wmd.ADMIN_EMAILS
-import dev.nathanpb.wmd.server.authenticate
-import io.ktor.response.*
-import io.ktor.routing.*
+import {initAuth0} from '@auth0/nextjs-auth0';
 
-fun Route.auth() {
-    get("isAdmin") {
-        val user = context.authenticate(respondCall = false)
+export const auth0 = initAuth0();
 
-        context.respondText(
-            """{ "isAdmin": ${user?.email?.toLowerCase() in ADMIN_EMAILS} }"""
-        )
+export async function sessionOrUndefined(req, res) {
+  if (typeof window === 'undefined') {
+    return auth0.getSession(req, res)?.user
+  }
+}
+
+export async function sessionOrRedirect(req, res) {
+  if (typeof window === 'undefined') {
+    const user = sessionOrUndefined(req, res)
+    if (!user) {
+      res.writeHead(302, { Location: '/api/auth/login' })
+      res.end()
     }
+
+    return user || undefined
+  }
 }

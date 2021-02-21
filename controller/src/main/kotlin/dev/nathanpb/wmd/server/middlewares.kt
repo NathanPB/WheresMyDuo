@@ -19,21 +19,27 @@
 
 package dev.nathanpb.wmd.server
 
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthException
-import com.google.firebase.auth.FirebaseToken
-import dev.nathanpb.wmd.ADMIN_EMAILS
-import dev.nathanpb.wmd.utils.parseObjectId
+import com.apurebase.kgraphql.Context
+import com.auth0.exception.APIException
+import dev.nathanpb.wmd.controller.Auth0Controller
+import dev.nathanpb.wmd.data.Auth0UserResume
+import dev.nathanpb.wmd.data.UserProfile
+import dev.nathanpb.wmd.utils.HttpException
+import dev.nathanpb.wmd.utils.exception
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
-import org.bson.types.ObjectId
 
-fun ApplicationCall.authenticate(requireAdmin: Boolean = false, respondCall: Boolean = true) : FirebaseToken? {
-    val token = request.header("Authorization").orEmpty()
+private val AUTHORIZATION_HEADER_REGEX = "^(?i)Bearer (.*)(?-i)".toRegex()
 
-    if (token.isEmpty()) {
+suspend fun ApplicationCall.authenticate(respondCall: Boolean = true) : Auth0UserResume? {
+    val token = request.header("Authorization")?.let {
+        val match = AUTHORIZATION_HEADER_REGEX.findAll(it).firstOrNull()?.groupValues
+        if (match?.size == 2) match[1] else null
+    }
+
+    if (token == null || token.isEmpty()) {
         if (respondCall) {
             response.status(HttpStatusCode.Unauthorized)
         }
@@ -41,31 +47,33 @@ fun ApplicationCall.authenticate(requireAdmin: Boolean = false, respondCall: Boo
     }
 
     try {
-        val user = FirebaseAuth.getInstance().verifyIdToken(token)
-
-        // Validate if the user is admin
-        if (user != null && requireAdmin && user.email.toLowerCase() !in ADMIN_EMAILS) {
-            return null
-        }
-
-        return user
-    } catch (e: IllegalArgumentException) {
+        return Auth0Controller.exchangeToken(token)
+    } catch (e: HttpException) {
         if (respondCall) {
-            response.status(HttpStatusCode.ServiceUnavailable)
+            respond(e.code, e.description)
         }
-    } catch (e: FirebaseAuthException) {
+    } catch(e: APIException) {
         if (respondCall) {
-            response.status(HttpStatusCode.Forbidden)
+            respond(HttpStatusCode.fromValue(e.statusCode), e.description)
+        }
+    } catch (e: Exception) {
+        if (respondCall) {
+            respond(HttpStatusCode.InternalServerError, e.message.orEmpty())
         }
     }
 
     return null
 }
 
-suspend fun ApplicationCall.getRequestedObjectId(paramKey: String): ObjectId? {
-    val id = parseObjectId(parameters[paramKey].orEmpty())
-    if (id == null) {
-        respond(HttpStatusCode.BadRequest, "$paramKey parameter is invalid")
+fun Context.userOrNull() = get<UserProfile>()
+
+fun Context.userOrThrow(): UserProfile {
+    return userOrNull() ?: throw HttpStatusCode.Unauthorized.exception()
+}
+
+suspend fun Context.checkIsAdmin() {
+    val user = userOrThrow()
+    if (!Auth0Controller.getUserPermissions(user.uid).contains("delete:users")) {
+        throw HttpStatusCode.Forbidden.exception()
     }
-    return id
 }
