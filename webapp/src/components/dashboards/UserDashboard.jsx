@@ -18,7 +18,6 @@
  */
 
 import React from 'react';
-import {auth} from 'firebase';
 
 import Styles from './UserDashboard.module.scss';
 import {Menubar} from 'primereact/menubar';
@@ -60,7 +59,7 @@ export default function UserDashboard({ children }) {
     {
       label: 'Logout',
       icon: 'pi pi-power-off',
-      command: () => auth().signOut()
+      url: '/api/auth/logout',
     }
   ]
 
