@@ -17,20 +17,19 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import * as Styles from './AppName.module.scss';
+import React from "react";
 
-export default function AppName({ purpleStyle = {}, size = '2rem', dark, ...props }) {
-  return (
-    <span
-      {...props}
-      style={{ fontSize: size, ...props.style }}
-      className={`${Styles.AppName} ${dark ? Styles.Dark : Styles.Light} ${props.className || ''}`}
-    >
-      WheresMy
-      <span style={purpleStyle} className={Styles.Purple}>
-        Duo
-      </span>
-    </span>
-  )
+export default function useLayout() {
+  const [layout, setLayout] = React.useState("mobile")
+
+  function callback() {
+    setLayout(window.document.body.clientWidth <= 480 ? "mobile" : "desktop")
+  }
+
+  React.useEffect(() => {
+    window.addEventListener('resize', callback)
+    callback()
+  }, [])
+
+  return layout
 }

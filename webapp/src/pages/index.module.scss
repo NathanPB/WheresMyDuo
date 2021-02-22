@@ -39,3 +39,70 @@
     margin-top: 1em;
   }
 }
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@100&display=swap');
+.AppName {
+  display: block;
+  text-align: center;
+
+  font-size: min(10vw, 4rem) !important;
+  margin-top: .75em;
+}
+
+.Slogan {
+  display: block;
+  font-size: min(4.5vw, 1.5rem);
+  text-align: center;
+  font-family: 'Raleway ExtraLight', fantasy;
+  color: rgba(160, 160, 160, 0.7);
+
+  & > span {
+    color: #46176c;
+    font-weight: bold;
+    font-family: 'Raleway Black', fantasy;
+  }
+}
+
+.MeetShareGame {
+
+  @media (min-width: 481px) {
+    margin-top: -5rem;
+  }
+
+  & > article {
+    padding: 8px;
+
+    & > p::before {
+      content: "      ";
+      padding-left: 1rem;
+    }
+
+    & > p {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: .9rem;
+    }
+
+    & > h1 {
+      color: rgba(255, 255, 255, 0.8);
+      font-family: 'Raleway Black';
+      font-size: 1.75rem;
+      margin-bottom: 0;
+
+      & > i, & > svg {
+        margin-right: 8px;
+        color: #6f35ad;
+      }
+    }
+  }
+}
+
+.Cards :global(.p-card-body) {
+  & > :global(.p-card-content) {
+    color: rgba(196, 196, 196, 0.9);
+  }
+
+  & :global(.p-card-title) {
+    @media (min-width: 576px) {
+      font-size: min(2.5vw, 1.25rem);
+    }
+  }
+}
