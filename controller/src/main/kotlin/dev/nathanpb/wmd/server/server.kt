@@ -22,7 +22,6 @@ package dev.nathanpb.wmd.server
 import com.apurebase.kgraphql.GraphQL
 import dev.nathanpb.wmd.controller.UserController
 import dev.nathanpb.wmd.server.graphql.*
-import dev.nathanpb.wmd.server.routes.analytics
 import dev.nathanpb.wmd.server.routes.igdbProxy
 import io.ktor.application.*
 import io.ktor.features.*
@@ -90,10 +89,6 @@ fun startServer() {
         routing {
             route("igdb/*") {
                 igdbProxy()
-            }
-
-            route("/analytics") {
-                analytics()
             }
         }
     }.start()
