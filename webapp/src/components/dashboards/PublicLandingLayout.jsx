@@ -33,7 +33,7 @@ export default function PublicLandingLayout({ children }) {
   const layout = useLayout()
 
   const menuEnd = <nav>
-    <a href="/api/auth/login">
+    <a href={`${process.env.REAUTH_BASE_URL}/oauth/authorize/discord?client_id=${process.env.REAUTH_CLIENT_ID}&response_type=code&scope=identity&redirect_uri=http://localhost:3000/api/auth/callback`}>
       <Button className={layout === "mobile" ? "p-button-rounded" : undefined} label="Join"/>
     </a>
 

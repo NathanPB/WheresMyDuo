@@ -1,0 +1,4 @@
+{
+  "nickname": "discord.username",
+  "avatar": "`https://cdn.discordapp.com/avatars/${discord.id}/${discord.avatar}.webp`"
+}

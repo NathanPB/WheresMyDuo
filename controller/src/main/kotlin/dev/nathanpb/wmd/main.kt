@@ -20,7 +20,7 @@
 package dev.nathanpb.wmd
 
 import com.api.igdb.request.IGDBWrapper
-import dev.nathanpb.wmd.controller.Auth0Controller
+import dev.nathanpb.wmd.controller.ReauthController
 import dev.nathanpb.wmd.controller.igdbToken
 import dev.nathanpb.wmd.migration.MigrationConfig
 import dev.nathanpb.wmd.server.startServer
@@ -33,6 +33,7 @@ import org.litote.kmongo.reactivestreams.KMongo
 
 val twitchClientId = System.getenv("TWITCH_CLIENT_ID")
 val twitchClientSecret = System.getenv("TWITCH_CLIENT_SECRET")
+val ADMIN_UID = System.getenv("ADMIN_UID")
 
 lateinit var mongoClient: CoroutineClient
 lateinit var mongoDb: CoroutineDatabase
@@ -55,16 +56,12 @@ fun main() {
             }
             subphase("Performing configurations") {
                 execute {
-                    if (Auth0Controller.domain.isEmpty()) {
-                        throw Error("AUTH0_DOMAIN is not defined")
+                    if (ReauthController.BASE_URL.isEmpty()) {
+                        throw Error("REAUTH_BASE_URL is not defined")
                     }
 
-                    if (Auth0Controller.clientId.isEmpty()) {
-                        throw Error("AUTH0_CLIENT_ID is not defined")
-                    }
-
-                    if (Auth0Controller.clientSecret.isEmpty()) {
-                        throw Error("AUTH0_CLIENT_SECRET is not defined")
+                    if (ReauthController.CLIENT_ID.isEmpty()) {
+                        throw Error("REAUTH_CLIENT_ID is not defined")
                     }
 
                     if (!MigrationConfig.ENABLE_TRANSACTION) {

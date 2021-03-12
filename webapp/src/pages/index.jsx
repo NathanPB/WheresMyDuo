@@ -24,7 +24,6 @@ import {gql, useQuery} from "@apollo/client";
 import PostWriter from "../components/input/PostWriter";
 import Styles from './index.module.scss';
 import Head from "next/head";
-import {sessionOrNull} from "../services/auth0";
 import PublicLandingLayout from "../components/dashboards/PublicLandingLayout";
 import AppName from "../components/misc/AppName";
 import {Card} from "primereact/card";
@@ -115,11 +114,11 @@ function LandingPage() {
 export async function getServerSideProps({ req, res }) {
   return {
     props: {
-      session: await sessionOrNull(req, res)
+      isLoggedIn: !!req.cookies.reauth_token
     }
   }
 }
 
 export default function Page(props) {
-  return (props.session ? HomePage : LandingPage)(props)
+  return (props.isLoggedIn ? HomePage : LandingPage)(props)
 }

@@ -17,27 +17,13 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+package dev.nathanpb.wmd.data
 
-import {initAuth0} from '@auth0/nextjs-auth0';
+import kotlinx.serialization.Serializable
 
-export const auth0 = initAuth0();
-
-export async function sessionOrNull(req, res) {
-  if (typeof window === 'undefined') {
-    return auth0.getSession(req, res)?.user || null
-  }
-
-  return null
-}
-
-export async function sessionOrRedirect(req, res) {
-  if (typeof window === 'undefined') {
-    const user = sessionOrNull(req, res)
-    if (!user) {
-      res.writeHead(302, { Location: '/api/auth/login' })
-      res.end()
-    }
-
-    return user || undefined
-  }
-}
+@Serializable
+data class IdentityResume (
+    val uid: String,
+    val nickname: String,
+    val avatar: String,
+)

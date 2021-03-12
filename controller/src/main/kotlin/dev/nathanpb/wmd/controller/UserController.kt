@@ -19,7 +19,6 @@
 
 package dev.nathanpb.wmd.controller
 
-import dev.nathanpb.wmd.data.Auth0UserResume
 import dev.nathanpb.wmd.data.ContactVisibility
 import dev.nathanpb.wmd.data.UserProfile
 import dev.nathanpb.wmd.mongoDb
@@ -40,19 +39,17 @@ object UserController {
         mongoDb.getCollection<UserProfile>()
     }
 
-    suspend fun getUserProfileOrCreate(user: Auth0UserResume): UserProfile {
-        return collection.findOne(byUid(user.uid)) ?: kotlin.run {
-            return@run UserProfile(
-                uid = user.uid,
-                slug = user.uid,
-                nickname = user.name,
-                photoURL = user.picture
-            ).let {
-                it.copy(slug = it.getSlugSuggestions(ContactVisibility.PUBLIC).first())
-            }.also {
-                collection.save(it)
-            }
-
+    suspend fun createUserProfile(token: String): UserProfile {
+        val identity = ReauthController.identity(token)
+        return UserProfile(
+            uid = identity.uid,
+            slug = identity.uid,
+            nickname = identity.nickname,
+            photoURL = identity.avatar
+        ).let {
+            it.copy(slug = it.getSlugSuggestions(ContactVisibility.PUBLIC).first())
+        }.also {
+            collection.save(it)
         }
     }
 

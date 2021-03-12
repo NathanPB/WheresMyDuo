@@ -17,25 +17,29 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// https://auth0.com/blog/ultimate-guide-nextjs-authentication-auth0/
 // https://github.com/vercel/next.js/discussions/14057
 // Thank you so much athrunsun
 
-import {auth0} from '../../../services/auth0';
 import {createProxyMiddleware} from 'http-proxy-middleware';
+import crypto from 'crypto';
 
 export const config = { api: { externalResolver: true, bodyParser: false } }
 
 export default async (req, res) => {
-  const session = await auth0.getSession(req, res)
+  let token = req.cookies.reauth_token
+
+  if (token) {
+    const decipher = crypto.createDecipheriv('aes-256-gcm',  process.env.COOKIE_SECRET, process.env.COOKIE_IV);
+    token = decipher.update(token, 'base64', 'utf8')
+  }
 
   const proxy = createProxyMiddleware({
     target: process.env.NEXT_PUBLIC_API_BASE_URL,
     changeOrigin: true,
-    pathRewrite: { ['^/api/proxy']: '' },
+    pathRewrite: { '^/api/proxy': '' },
     secure: process.env.NEXT_PUBLIC_NODE_ENV !== 'development',
     headers: {
-      Authorization: session ? `${session.token_type} ${session.accessToken}` : null
+      Authorization: token ? `Bearer ${token}` : null
     }
   })
 

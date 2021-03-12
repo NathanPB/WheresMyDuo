@@ -16,7 +16,7 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation("io.ktor:ktor-server-netty:1.4.1")
     implementation("io.ktor:ktor-serialization:1.4.1")
-    implementation("com.auth0:auth0:1.27.0")
+    implementation("com.auth0:java-jwt:3.14.0")
     implementation("com.github.NathanPB:BootingBits:1.0-SNAPSHOT")
     implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.1.2")
     implementation("org.slf4j:slf4j-simple:1.7.30")

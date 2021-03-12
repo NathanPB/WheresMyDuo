@@ -20,49 +20,36 @@
 package dev.nathanpb.wmd.server
 
 import com.apurebase.kgraphql.Context
-import com.auth0.exception.APIException
-import dev.nathanpb.wmd.controller.Auth0Controller
-import dev.nathanpb.wmd.data.Auth0UserResume
+import com.auth0.jwt.interfaces.DecodedJWT
+import dev.nathanpb.wmd.ADMIN_UID
+import dev.nathanpb.wmd.controller.ReauthController
 import dev.nathanpb.wmd.data.UserProfile
-import dev.nathanpb.wmd.utils.HttpException
 import dev.nathanpb.wmd.utils.exception
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
-import io.ktor.response.*
 
 private val AUTHORIZATION_HEADER_REGEX = "^(?i)Bearer (.*)(?-i)".toRegex()
 
-suspend fun ApplicationCall.authenticate(respondCall: Boolean = true) : Auth0UserResume? {
-    val token = request.header("Authorization")?.let {
+fun ApplicationCall.retrieveBearerToken(): String? {
+    return request.header("Authorization")?.let {
         val match = AUTHORIZATION_HEADER_REGEX.findAll(it).firstOrNull()?.groupValues
         if (match?.size == 2) match[1] else null
     }
+}
+
+fun ApplicationCall.authenticate(): DecodedJWT {
+    val token = retrieveBearerToken()
 
     if (token == null || token.isEmpty()) {
-        if (respondCall) {
-            response.status(HttpStatusCode.Unauthorized)
-        }
-        return null
+        throw HttpStatusCode.Unauthorized.exception()
     }
 
     try {
-        return Auth0Controller.exchangeToken(token)
-    } catch (e: HttpException) {
-        if (respondCall) {
-            respond(e.code, e.description)
-        }
-    } catch(e: APIException) {
-        if (respondCall) {
-            respond(HttpStatusCode.fromValue(e.statusCode), e.description)
-        }
+        return ReauthController.decodeToken(token)
     } catch (e: Exception) {
-        if (respondCall) {
-            respond(HttpStatusCode.InternalServerError, e.message.orEmpty())
-        }
+        throw HttpStatusCode.Forbidden.exception()
     }
-
-    return null
 }
 
 fun Context.userOrNull() = get<UserProfile>()
@@ -71,9 +58,9 @@ fun Context.userOrThrow(): UserProfile {
     return userOrNull() ?: throw HttpStatusCode.Unauthorized.exception()
 }
 
-suspend fun Context.checkIsAdmin() {
+fun Context.checkIsAdmin() {
     val user = userOrThrow()
-    if (!Auth0Controller.getUserPermissions(user.uid).contains("delete:users")) {
+    if (ADMIN_UID != user.uid) {
         throw HttpStatusCode.Forbidden.exception()
     }
 }

@@ -22,7 +22,6 @@ import React from "react";
 import {ApiProvider} from "../providers/ApiProvider";
 import {ApolloProvider} from "@apollo/client";
 import {createClient} from "../services/apollo"
-import {UserProvider} from '@auth0/nextjs-auth0';
 
 import 'primereact/resources/primereact.css';
 import 'primereact/resources/themes/mdc-dark-deeppurple/theme.css';
@@ -30,7 +29,6 @@ import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import '../primereact-hack.scss';
 import '../services/firebase';
-import '../services/auth0';
 import '../index.css'
 import '../waves.css'
 
@@ -41,9 +39,7 @@ export default function App({ Component, pageProps }) {
   return (
     <ApiProvider>
       <ApolloProvider client={apolloClient}>
-        <UserProvider>
-          <Component {...pageProps}/>
-        </UserProvider>
+        <Component {...pageProps}/>
       </ApolloProvider>
     </ApiProvider>
   )
