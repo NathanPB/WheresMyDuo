@@ -20,11 +20,12 @@
 import React from 'react';
 import * as Styles from './AppName.module.scss';
 
-export default function AppName({ style = {}, purpleStyle = {}, size = '2rem', dark }) {
+export default function AppName({ purpleStyle = {}, size = '2rem', dark, ...props }) {
   return (
     <span
-      style={{ fontSize: size, ...style }}
-      className={`${Styles.AppName} ${dark ? Styles.Dark : Styles.Light}`}
+      {...props}
+      style={{ fontSize: size, ...props.style }}
+      className={`${Styles.AppName} ${dark ? Styles.Dark : Styles.Light} ${props.className || ''}`}
     >
       WheresMy
       <span style={purpleStyle} className={Styles.Purple}>

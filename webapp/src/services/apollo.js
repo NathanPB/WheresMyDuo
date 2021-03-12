@@ -32,14 +32,11 @@ const cache = new InMemoryCache({
   }
 });
 
-export function createClient(apiKey) {
+export function createClient() {
   return new ApolloClient({
-    uri: `${process.env.NEXT_PUBLIC_API_BASE_URL}/graphql`,
+    uri: 'api/proxy/graphql',
     cache,
-    connectToDevTools: process.env.NODE_ENV === 'development',
+    connectToDevTools: process.env.NEXT_PUBLIC_NODE_ENV === 'development',
     queryDeduplication: true,
-    headers: {
-      Authorization: apiKey
-    }
   })
 }

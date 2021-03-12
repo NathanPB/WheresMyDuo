@@ -23,11 +23,13 @@ import com.api.igdb.request.IGDBWrapper
 import com.api.igdb.utils.Endpoints
 import com.apurebase.kgraphql.Context
 import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
+import dev.nathanpb.wmd.controller.UserController
 import dev.nathanpb.wmd.data.GamingProfile
 import dev.nathanpb.wmd.data.Tag
 import dev.nathanpb.wmd.data.UserProfile
 import dev.nathanpb.wmd.matcher.matchProfiles
 import dev.nathanpb.wmd.mongoDb
+import dev.nathanpb.wmd.server.userOrThrow
 import kotlinx.coroutines.runBlocking
 import org.litote.kmongo.`in`
 import org.litote.kmongo.and
@@ -41,7 +43,7 @@ fun SchemaBuilder.gamingProfiles() {
     type<GamingProfile> {
         property(GamingProfile::id) {}
         property<UserProfile?>("user") {
-            resolver { getUserProfile(it.user) }
+            resolver { UserController.getUserProfile(it.user) }
         }
 
         property(GamingProfile::game) {}
@@ -63,7 +65,7 @@ fun SchemaBuilder.gamingProfiles() {
 
     query("match") {
         resolver { profileId: String, ctx: Context ->
-            val user = ctx.get<UserProfile>() ?: error("Not Authenticated")
+            val user = ctx.userOrThrow()
             val profile = collection.findOne(and(GamingProfile::id eq profileId, GamingProfile::user eq user.uid)) ?: error("Not Found")
 
             matchProfiles(profile, 25)
@@ -72,7 +74,7 @@ fun SchemaBuilder.gamingProfiles() {
 
     mutation("createGamingProfile") {
         resolver { game: Int, ctx: Context ->
-            val user = ctx.get<UserProfile>() ?: error("Not Authenticated")
+            val user = ctx.userOrThrow()
 
             val validateGame by lazy {
                 GameResult.parseFrom(
@@ -107,7 +109,7 @@ fun SchemaBuilder.gamingProfiles() {
 
     mutation("updateGamingProfile") {
         resolver { id: String, tags: List<String>?, calendar: List<Int>?, ctx: Context ->
-            val user = ctx.get<UserProfile>() ?: error("Not Authenticated")
+            val user = ctx.userOrThrow()
             val profile = collection.findOneById(id) ?: error("Gaming Profile $id not found")
 
             if (profile.user != user.uid) {
@@ -142,7 +144,7 @@ fun SchemaBuilder.gamingProfiles() {
 
     mutation("deleteGamingProfile") {
         resolver { id: String, ctx: Context ->
-            val user = ctx.get<UserProfile>() ?: error("Not Authenticated")
+            val user = ctx.userOrThrow()
             val profile = collection.findOneById(id) ?: error("Gaming Profile $id not found")
 
             if (profile.user != user.uid) {

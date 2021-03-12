@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - Nathan P. Bombana
+ * Copyright (c) 2021 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
  *
@@ -17,19 +17,10 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.nathanpb.wmd.server.routes
+package dev.nathanpb.wmd.utils
 
-import dev.nathanpb.wmd.ADMIN_EMAILS
-import dev.nathanpb.wmd.server.authenticate
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.http.*
 
-fun Route.auth() {
-    get("isAdmin") {
-        val user = context.authenticate(respondCall = false)
+class HttpException(val code: HttpStatusCode, val description: String) : Exception("HTTP Exception $code $description")
 
-        context.respondText(
-            """{ "isAdmin": ${user?.email?.toLowerCase() in ADMIN_EMAILS} }"""
-        )
-    }
-}
+fun HttpStatusCode.exception() = HttpException(this, description)

@@ -18,11 +18,16 @@
  */
 
 import firebase from 'firebase/app';
-import 'firebase/auth'
 import 'firebase/analytics'
 
 try {
-  const config = require(`../firebase-config.json`)
-  firebase.initializeApp(config)
-  firebase.analytics()
+  if (typeof window !== 'undefined') {
+
+    const config = require(`../firebase-config.json`)
+    firebase.initializeApp(config)
+
+    firebase.analytics.isSupported()
+      .then(flag => flag ? firebase.analytics() : undefined)
+      .catch(console.error)
+  }
 } catch (e) {}

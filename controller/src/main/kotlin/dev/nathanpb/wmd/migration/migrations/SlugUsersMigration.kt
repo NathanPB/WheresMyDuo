@@ -20,12 +20,12 @@
 package dev.nathanpb.wmd.migration.migrations
 
 import com.mongodb.reactivestreams.client.ClientSession
+import dev.nathanpb.wmd.controller.UserController
 import dev.nathanpb.wmd.data.ContactVisibility
 import dev.nathanpb.wmd.data.UserProfile
 import dev.nathanpb.wmd.migration.DataLossPotential
 import dev.nathanpb.wmd.migration.Migration
 import dev.nathanpb.wmd.mongoDb
-import dev.nathanpb.wmd.server.graphql.getUserProfile
 import dev.nathanpb.wmd.utils.getSlugSuggestions
 import kotlinx.coroutines.reactive.awaitFirst
 import org.litote.kmongo.coroutine.toList
@@ -55,7 +55,7 @@ class SlugUsersMigration(
         }
 
         selectedUsers.forEach { user ->
-            val profile = getUserProfile(user.getString("_id"))
+            val profile = UserController.getUserProfile(user.getString("_id"))
             if (profile != null) {
                 val slug = profile.getSlugSuggestions(ContactVisibility.PUBLIC).first()
                 mongoDb.getCollection<UserProfile>().save(

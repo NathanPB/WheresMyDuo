@@ -20,13 +20,14 @@
 package dev.nathanpb.wmd.server
 
 import com.apurebase.kgraphql.GraphQL
+import dev.nathanpb.wmd.controller.UserController
 import dev.nathanpb.wmd.server.graphql.*
-import dev.nathanpb.wmd.server.routes.analytics
-import dev.nathanpb.wmd.server.routes.auth
 import dev.nathanpb.wmd.server.routes.igdbProxy
+import dev.nathanpb.wmd.utils.HttpException
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
+import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.serialization.*
 import io.ktor.server.engine.*
@@ -68,9 +69,18 @@ fun startServer() {
             useDefaultPrettyPrinter = true
 
             context { call ->
-                call.authenticate(requireAdmin = false)?.let {
-                    + runBlocking { getUserProfileOrCreate(it.uid) }
-                    + it
+                runBlocking {
+                    try {
+                        val jwt = call.authenticate()
+                        val jwtString = call.retrieveBearerToken()!!
+                        val uid = jwt.getClaim("uid").asString()
+
+                        + (UserController.getUserProfile(uid) ?: UserController.createUserProfile(jwtString))
+                    } catch (e: HttpException) {
+                        call.respond(e.code, e.description)
+                    } catch (e: Exception) {
+                        call.respond(HttpStatusCode.InternalServerError)
+                    }
                 }
             }
 
@@ -86,14 +96,6 @@ fun startServer() {
         routing {
             route("igdb/*") {
                 igdbProxy()
-            }
-
-            route("/auth") {
-                auth()
-            }
-
-            route("/analytics") {
-                analytics()
             }
         }
     }.start()

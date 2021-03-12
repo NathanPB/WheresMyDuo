@@ -1,0 +1,18 @@
+[
+  {
+    "id": "discord",
+    "clientId": "812852515669278751",
+    "clientSecret": "superman",
+    "scopes": ["identify", "email"],
+    "authorizeURL": "https://discord.com/api/oauth2/authorize",
+    "tokenURL": "https://discord.com/api/oauth2/token",
+    "userDataURL": "https://discord.com/api/v8/users/@me",
+    "linkageField": "email",
+    "idField": "id",
+    "dataAccessRules": {
+      "id": ["identity"],
+      "username": ["identity"],
+      "avatar": ["identity"]
+    }
+  }
+]

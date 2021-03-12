@@ -63,3 +63,8 @@
     color: inherit;
   }
 }
+
+// Fix outlined buttons a pixel bigger than the other buttons
+.p-button-outlined {
+  padding: calc(0.571rem - 1px) 0.75rem;
+}

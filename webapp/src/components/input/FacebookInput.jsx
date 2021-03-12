@@ -23,7 +23,7 @@ import DiscordStyles from "./DiscordInput.module.scss";
 import {InputText} from "primereact/inputtext"; // Stolen styles :P
 
 const IS_URL_SAFE = /^[.a-zA-Z0-9_-]*$/g
-const FB_URL = /(?:(?:http|https):\/\/)?(?:www.|m.)?facebook.com\/(?!home.php)(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\.-]+)/g
+const FB_URL = /(?:(?:http|https):\/\/)?(?:www.|m.)?facebook.com\/(?!home.php)(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w.-]+)/g
 
 export default function FacebookInput(props) {
   const { infoIcon } = props

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - Nathan P. Bombana
+ * Copyright (c) 2021 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
  *
@@ -17,12 +17,19 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.nathanpb.wmd.utils
+import React from "react";
 
-import org.bson.types.ObjectId
+export default function useLayout() {
+  const [layout, setLayout] = React.useState("mobile")
 
-fun parseObjectId(string: String) = try {
-    ObjectId(string)
-} catch (e: Exception) {
-    null
+  function callback() {
+    setLayout(window.document.body.clientWidth <= 480 ? "mobile" : "desktop")
+  }
+
+  React.useEffect(() => {
+    window.addEventListener('resize', callback)
+    callback()
+  }, [])
+
+  return layout
 }

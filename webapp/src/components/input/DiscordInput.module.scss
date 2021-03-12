@@ -42,10 +42,6 @@
   line-height: 11pt;
 }
 
-.DiscordInput:not(:focus) + .DiscordPlaceholder {
-  display: none;
-}
-
 .Info {
   position: absolute;
   display: flex;
