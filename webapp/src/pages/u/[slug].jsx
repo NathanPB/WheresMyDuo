@@ -29,13 +29,13 @@ import LoadingWrapper from "../../components/misc/LoadingWrapper";
 import {useRouter} from "next/router";
 import UserDashboard from "../../components/dashboards/UserDashboard";
 import Head from "next/head";
-import {auth} from "firebase";
 import LabeledComponent from "../../components/misc/LabeledComponent";
 import UserFollow from "../../components/misc/UserFollow";
 import BigAvatar from "../../components/misc/BigAvatar";
 import {FullFollowersList, FullFollowingList} from "../../components/screen/FullFollowList";
 import {Card} from "primereact/card";
 import ContactOutputForm from "../../components/forms/ContactOutputForm";
+import {serverUser} from "../../services/reauth";
 
 
 const QUERY = gql`
@@ -73,8 +73,7 @@ mutation Unfollow($uid: String!) {
   unfollow(uid: $uid) { uid }
 }`
 
-export default function UserProfileScreen() {
-  const currentUser = auth().currentUser
+export default function UserProfileScreen({ token }) {
 
   const router = useRouter()
   const { slug } = router.query
@@ -95,10 +94,10 @@ export default function UserProfileScreen() {
   }, [router])
 
   React.useEffect(() => {
-    if (data?.user?.uid && data?.user?.uid === currentUser?.uid) {
+    if (data?.user?.uid && data.user.uid === token?.uid) {
       router.push('../me')
     }
-  }, [currentUser?.uid, data?.user?.uid])
+  }, [data?.user?.uid])
 
   if (!loading && !data) {
     return null
@@ -186,4 +185,12 @@ export default function UserProfileScreen() {
       </div>
     </UserDashboard>
   )
+}
+
+export async function getServerSideProps({ req, res }) {
+  const token = await serverUser(req)
+
+  return {
+    token
+  }
 }

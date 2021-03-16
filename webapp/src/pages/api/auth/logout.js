@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - Nathan P. Bombana
+ * Copyright (c) 2021 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
  *
@@ -17,17 +17,10 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import create from '../services/api';
+import Cookies from 'cookies'
 
-export const ApiContext = React.createContext({ api: null })
-
-export function ApiProvider({ children }) {
-  const api = React.useMemo(() => create(undefined), []) // TODO
-
-  return (
-    <ApiContext.Provider value={api}>
-      { children }
-    </ApiContext.Provider>
-  );
+export default function logout(req, res) {
+  const cookies = new Cookies(req, res)
+  cookies.set('reauth_token')
+  res.redirect('/')
 }

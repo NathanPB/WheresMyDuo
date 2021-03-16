@@ -1,5 +1,5 @@
-/*!
- * Copyright (c) 2020 - Nathan P. Bombana
+/*
+ * Copyright (c) 2021 - Nathan P. Bombana
  *
  * This file is part of Wheres My Duo.
  *
@@ -17,46 +17,27 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-.LoginScreen {
-  height: 100%;
+import Axios from 'axios';
+import crypto from "crypto";
+import JWT from 'jsonwebtoken';
 
-  @media (max-width: 480px) {
-    margin-top: 2rem;
+export const Reauth = Axios.create({ baseURL: process.env.REAUTH_BASE_URL })
+
+export const publicKey = Reauth.get('public_key.pub').data;
+
+export async function serverUser(req) {
+  let token = req.cookies.reauth_token
+
+  if (token) {
+    const decipher = crypto.createDecipheriv('aes-256-gcm',  process.env.COOKIE_SECRET, process.env.COOKIE_IV);
+    token = decipher.update(token, 'base64', 'utf8')
+  } else {
+    return null
   }
-}
 
-.LoginCard {
-
-  text-align: center;
-
-  @media (min-width: 481px) {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-    width: 350px;
-    height: 90vh;
-
-    background: var(--surface-a);
-    border-radius: 8px;
-    padding: 1em;
-
-    -webkit-box-shadow: 10px 10px 10px -6px rgba(68,4,115,1);
-    -moz-box-shadow: 10px 10px 10px -6px rgba(68,4,115,1);
-    box-shadow: 10px 10px 10px -6px rgba(68,4,115,1);
-  }
-}
-
-.Subtitle {
-  font-size: 1.25rem;
-}
-
-.LoginText {
-  cursor: pointer;
-  margin-top: 64px;
-
-  & > span {
-    font-size: 1.25rem;
+  try {
+    return JWT.verify(token, await publicKey, { issuer: 'wheresmyduo', subject: 'access_token' })
+  } catch (e) {
+    return null
   }
 }
