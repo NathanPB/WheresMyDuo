@@ -19,10 +19,12 @@
 
 import React from 'react';
 import Styles from './BigAvatar.module.scss';
-import {Tooltip} from "primereact/tooltip";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faHeart as faHeartSolid} from "@fortawesome/free-solid-svg-icons";
 import {faHeart} from "@fortawesome/free-regular-svg-icons";
+import dynamic from "next/dynamic"
+
+const Tooltip = dynamic(import('primereact/tooltip').then(it => it.Tooltip), { ssr: false })
 
 export default function BigAvatar({ photoURL, nickname, onFollowClick, isSelf, isFollowing }) {
 
