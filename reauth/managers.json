@@ -1,0 +1,7 @@
+[
+  {
+    "id": "wheresmyduo",
+    "displayName": "Wheres My Duo",
+    "token": "${REAUTH_MANAGER_TOKEN}"
+  }
+]

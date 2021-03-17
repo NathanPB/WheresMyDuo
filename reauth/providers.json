@@ -2,8 +2,8 @@
   {
     "id": "discord",
     "clientId": "812852515669278751",
-    "clientSecret": "superman",
-    "scopes": ["identify", "email"],
+    "clientSecret": "${DISCORD_SECRET}",
+    "scope": "identify email",
     "authorizeURL": "https://discord.com/api/oauth2/authorize",
     "tokenURL": "https://discord.com/api/oauth2/token",
     "userDataURL": "https://discord.com/api/v8/users/@me",

@@ -30,7 +30,7 @@ export default async (req, res) => {
       client_id: process.env.REAUTH_CLIENT_ID,
       client_secret: process.env.REAUTH_CLIENT_SECRET,
       grant_type: 'authorization_code',
-      redirect_uri: `${req.hostname}/api/auth/callback`
+      redirect_uri: `${req.connection?.encrypted ? 'https' : 'http'}://${req.headers.host}/api/auth/callback`
     })).data
 
     const cookies = new Cookies(req, res)
