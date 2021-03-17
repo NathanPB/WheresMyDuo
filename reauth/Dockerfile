@@ -1,4 +1,4 @@
-FROM nathanpb/reauth:0.4.2
+FROM nathanpb/reauth:0.4.4
 
 WORKDIR /app
 ADD providers.json .

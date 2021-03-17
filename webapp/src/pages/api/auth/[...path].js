@@ -17,13 +17,21 @@
  * along with Wheres My Duo.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-module.exports = {
-  async rewrites() {
-    return [
-      {
-        source: '/api/auth/:path*',
-        destination: `${process.env.REAUTH_BASE_URL}/:path*`
-      }
-    ]
-  }
+
+import {createProxyMiddleware} from 'http-proxy-middleware';
+
+export const config = { api: { externalResolver: true, bodyParser: false } }
+
+export default async (req, res) => {
+  const proxy = createProxyMiddleware({
+    target: process.env.NEXT_PUBLIC_REAUTH_BASE_URL,
+    changeOrigin: true,
+    pathRewrite: { '^/api/auth': '' },
+    secure: process.env.NEXT_PUBLIC_NODE_ENV !== 'development',
+    headers: {
+      'Reauth-Origin': `${process.env.NEXT_PUBLIC_APP_BASE_URL}/api/auth`,
+    }
+  })
+
+  await proxy(req, res, () => { /* the middleware expects a "next" function, which is that */ })
 }

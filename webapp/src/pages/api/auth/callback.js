@@ -20,16 +20,15 @@
 import Axios from "axios";
 import Cookies from 'cookies';
 import crypto from 'crypto';
-import absUrl from 'next-absolute-url';
 
 export default async (req, res) => {
   if (req.query.code) {
-    const data = (await Axios.post(`${absUrl(req).origin}/api/auth/oauth/token`, {
+    const data = (await Axios.post(`${process.env.NEXT_PUBLIC_APP_BASE_URL}/api/auth/oauth/token`, {
       code: req.query.code,
-      client_id: process.env.REAUTH_CLIENT_ID,
+      client_id: process.env.NEXT_PUBLIC_REAUTH_CLIENT_ID,
       client_secret: process.env.REAUTH_CLIENT_SECRET,
       grant_type: 'authorization_code',
-      redirect_uri: `${req.connection?.encrypted ? 'https' : 'http'}://${req.headers.host}/api/auth/callback`
+      redirect_uri: `${process.env.NEXT_PUBLIC_APP_BASE_URL}/api/auth/callback`
     })).data
 
     const cookies = new Cookies(req, res)
