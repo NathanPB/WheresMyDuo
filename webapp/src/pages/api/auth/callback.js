@@ -20,12 +20,11 @@
 import Axios from "axios";
 import Cookies from 'cookies';
 import crypto from 'crypto';
-
-const Reauth = Axios.create({ baseURL: process.env.REAUTH_BASE_URL })
+import absUrl from 'next-absolute-url';
 
 export default async (req, res) => {
   if (req.query.code) {
-    const data = (await Reauth.post('/oauth/token', {
+    const data = (await Axios.post(`${absUrl(req).origin}/api/auth/oauth/token`, {
       code: req.query.code,
       client_id: process.env.REAUTH_CLIENT_ID,
       client_secret: process.env.REAUTH_CLIENT_SECRET,
