@@ -24,6 +24,7 @@ import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.coroutines.awaitString
 import dev.nathanpb.wmd.controller.igdbToken
 import dev.nathanpb.wmd.server.authenticate
+import dev.nathanpb.wmd.server.retrieveBearerToken
 import dev.nathanpb.wmd.twitchClientId
 import io.ktor.application.*
 import io.ktor.http.*
@@ -52,7 +53,13 @@ private suspend fun proxyToIgdb(path: String, body: String, tryCount: Int = 0): 
 
 fun Route.igdbProxy() {
     post {
-        context.authenticate() ?: return@post
+        val jwtToken = context.retrieveBearerToken() ?: return@post context.respond(HttpStatusCode.Unauthorized)
+
+        try {
+            authenticate(jwtToken)
+        } catch (e: Exception) {
+            return@post context.respond(HttpStatusCode.Unauthorized)
+        }
 
         try {
             context.respondText(

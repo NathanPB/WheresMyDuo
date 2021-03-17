@@ -38,10 +38,8 @@ fun ApplicationCall.retrieveBearerToken(): String? {
     }
 }
 
-fun ApplicationCall.authenticate(): DecodedJWT {
-    val token = retrieveBearerToken()
-
-    if (token == null || token.isEmpty()) {
+fun authenticate(token: String): DecodedJWT {
+    if (token.isBlank()) {
         throw HttpStatusCode.Unauthorized.exception()
     }
 
@@ -54,13 +52,23 @@ fun ApplicationCall.authenticate(): DecodedJWT {
 
 fun Context.userOrNull() = get<UserProfile>()
 
-fun Context.userOrThrow(): UserProfile {
-    return userOrNull() ?: throw HttpStatusCode.Unauthorized.exception()
+fun Context.requireAuthentication(): Exception? {
+    if (userOrNull() == null) {
+        return HttpStatusCode.Unauthorized.exception()
+    }
+
+    return null
 }
 
-fun Context.checkIsAdmin() {
-    val user = userOrThrow()
-    if (ADMIN_UID != user.uid) {
-        throw HttpStatusCode.Forbidden.exception()
+fun Context.requireAdminAuthentication(): Exception? {
+    val user = userOrNull() ?: return HttpStatusCode.Unauthorized.exception()
+    if (user.uid != ADMIN_UID) {
+        return HttpStatusCode.Forbidden.exception()
     }
+
+    return null
+}
+
+fun Context.userOrThrow(): UserProfile {
+    return userOrNull() ?: throw HttpStatusCode.Unauthorized.exception()
 }

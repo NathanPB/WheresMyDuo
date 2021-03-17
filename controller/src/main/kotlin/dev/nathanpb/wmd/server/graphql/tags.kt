@@ -24,7 +24,7 @@ import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
 import dev.nathanpb.wmd.data.GamingProfile
 import dev.nathanpb.wmd.data.Tag
 import dev.nathanpb.wmd.mongoDb
-import dev.nathanpb.wmd.server.checkIsAdmin
+import dev.nathanpb.wmd.server.requireAdminAuthentication
 import org.litote.kmongo.*
 
 fun SchemaBuilder.tags() {
@@ -66,8 +66,8 @@ fun SchemaBuilder.tags() {
     }
 
     mutation("createTag") {
+        accessRule(Context::requireAdminAuthentication)
         resolver { displayName: String, description: String?, ctx: Context ->
-            ctx.checkIsAdmin()
 
             return@resolver Tag(displayName = displayName, description = description).also {
                 collection.save(it)
@@ -76,8 +76,8 @@ fun SchemaBuilder.tags() {
     }
 
     mutation("updateTag") {
+        accessRule(Context::requireAdminAuthentication)
         resolver { id: String, displayName: String, description: String?, ctx: Context ->
-            ctx.checkIsAdmin()
 
             val tag = collection.findOneById(id) ?: error("Not Found")
 
@@ -88,8 +88,8 @@ fun SchemaBuilder.tags() {
     }
 
     mutation("deleteTag") {
+        accessRule(Context::requireAdminAuthentication)
         resolver { id: String, force: Boolean, ctx: Context ->
-            ctx.checkIsAdmin()
 
             if (!force) {
                 val count = mongoDb.getCollection<GamingProfile>().countDocuments(GamingProfile::tags contains id)

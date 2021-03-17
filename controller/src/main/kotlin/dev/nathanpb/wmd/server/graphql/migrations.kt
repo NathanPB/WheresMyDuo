@@ -25,7 +25,7 @@ import dev.nathanpb.wmd.migration.DataLossPotential
 import dev.nathanpb.wmd.migration.Migration
 import dev.nathanpb.wmd.migration.MigrationController
 import dev.nathanpb.wmd.migration.MigrationResult
-import dev.nathanpb.wmd.server.checkIsAdmin
+import dev.nathanpb.wmd.server.requireAdminAuthentication
 
 fun SchemaBuilder.migrations() {
     type<Migration>()
@@ -38,8 +38,8 @@ fun SchemaBuilder.migrations() {
     enum<DataLossPotential>()
 
     query("migrations") {
-        resolver { query: String?, ctx: Context ->
-            ctx.checkIsAdmin()
+        accessRule(Context::requireAdminAuthentication)
+        resolver { query: String?  ->
             MigrationController.migrations.filter {
                 if (query != null) {
                     ".*${query}.*".toRegex(RegexOption.IGNORE_CASE).matches(it.name)
@@ -49,8 +49,8 @@ fun SchemaBuilder.migrations() {
     }
 
     query("migration") {
-        resolver { id: String, ctx: Context ->
-            ctx.checkIsAdmin()
+        accessRule(Context::requireAdminAuthentication)
+        resolver { id: String ->
             MigrationController.migrations.firstOrNull {
                 it.id === id
             }
@@ -58,16 +58,16 @@ fun SchemaBuilder.migrations() {
     }
 
     mutation("runMigration") {
-        resolver { id: String, ctx: Context ->
-            ctx.checkIsAdmin()
+        accessRule(Context::requireAdminAuthentication)
+        resolver { id: String ->
             val migration = MigrationController.migrations.firstOrNull { it.id == id } ?: error("Not Found")
             MigrationController.run(migration)
         }
     }
 
     mutation("rollbackMigration") {
-        resolver { id: String, ctx: Context ->
-            ctx.checkIsAdmin()
+        accessRule(Context::requireAdminAuthentication)
+        resolver { id: String ->
             val migration = MigrationController.migrations.firstOrNull { it.id == id } ?: error("Not Found")
             MigrationController.rollback(migration)
         }

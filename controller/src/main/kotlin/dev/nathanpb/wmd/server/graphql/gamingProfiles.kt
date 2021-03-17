@@ -29,6 +29,7 @@ import dev.nathanpb.wmd.data.Tag
 import dev.nathanpb.wmd.data.UserProfile
 import dev.nathanpb.wmd.matcher.matchProfiles
 import dev.nathanpb.wmd.mongoDb
+import dev.nathanpb.wmd.server.requireAuthentication
 import dev.nathanpb.wmd.server.userOrThrow
 import kotlinx.coroutines.runBlocking
 import org.litote.kmongo.`in`
@@ -64,6 +65,7 @@ fun SchemaBuilder.gamingProfiles() {
     }
 
     query("match") {
+        accessRule(Context::requireAuthentication)
         resolver { profileId: String, ctx: Context ->
             val user = ctx.userOrThrow()
             val profile = collection.findOne(and(GamingProfile::id eq profileId, GamingProfile::user eq user.uid)) ?: error("Not Found")
@@ -73,6 +75,7 @@ fun SchemaBuilder.gamingProfiles() {
     }
 
     mutation("createGamingProfile") {
+        accessRule(Context::requireAuthentication)
         resolver { game: Int, ctx: Context ->
             val user = ctx.userOrThrow()
 
@@ -108,6 +111,7 @@ fun SchemaBuilder.gamingProfiles() {
     }
 
     mutation("updateGamingProfile") {
+        accessRule(Context::requireAuthentication)
         resolver { id: String, tags: List<String>?, calendar: List<Int>?, ctx: Context ->
             val user = ctx.userOrThrow()
             val profile = collection.findOneById(id) ?: error("Gaming Profile $id not found")
@@ -143,6 +147,7 @@ fun SchemaBuilder.gamingProfiles() {
     }
 
     mutation("deleteGamingProfile") {
+        accessRule(Context::requireAuthentication)
         resolver { id: String, ctx: Context ->
             val user = ctx.userOrThrow()
             val profile = collection.findOneById(id) ?: error("Gaming Profile $id not found")

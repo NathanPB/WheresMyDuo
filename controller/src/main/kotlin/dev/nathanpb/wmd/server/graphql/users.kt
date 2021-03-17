@@ -25,6 +25,7 @@ import dev.nathanpb.wmd.controller.UserController
 import dev.nathanpb.wmd.data.*
 import dev.nathanpb.wmd.data.input.UserProfileInput
 import dev.nathanpb.wmd.mongoDb
+import dev.nathanpb.wmd.server.requireAuthentication
 import dev.nathanpb.wmd.server.userOrNull
 import dev.nathanpb.wmd.server.userOrThrow
 import dev.nathanpb.wmd.utils.getSlugSuggestions
@@ -52,7 +53,7 @@ fun SchemaBuilder.users() {
                     //   with reflection
                     val field = Context::class.java.getDeclaredField("map")
                     val map = field.also { it.isAccessible = true }.get(ctx) as LinkedHashMap<Any, Any>
-                    val requester = ctx.userOrThrow()
+                    val requester = ctx.userOrNull()
                     val requested = map["requested"] as UserProfile
                     val contactField = prop.call(contact)
 
@@ -88,12 +89,11 @@ fun SchemaBuilder.users() {
         }
 
         property<List<Post>>("posts") {
-            resolver { profile: UserProfile, offset: Int, limit: Int, ctx: Context ->
+            accessRule { _, ctx -> ctx.requireAuthentication() }
+            resolver { profile: UserProfile, offset: Int, limit: Int ->
                 if (limit > 20) {
                     error("Retrieving more than 20 posts is not allowed")
                 }
-
-                ctx.userOrThrow()
 
                 postsCollection.aggregate<Post>(
                     match(Post::author eq profile.uid),
@@ -106,6 +106,7 @@ fun SchemaBuilder.users() {
         }
 
         property<List<String>>("slugSuggestions") {
+            accessRule { _, ctx -> ctx.requireAuthentication() }
             resolver { userProfile, ctx: Context ->
                 val requester = ctx.userOrThrow()
                 val privacy = ContactVisibility.values().first {
@@ -179,12 +180,14 @@ fun SchemaBuilder.users() {
         }
 
         property<Boolean>("doesFollowMe") {
+            accessRule { _, ctx -> ctx.requireAuthentication() }
             resolver { it, ctx: Context ->
                 ctx.userOrThrow().uid in it.following
             }
         }
 
         property<Boolean>("isFollowedByMe") {
+            accessRule { _, ctx -> ctx.requireAuthentication() }
             resolver { it, ctx: Context ->
                 it.uid in ctx.userOrThrow().following
             }
@@ -192,6 +195,7 @@ fun SchemaBuilder.users() {
     }
 
     query("me") {
+        accessRule(Context::requireAuthentication)
         resolver { ctx: Context -> ctx.userOrThrow()}
     }
 
@@ -228,6 +232,7 @@ fun SchemaBuilder.users() {
     }
 
     mutation("follow") {
+        accessRule(Context::requireAuthentication)
         resolver { uid: String, ctx: Context ->
             val user = ctx.userOrThrow()
             UserController.getUserProfile(uid) ?: error("$uid does not exists")
@@ -242,6 +247,7 @@ fun SchemaBuilder.users() {
     }
 
     mutation("unfollow") {
+        accessRule(Context::requireAuthentication)
         resolver { uid: String, ctx: Context ->
             val user = ctx.userOrThrow()
             UserController.getUserProfile(uid) ?: error("$uid does not exists")
@@ -253,6 +259,7 @@ fun SchemaBuilder.users() {
     }
 
     mutation("setProfileInfo") {
+        accessRule(Context::requireAuthentication)
         resolver { profile: UserProfileInput, ctx: Context ->
             val requester = ctx.userOrThrow()
             val (slug, nickname) = profile
@@ -275,6 +282,7 @@ fun SchemaBuilder.users() {
     }
 
     mutation("setContact") {
+        accessRule(Context::requireAuthentication)
         resolver { contact: UserContact, ctx: Context ->
             val user = ctx.userOrThrow()
             contact.validate()

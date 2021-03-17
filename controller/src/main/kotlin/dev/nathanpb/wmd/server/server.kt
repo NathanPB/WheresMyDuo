@@ -65,21 +65,29 @@ fun startServer() {
             anyHost()
         }
 
+        install(StatusPages) {
+            exception<HttpException> {
+                call.respond(it.code, it.description)
+            }
+
+            exception<Throwable> {
+                it.printStackTrace()
+                call.respond(HttpStatusCode.InternalServerError)
+            }
+        }
+
         install(GraphQL) {
             useDefaultPrettyPrinter = true
 
             context { call ->
                 runBlocking {
-                    try {
-                        val jwt = call.authenticate()
-                        val jwtString = call.retrieveBearerToken()!!
-                        val uid = jwt.getClaim("uid").asString()
+                    runCatching {
+                        call.retrieveBearerToken()?.let { jwtString ->
+                            val jwt = authenticate(jwtString)
+                            val uid = jwt.getClaim("uid").asString()
 
-                        + (UserController.getUserProfile(uid) ?: UserController.createUserProfile(jwtString))
-                    } catch (e: HttpException) {
-                        call.respond(e.code, e.description)
-                    } catch (e: Exception) {
-                        call.respond(HttpStatusCode.InternalServerError)
+                            + (UserController.getUserProfile(uid) ?: UserController.createUserProfile(jwtString))
+                        }
                     }
                 }
             }

@@ -21,6 +21,6 @@ package dev.nathanpb.wmd.utils
 
 import io.ktor.http.*
 
-class HttpException(val code: HttpStatusCode, val description: String) : Exception("HTTP Exception $code $description")
+class HttpException(val code: HttpStatusCode, val description: String) : Exception("HTTP Exception ${code.value} $description")
 
 fun HttpStatusCode.exception() = HttpException(this, description)

@@ -27,6 +27,7 @@ import dev.nathanpb.wmd.data.PostEditHistory
 import dev.nathanpb.wmd.data.PostReply
 import dev.nathanpb.wmd.data.UserProfile
 import dev.nathanpb.wmd.mongoDb
+import dev.nathanpb.wmd.server.requireAuthentication
 import dev.nathanpb.wmd.server.userOrThrow
 import org.litote.kmongo.*
 
@@ -102,6 +103,7 @@ fun SchemaBuilder.posts() {
     }
 
     mutation("post") {
+        accessRule(Context::requireAuthentication)
         resolver { content: String, ctx: Context ->
             if (content.isEmpty()) {
                 error("Text cannot be empty")
@@ -116,6 +118,7 @@ fun SchemaBuilder.posts() {
     }
 
     mutation("reply") {
+        accessRule(Context::requireAuthentication)
         resolver { content: String, postId: String, ctx: Context ->
             if (content.isEmpty()) {
                 error("Content is empty")
@@ -133,6 +136,7 @@ fun SchemaBuilder.posts() {
     }
 
     mutation("editPost") {
+        accessRule(Context::requireAuthentication)
         resolver { content: String, postId: String, ctx: Context ->
             val requester = ctx.userOrThrow()
             val post = posts.findOne(Post::id eq postId) ?: error("Post Not Found")
@@ -155,6 +159,7 @@ fun SchemaBuilder.posts() {
     }
 
     mutation("editReply") {
+        accessRule(Context::requireAuthentication)
         resolver { content: String,  replyId: String, ctx: Context ->
             val requester = ctx.userOrThrow()
             val reply = replies.findOne(PostReply::id eq  replyId) ?: error("Reply Not Found")
@@ -185,6 +190,7 @@ fun SchemaBuilder.posts() {
     }
 
     query("feed") {
+        accessRule(Context::requireAuthentication)
         resolver { offset: Int, ctx: Context ->
             val requester = ctx.userOrThrow()
             posts.aggregate<Post>(
