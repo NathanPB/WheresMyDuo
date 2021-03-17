@@ -29,6 +29,9 @@ dependencies {
     implementation("org.reflections:reflections:0.9.12")
     implementation("com.google.protobuf:protobuf-java:3.11.0")
     implementation("com.github.ben-manes.caffeine:caffeine:2.9.0")
+
+    implementation("io.projectreactor:reactor-core:3.4.4")
+    implementation("commons-codec:commons-codec:1.15")
 }
 
 tasks.withType<Jar> {
