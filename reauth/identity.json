@@ -1,4 +1,4 @@
 {
-  "nickname": "discord.username",
-  "avatar": "`https://cdn.discordapp.com/avatars/${discord.id}/${discord.avatar}.webp`"
+  "nickname": "discord.username || twitch.display_name",
+  "avatar": "`(discord.id && discord.avatar) ? https://cdn.discordapp.com/avatars/${discord.id}/${discord.avatar}.webp` : twitch.profile_image_url"
 }

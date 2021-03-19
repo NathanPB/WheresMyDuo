@@ -27,15 +27,18 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {Button} from "primereact/button";
 import {faGithub} from "@fortawesome/free-brands-svg-icons";
 import useLayout from "../../hooks/useLayout";
+import Link from 'next/link';
 
 export default function PublicLandingLayout({ children }) {
 
   const layout = useLayout()
 
   const menuEnd = <nav>
-    <a href={`api/auth/oauth/authorize/discord?client_id=${process.env.NEXT_PUBLIC_REAUTH_CLIENT_ID}&response_type=code&scope=identity&redirect_uri=${process.env.NEXT_PUBLIC_APP_BASE_URL}/api/auth/callback`}>
-      <Button className={layout === "mobile" ? "p-button-rounded" : undefined} label="Join"/>
-    </a>
+    <Link href="/login">
+      <a>
+        <Button className={layout === "mobile" ? "p-button-rounded" : undefined} label="Join"/>
+      </a>
+    </Link>
 
     { /* Having to do these buttons by hand due primereact poorly supporting foreign icons */ }
     { /* TODO open an issue about that on primereact repo */ }
