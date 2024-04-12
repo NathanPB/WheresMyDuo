@@ -1,3 +1,5 @@
+> **DISCLAIMER:** This project is no longer active, it was a good learning experience but I have focused my carrer through a different path now. You can check my other relevant projects in [my profile](https://github.com/NathanPB).
+
 # What is WheresMyDuo
 
 The WheresMyDuo project is a in development social network designed to help gamers meet people for playing around and making friends. 
